@@ -23,4 +23,6 @@ organic={
 'answer':'''<p>第 8 题评判分共 21 分。A–F 的结构各 2 分；G、H、I 的结构各 3 分。</p><div class="answer-grid">'''+''.join(f'<figure class="compound"><figcaption><b>{c.upper()}</b><span>{2 if c in "abcdef" else 3} 分</span></figcaption><img src="assets/answer-{c}.svg" alt="化合物 {c.upper()} 的原参考答案结构" width="240" height="170"></figure>' for c in 'abcdefghi')+'''</div>'''
 }
 
-if __name__=='__main__':write([organic,electro])
+if __name__=='__main__':
+    import subprocess,sys
+    subprocess.run([sys.executable,str(ROOT/'scripts'/'import_paper1.py')],check=True)

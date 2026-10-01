@@ -7,11 +7,12 @@ from html import escape
 import base64
 from pypdf import PdfReader
 import pdfplumber
+from paper1_manifest import Q_SOURCE, A_SOURCE
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'dist' / 'assets'
-Q = Path('C:/Users/Prettibruce/Downloads/第39届Chemy化学奥林匹克竞赛模拟试题题目合集.pdf')
-A = Path('C:/Users/Prettibruce/Downloads/第39届Chemy化学奥林匹克竞赛模拟试题参考答案合集.pdf')
+Q = Q_SOURCE
+A = A_SOURCE
 
 def inside(obj, box):
     x0, y0, x1, y1 = box
@@ -54,7 +55,7 @@ def svg(page, box, name, label, original_images=None):
 
 OUT.mkdir(parents=True,exist_ok=True)
 with pdfplumber.open(Q) as p:
-    svg(p.pages[6],(92,575,503,698),'organic-route.svg','二环化合物合成：由起始氨基醇经 A 至 F 得到二环产物')
+    svg(p.pages[6],(91,575,505,698),'organic-route.svg','二环化合物合成：由起始氨基醇经 A 至 F 得到二环产物')
     svg(p.pages[7],(94,120,490,168),'organic-g.svg','反应 G：酸促进的环化反应')
     svg(p.pages[7],(96,179,490,243),'organic-h.svg','反应 H：BPA 催化的环化反应')
     svg(p.pages[7],(96,252,490,334),'organic-i.svg','反应 I：TFAA 和 TFA 促进的环化反应')

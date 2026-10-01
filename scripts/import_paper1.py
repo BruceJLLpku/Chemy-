@@ -14,7 +14,7 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import ContentStream, NameObject
 import pdfplumber
 from PIL import Image
-from paper1_manifest import ROOT, Q_SOURCE, A_SOURCE, PAPER, FIGURES
+from paper1_manifest import ROOT, Q_SOURCE, A_SOURCE, PAPER, FIGURES, SLUGS
 from write_questions import organic, electro
 
 TMP = ROOT / 'tmp' / 'paper1'
@@ -84,9 +84,9 @@ def line_html(chars):
         text = c['text'].replace('\uf044','Δ')
         tag = ''
         if c['size'] < 9.5:
-            if c['bottom'] < baseline-2:
+            if c['bottom'] < baseline-1.3:
                 tag = 'sup'
-            elif c['bottom'] > baseline+1.7:
+            else:
                 tag = 'sub'
         if tag != current_tag:
             if current_tag: pieces.append(f'</{current_tag}>')
@@ -125,11 +125,19 @@ def section(kind, ranges):
     parts = []
     for n,y0,y1 in ranges:
         chars = [c for c in CACHE[kind][str(n)]
-                 if y0 <= c['top'] < y1 and 86 <= c['x0'] < 512 and c['text'].strip()]
+                 if y0-1.1 <= c['top'] < y1 and 86 <= c['x0'] < 512 and c['text'].strip()]
         figures = [f for f in FIGURES if f[0]==kind and f[1]==n and y0<=f[3]<y1]
         text_chars = [c for c in chars if not any(in_box(c,f[2:6]) for f in figures)]
+        # Preserve explicit source spaces, including narrow spaces in justified
+        # lines; guessing solely from geometric gaps can join “0.400 mol SF4”.
+        anchors=[c for c in text_chars if c['size']>=9.8]
+        spaces=[c for c in CACHE[kind][str(n)] if c['text']==' '
+                and y0-1.1<=c['top']<y1 and 86<=c['x0']<512
+                and not any(in_box(c,f[2:6]) for f in figures)
+                and any(abs((c['top']+c['bottom']-a['top']-a['bottom'])/2)<2.3
+                        for a in anchors)]
         try:
-            rows = native_blocks(text_chars) if text_chars else []
+            rows = native_blocks(text_chars+spaces) if text_chars else []
         except ValueError as e:
             raise ValueError(f'{kind} original page {n}, range {y0}-{y1}: {e}') from e
         events = [(top,'text',html,x) for top,html,x in rows]
@@ -152,6 +160,13 @@ def section(kind, ranges):
             new_para = bool(re.match(r'^(?:<strong>|第\s*\d|\(?\d\)|\d[）)]|关于)',html))
             if pending and (new_para or x>95 or (last_top is not None and top-last_top>19)):
                 flush()
+            # Keep separated source lines from accidentally joining Latin
+            # words/formulae (e.g. the final formula D and the next label E).
+            if pending:
+                tail=re.sub('<[^>]+>','',pending[-1]).rstrip()
+                head=re.sub('<[^>]+>','',html).lstrip()
+                if tail and head and tail[-1].isascii() and head[0].isascii():
+                    pending.append(' ')
             pending.append(html)
             last_top=top
         flush()
@@ -174,7 +189,8 @@ if __name__ == '__main__':
             'answer':section('a',spec['answer'])}
         item.update({k:spec[k] for k in ('number','title','topic','points','percent')})
         item['paper']=1
-        item['pdfReady']=False
+        item['pdfReady']=all((ROOT/'dist'/'downloads'/f'{SLUGS[spec["topic"]]}-{kind}.pdf').exists()
+                            for kind in ('questions','answers'))
         def pages(ranges):
             ns=sorted({r[0] for r in ranges})
             return str(ns[0]) if len(ns)==1 else f'{ns[0]}–{ns[-1]}'
