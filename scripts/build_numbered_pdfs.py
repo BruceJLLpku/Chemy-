@@ -17,6 +17,7 @@ from build_library_pdfs import ROOT,CACHE,DATA,SLUGS,W,H,bands,part_path,render_
 from paper1_manifest import PAPER,FIGURES
 from library_config import EDITION
 from fast_pdf import page_count,stamp_template,merge_parts
+from source_info import source_name,question_source,score_text,set_source_color
 
 pdfmetrics.registerFont(TTFont('LabelRegular','C:/Windows/Fonts/times.ttf'))
 pdfmetrics.registerFont(TTFont('LabelBold','C:/Windows/Fonts/timesbd.ttf'))
@@ -41,7 +42,7 @@ def specs_for(paper):
 def frame(topic,k,paper,index):
     buf=BytesIO();c=canvas.Canvas(buf,pagesize=(W,H));c.setFont('SourceSong',14)
     c.drawString(62,H-48,f'Chemy 化学竞赛专题题库 · {topic} · '+('题目册' if k=='q' else '答案册'))
-    c.setFont('SourceSong',9);c.drawString(62,H-66,f'第{EDITION}届模拟试题{paper} · 专题连续编号')
+    c.setFont('SourceSong',9);c.drawString(62,H-66,source_name(EDITION,paper,compact=True)+' · 专题连续编号')
     c.setLineWidth(.4);c.setStrokeColorRGB(.55,.6,.57);c.line(62,H-77,W-62,H-77)
     c.setFillColorRGB(.3,.3,.3);c.setFont('SourceSong',7.5)
     c.drawString(62,35,'版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流，禁止商业用途。');c.drawRightString(W-62,35,str(index))
@@ -53,15 +54,15 @@ def frame(topic,k,paper,index):
 def draw_heading(c,q,cursor):
     n=NUMBERS[q['id']];title=reformat_title(q.get('titleHtml') or escape(q['title']))
     percent='' if q.get('percent') is None else f'，占 {q["percent"]}%'
-    p=Paragraph(f'第 {n} 题　{title}（{q["points"]} 分{percent}）',TITLE_STYLE);_,height=p.wrap(W-124,100)
+    p=Paragraph(f'第 {n} 题　{title}{score_text(q)}',TITLE_STYLE);_,height=p.wrap(W-124,100)
     p.drawOn(c,62,cursor-height)
     c.setFont('SourceSong',8.5);c.setFillColorRGB(.35,.4,.37)
-    c.drawString(62,cursor-height-13,f'来源：第{EDITION}届 · 模拟试题{q["paper"]} · 原第{q["number"]}题')
+    c.drawString(62,cursor-height-13,question_source(q))
     return height+25
 
 def heading_height(q):
     title=reformat_title(q.get('titleHtml') or escape(q['title']));percent='' if q.get('percent') is None else f'，占 {q["percent"]}%'
-    p=Paragraph(f'第 {NUMBERS[q["id"]]} 题　{title}（{q["points"]} 分{percent}）',TITLE_STYLE)
+    p=Paragraph(f'第 {NUMBERS[q["id"]]} 题　{title}{score_text(q)}',TITLE_STYLE)
     return p.wrap(W-124,100)[1]+25
 
 def heading(q,cursor):
@@ -91,7 +92,7 @@ def create(paper,topic,k,specs):
     owned={page:[p for p in ps if p['id'] in ids] for page,ps in LABELS.items() if any(p['id'] in ids for p in ps)}
     static={page:[{key:p[key] for key in ['id','old','box','font','size','baseline','color']} for p in ps] for page,ps in owned.items()}
     heights={i:heading_height(QUESTIONS[i]) for i in ids}
-    fingerprint=hashlib.sha256(json.dumps({'profile':'numberless-template-v2','specs':specs,'q':[{key:QUESTIONS[i].get(key) for key in ['id','title','titleHtml','points','percent']} for i in sorted(ids)],'heights':heights,'labels':static},sort_keys=True).encode()).hexdigest()
+    fingerprint=hashlib.sha256(json.dumps({'profile':'numberless-template-v2','specs':specs,'q':[{key:QUESTIONS[i].get(key) for key in ['id','title','titleHtml','points','percent','sourcePaperLabel','series','answerCorrectionPages']} for i in sorted(ids)],'heights':heights,'labels':static},sort_keys=True).encode()).hexdigest()
     signature=hashlib.sha256((fingerprint+json.dumps({i:NUMBERS[i] for i in sorted(ids)})+json.dumps(owned,sort_keys=True)).encode()).hexdigest()
     if dest.exists() and dest.with_suffix('.json').exists() and stamp.exists() and stamp.read_text()==signature:return
     template=dest.with_suffix('.template.pdf');layout_path=dest.with_suffix('.layout.json');template_stamp=dest.with_suffix('.template.sha256')
@@ -147,7 +148,7 @@ def create(paper,topic,k,specs):
         for place in layout['placements']:
             if place['page']!=page_number:continue
             label=next(p for p in LABELS[place['key']] if p['box']==place['labelBox'] and p['id']==place['labelId']);sc=place['scale'];color=label['color']
-            c.saveState();c.setFillColorRGB(*color[:3]) if isinstance(color,list) else c.setFillGray(color or 0)
+            c.saveState();set_source_color(c,color)
             c.translate(place['tx']+label['x']*sc,place['ty']+label['baseline']*sc);c.scale(sc*label['horizontalScale'],sc);c.setFont(label['font'],label['size']);c.drawString(0,0,label['new']);c.restoreState()
         c.showPage()
     c.save();stamp_template(template,buf.getvalue(),dest)

@@ -75,6 +75,7 @@ def merge_parts(paths,records,dest,metadata):
     for key,value in metadata.items():pdf.docinfo[key]=value
     with pdf.open_outline() as outline:
         for entry in records:
-            title=f'第{entry["number"]}题 · 第{entry["sourceEdition"]}届模拟试题{entry["sourcePaper"]}原第{entry["sourceNumber"]}题'
+            from source_info import source_name
+            title=f'第{entry["number"]}题 · {source_name(entry["sourceEdition"],entry["sourcePaper"],compact=True)}原第{entry["sourceNumber"]}题'
             outline.root.append(pikepdf.OutlineItem(title,entry['firstPage']-1))
     count=len(pdf.pages);pdf.save(dest,compress_streams=True,object_stream_mode=pikepdf.ObjectStreamMode.generate,deterministic_id=True);pdf.close();return count

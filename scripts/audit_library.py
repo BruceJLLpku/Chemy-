@@ -50,10 +50,12 @@ def audit(pixels=True,books=True):
         require(sourcekeys=={(e,h['paper'],h['number']) for h in aindex['questions']},'source_pairing',{'edition':e})
         require(sourcekeys=={key for key in bykey if key[0]==e},'bank_source_keys',{'edition':e})
         require(len(sourcekeys)==count and len(qindex['papers'])==papers,'edition_totals',{'edition':e})
-        sources=read(ROOT/'sources/manifest.json')['editions'][str(e)]['originalFiles']
+        entry=read(ROOT/'sources/manifest.json')['editions'][str(e)]
+        sources=entry['originalFiles']+entry.get('workingFiles',[])
+        config=read(ROOT/'data/editions.json')[str(e)]
         for source in sources:
             require(digest((ROOT/'sources'/source['filename']).read_bytes())==source['sha256'],'source_changed',{'edition':e,'kind':source['kind']})
-            if source['kind'] in ['q','a']:
+            if source['kind'] in ['q','a'] and source['filename']==config[source['kind']]:
                 require(source['sha256']=={'q':qindex,'a':aindex}[source['kind']]['sha256'],'source_index_changed',{'edition':e,'kind':source['kind']})
         checks['source_questions']+=count
     allhtml=[q['body']+q['answer'] for q in bank]+[str(n.get('instructions',''))+str(n.get('scoring','')) for n in list(notes.values())+[read(ROOT/'dist/paper1-notes.json')]]

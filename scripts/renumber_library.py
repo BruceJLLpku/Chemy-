@@ -19,6 +19,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from import_library import ROOT,CACHE,DATA,load,render_page,colored,SOURCES
+from source_info import set_source_color
 from paper1_manifest import PAPER,FIGURES
 from display_numbering import write_numbering,renumber_attributes
 from fast_pdf import clip_stamp
@@ -176,7 +177,7 @@ def patch_page(k,n):
             x0,y0,x1,y1=patch['box'];holes.append(f'{x0-.06:.5f} {h-y1-.12:.5f} {x1-x0+.12:.5f} {y1-y0+.24:.5f} re\n')
         buf=BytesIO();c=canvas.Canvas(buf,pagesize=(w,h))
         for patch in patches:
-            c.saveState();color=patch['color'];c.setFillColorRGB(*color[:3]) if isinstance(color,list) else c.setFillGray(color or 0)
+            c.saveState();set_source_color(c,patch['color'])
             c.translate(patch['x'],patch['baseline']);c.scale(patch['horizontalScale'],1);c.setFont(patch['font'],patch['size']);c.drawString(0,0,patch['new']);c.restoreState()
         c.save();clip_stamp(source,holes,buf.getvalue(),temporary)
     else:

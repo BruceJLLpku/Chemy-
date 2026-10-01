@@ -56,14 +56,19 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
         readme=ROOT/'README.md';s=readme.read_text(encoding='utf8')
         start=s.index('当前完整收录');end=s.index('网页正文',start)
         counts={e:len({q['paper'] for q in bank if edition_of(q)==e}) for e in sorted({edition_of(q) for q in bank},reverse=True)}
-        scope='、'.join(f'第{e}届{n}套' for e,n in counts.items())
+        scope='、'.join(f'第{e}届{n}份' if e else f'Chemy联赛{n}届' for e,n in counts.items())
         audit_path=ROOT/'data/audit_report.json';review=json.loads(audit_path.read_text(encoding='utf8')) if audit_path.exists() else {}
         reviewed=review.get('automatedPassed') and review.get('visualReviewComplete') and review.get('checks',{}).get('source_questions')==len(bank)
         status='已完成全量来源、字形、原图及题答配对检查，并复核边界异常和各专题打印册样页；记录见data/audit_report.json。' if reviewed else '图文与对应关系将在全部录入结束后统一复核。'
-        s=s[:start]+f'当前完整收录{scope}模拟试题，共{len(bank)}道完整大题。每道大题只设置一个主专题。九个专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。{status}\n\n'+s[end:]
+        s=s[:start]+f'当前完整收录{scope}试题，共{len(bank)}道完整大题。每道大题只设置一个主专题。九个专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。{status}\n\n'+s[end:]
         readme.write_text(s,encoding='utf8')
+        # Bound Git's temporary working set and pack existing objects before disk space runs low.
+        import shutil
+        if shutil.disk_usage(ROOT).free<3*1024**3:
+            git('repack','-d','-l','--window=5','--window-memory=64m','--threads=2','--depth=20')
+            print('STORAGE Git history packed; all commits retained',flush=True)
         git('add','dist','scripts','data','docs','sources','README.md','WORK_STATE.md','.github/workflows/pages.yml')
-        git('commit','-m',message or f'Import Chemy {EDITION} mock paper {paper} with cumulative topic PDFs')
+        git('commit','-m',message or (f'Import Chemy league edition {paper} with cumulative topic PDFs' if EDITION==0 else f'Import Chemy {EDITION} collection {paper} with cumulative topic PDFs'))
     sha=git('rev-parse','HEAD')
     snapshot_names=['index.html','questions.json','app.js','papers.json','numbering.json','presentation.json']
     snapshot={name:subprocess.run([GIT,'show',sha+':dist/'+name],cwd=ROOT,env=env,capture_output=True,check=True).stdout for name in snapshot_names}

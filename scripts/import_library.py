@@ -8,7 +8,8 @@ from PIL import Image
 from pypdf import PdfReader,PdfWriter
 from pypdf.generic import ContentStream,NameObject,DictionaryObject
 from paper1_manifest import SLUGS
-from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION,paper_key,edition_of
+from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION,paper_key,edition_of,config
+from source_info import source_name,paper_name
 from import_paper1 import native_blocks,in_box
 from display_numbering import write_numbering
 
@@ -16,6 +17,7 @@ ASSETS=ROOT/'dist/assets'; DATA=ROOT/'data/library_manifest.json'
 SOURCES={'q':Q_SOURCE,'a':A_SOURCE}
 INDEX={k:json.loads((CACHE/k/'index.json').read_text(encoding='utf8')) for k in SOURCES}
 READERS={}
+CORRECTIONS=json.loads((ROOT/"data/answer_corrections32.json").read_text(encoding="utf8"))["corrections"] if EDITION==32 else {}
 EXCEPTIONS=json.loads((ROOT/'data/source_exceptions.json').read_text(encoding='utf8'))
 BACKGROUND_HASHES=set(EXCEPTIONS['backgroundHashes'])
 def ignored_shape(s):
@@ -50,8 +52,10 @@ def background(im,k):
     return im['hash'] in BACKGROUND_HASHES or (im['width']>400 and 89<im['x0']<92 and 190<im['top']<645
             and INDEX[k]['imageFrequency'].get(im['hash'],0)>10)
 def spans(k,paper,number,heading=False):
+    correction=CORRECTIONS.get(f"{paper}-{number}")
+    if k=="a" and correction:return correction["effectiveRanges"]
     hs=INDEX[k]['questions']; i=next(i for i,x in enumerate(hs) if (x['paper'],x['number'])==(paper,number)); h=hs[i]
-    end=hs[i+1] if i+1<len(hs) and hs[i+1]['paper']==paper else {'page':int(INDEX[k]['papers'].get(str(paper+1),len(INDEX[k]['pages'])+1)),'top':70}
+    end=hs[i+1] if i+1<len(hs) and hs[i+1]['paper']==paper else {'page':int(INDEX[k]['papers'].get(str(paper+1),(config.get('aContentPages',len(INDEX[k]['pages'])) if k=='a' else len(INDEX[k]['pages']))+1)),'top':70}
     ranges=[]
     for n in range(h['page'],end['page']+1):
         lo=(h['top']-2 if heading else h['bottom']+.5) if n==h['page'] else 70
@@ -148,7 +152,7 @@ def section(k,ranges,paper,number,label):
             versioned=f'{target.stem}-{checksum[:12]}.webp';final=ASSETS/versioned
             if not final.exists():final.write_bytes(target.read_bytes())
             name=versioned;target=final
-            w,h=crop.size;alt=f'第{EDITION}届模拟试题{paper} 第{number}题 {label}原图'
+            w,h=crop.size;alt=f'{source_name(EDITION,paper)} 第{number}题 {label}原图'
             cls='source-figure source-float' if mode=='float' else 'source-figure'
             html=f'<figure class="{cls}" style="--source-width:{round((x1-x0)*1.7)}px"><a href="assets/{name}" target="_blank" rel="noopener" aria-label="查看大图：{alt}"><img src="assets/{name}" alt="{alt}" width="{w}" height="{h}" loading="lazy" style="--figure-width:{round((x1-x0)*1.7)}px"></a></figure>'
             events.append((min(a,lo-2) if mode=='float' and a<lo else a,'figure',html,0));captures.append({'page':n,'box':box,'asset':name,'mode':mode,'sha256':hashlib.sha256(target.read_bytes()).hexdigest()})
@@ -179,7 +183,9 @@ def import_paper(paper,topics):
         body,qf,qa=section('q',qr,paper,number,'题目');answer,af,aa=section('a',ar,paper,number,'答案')
         assert body and answer,(paper,number)
         def pages(rs):return str(rs[0][0]) if rs[0][0]==rs[-1][0] else f'{rs[0][0]}–{rs[-1][0]}'
-        items.append({k:h[k] for k in ('paper','number','points','percent')}|{'title':title,'titleHtml':title_html,'edition':EDITION,'id':f'chemy{EDITION}-{paper}-{number}','topic':topic,'body':body,'answer':answer,'questionPages':pages(qr),'answerPages':pages(ar),'pdfReady':True})
+        items.append({k:h[k] for k in ('paper','number','points','percent')}|{'title':title,'titleHtml':title_html,'edition':EDITION,'id':f'chemy{EDITION}-{paper}-{number}','topic':topic,'body':body,'answer':answer,'questionPages':pages(qr),'answerPages':pages(CORRECTIONS.get(f'{paper}-{number}',{}).get('originalRanges',ar)),'pdfReady':True,'sourcePaperLabel':paper_name(EDITION,paper),'series':config.get('series','annual')})
+        correction=CORRECTIONS.get(f'{paper}-{number}')
+        if correction:items[-1]['answerCorrectionPages']='、'.join(map(str,correction['errataPages']))
         records.append({'number':number,'topic':topic,'question':qr,'printQuestion':spans('q',paper,number,True),'answer':ar,'figures':{'q':qf,'a':af},'coverage':{'q':qa,'a':aa},'reviewed':False})
     bank=[q for q in bank if (edition_of(q),q['paper'])!=(EDITION,paper)]+items;bank.sort(key=lambda q:(-edition_of(q),q['paper'],q['number']))
     assert [q for q in bank if edition_of(q)==39 and q['paper']==1]==original
