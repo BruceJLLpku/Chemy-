@@ -29,7 +29,7 @@ def committed_assets(paths,revision):
     return result
 def api(path,headers):
     with urllib.request.urlopen(urllib.request.Request('https://api.github.com/repos/'+REPO+path,headers=headers),timeout=45) as r:return json.load(r)
-def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=False,push_existing=False):
+def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=False,push_existing=False,numbered_only=False):
     assert not(prepare_only and (verify_only or push_existing))
     if push_existing:verify_only=True
     bank=json.loads(committed('dist/questions.json')) if verify_only else json.loads((ROOT/'dist/questions.json').read_text(encoding='utf8'))
@@ -41,12 +41,14 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
         assert q['body'] and q['answer'] and q['pdfReady']
     notes=json.loads(committed('dist/papers.json')) if verify_only else json.loads((ROOT/'dist/papers.json').read_text(encoding='utf8'))
     legacy_notes=json.loads(committed('dist/paper1-notes.json')) if verify_only else json.loads((ROOT/'dist/paper1-notes.json').read_text(encoding='utf8'))
-    all_html=[q['body']+q['answer'] for q in bank]+[str(n.get('instructions',''))+str(n.get('scoring','')) for n in [legacy_notes]+list(notes.values())]
-    for html in all_html:
-        for name in re.findall(r'(?:src|href)="(assets/[^\"]+)"',html):
-            path=ROOT/'dist'/name;assert path.is_file(),name
-            if path.suffix=='.webp':
-                with Image.open(path) as im:im.verify()
+    display=json.loads(committed('dist/presentation.json')) if verify_only else json.loads((ROOT/'dist/presentation.json').read_text(encoding='utf8'))
+    numbers=json.loads(committed('dist/numbering.json')) if verify_only else json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))
+    assert set(display)=={q['id'] for q in bank}==set(numbers['numberById'])
+    all_html=[q['body']+q['answer'] for q in bank]+[d['body']+d['answer'] for d in display.values()]
+    for name in {name for html in all_html for name in re.findall(r'(?:src|href)="(assets/[^\"]+)"',html)}:
+        path=ROOT/'dist'/name;assert path.is_file(),name
+        if path.suffix=='.webp':
+            with Image.open(path) as im:im.verify()
     old=json.loads(git('show','HEAD:dist/questions.json'));assert [q for q in bank if edition_of(q)==39 and q['paper']==1]==[q for q in old if edition_of(q)==39 and q['paper']==1]
     if not verify_only:
         readme=ROOT/'README.md';s=readme.read_text(encoding='utf8')
@@ -61,13 +63,16 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
         git('add','dist','scripts','data','docs','sources','README.md','WORK_STATE.md')
         git('commit','-m',message or f'Import Chemy {EDITION} mock paper {paper} with cumulative topic PDFs')
     sha=git('rev-parse','HEAD')
-    snapshot={name:subprocess.run([GIT,'show',sha+':dist/'+name],cwd=ROOT,env=env,capture_output=True,check=True).stdout for name in ['questions.json','app.js','papers.json']}
-    selected_html=all_html if check_all else [q['body']+q['answer'] for q in bank if (edition_of(q),q['paper'])==(EDITION,paper)]
+    snapshot_names=['index.html','questions.json','app.js','papers.json','numbering.json','presentation.json']
+    snapshot={name:subprocess.run([GIT,'show',sha+':dist/'+name],cwd=ROOT,env=env,capture_output=True,check=True).stdout for name in snapshot_names}
+    selected_html=all_html if check_all else [display[q['id']]['body']+display[q['id']]['answer'] for q in bank if (edition_of(q),q['paper'])==(EDITION,paper)]
     if not check_all:
         key=str(paper) if EDITION==39 else f'{EDITION}-{paper}'
         n=legacy_notes if key=='1' else notes.get(key,{})
         selected_html.append(str(n.get('instructions',''))+str(n.get('scoring','')))
     asset_paths={name for html in selected_html for name in re.findall(r'src="(assets/[^\"]+)"',html)}
+    if numbered_only:
+        asset_paths={name for html in all_html for name in re.findall(r'src="(assets/numbered-[^\"]+)"',html)}
     tracked=set(git('ls-files','dist/assets').splitlines())
     all_paths={name for html in all_html for name in re.findall(r'src="(assets/[^\"]+)"',html)}
     assert all('dist/'+name in tracked for name in all_paths),'Referenced image missing from Git commit'
@@ -89,7 +94,7 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
                 break
         time.sleep(20)
     else:raise TimeoutError('Pages deploy still pending')
-    for filename in ['questions.json','app.js','papers.json']:
+    for filename in snapshot_names:
         local=snapshot[filename];url=BASE+filename+'?commit='+sha
         for attempt in range(12):
             with urllib.request.urlopen(urllib.request.Request(url,headers={'Cache-Control':'no-cache'}),timeout=45) as r:remote=r.read()
@@ -111,4 +116,4 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
     print('RESOURCE CHECK',len(asset_snapshot),'source images available and byte-identical',flush=True)
     print('PUBLISHED',paper,len(json.loads(snapshot['questions.json'])),BASE,sha,flush=True)
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('paper',type=int);ap.add_argument('--verify-only',action='store_true');ap.add_argument('--prepare-only',action='store_true');ap.add_argument('--push-existing',action='store_true');ap.add_argument('--assets-all',action='store_true');ap.add_argument('--message');args=ap.parse_args();publish(args.paper,args.verify_only,args.assets_all,args.message,args.prepare_only,args.push_existing)
+    ap=argparse.ArgumentParser();ap.add_argument('paper',type=int);ap.add_argument('--verify-only',action='store_true');ap.add_argument('--prepare-only',action='store_true');ap.add_argument('--push-existing',action='store_true');ap.add_argument('--assets-all',action='store_true');ap.add_argument('--numbered-assets',action='store_true');ap.add_argument('--message');args=ap.parse_args();publish(args.paper,args.verify_only,args.assets_all,args.message,args.prepare_only,args.push_existing,args.numbered_assets)

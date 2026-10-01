@@ -1,0 +1,108 @@
+{
+  "questions": 713,
+  "nativeSections": 1426,
+  "numberedCaptures": 227,
+  "preservedPixelsOutsideLabels": true,
+  "pdfs": {
+    "organic-questions.pdf": {
+      "pages": 294,
+      "sha256": "4edce7157ca6f4af856de94dea07cfb94da63a31d707aa5f16f44a7629559152",
+      "numberedQuestions": 242
+    },
+    "organic-answers.pdf": {
+      "pages": 333,
+      "sha256": "5ba913f2cecd568f0e98d840380cd041c0b559e0791a8d6682d5e13da442bf3a",
+      "numberedQuestions": 242
+    },
+    "polymer-questions.pdf": {
+      "pages": 28,
+      "sha256": "43c48733e6679ad9d7aaae0a425aaa16081e8482c05dc7cd16aba8311d51a3b6",
+      "numberedQuestions": 24
+    },
+    "polymer-answers.pdf": {
+      "pages": 38,
+      "sha256": "e59bf247ae778ff22365175ffc331789546338d69cf015450013fd4d494144b6",
+      "numberedQuestions": 24
+    },
+    "crystal-questions.pdf": {
+      "pages": 73,
+      "sha256": "e01dd7b43c9671495dc06a5f70441527958c0adfc575324d6edde491c1e855f6",
+      "numberedQuestions": 66
+    },
+    "crystal-answers.pdf": {
+      "pages": 93,
+      "sha256": "a46d68c3356ec605b268c75f5dea9b5802ebcbb7b2d81904952d5e56e41ea87f",
+      "numberedQuestions": 66
+    },
+    "inference-questions.pdf": {
+      "pages": 147,
+      "sha256": "47fbb0fa2bd3268d600c97e8dbf5306d77f4025826faa24a52e5bb35210dface",
+      "numberedQuestions": 193
+    },
+    "inference-answers.pdf": {
+      "pages": 229,
+      "sha256": "c0ea6ff723b792c11b378083568b768866c32e985321df408d74fee853fcfeb4",
+      "numberedQuestions": 193
+    },
+    "elements-questions.pdf": {
+      "pages": 63,
+      "sha256": "8bccb3ca731e8be16023dd640b67801192c24f5f7b74ba51a6ddf70cba69f9d2",
+      "numberedQuestions": 77
+    },
+    "elements-answers.pdf": {
+      "pages": 73,
+      "sha256": "e4443bc1fc0e16d5a18a2e18403b0d11cb8591ac00ddc3e78090177786be63e9",
+      "numberedQuestions": 77
+    },
+    "equilibrium-questions.pdf": {
+      "pages": 47,
+      "sha256": "f742ea378bd55b70845b1f1001e10a2cbf4460cef2dad3c36a9f7c5c681962e1",
+      "numberedQuestions": 50
+    },
+    "equilibrium-answers.pdf": {
+      "pages": 61,
+      "sha256": "2434f6c5001c784b574ae54022cda748d26fe25075019840422cf39598f8d7cd",
+      "numberedQuestions": 50
+    },
+    "electrochemistry-questions.pdf": {
+      "pages": 24,
+      "sha256": "f75636a9af62b31ca77b2034bd43d9487117397cc8bd136eb72f1971075e422e",
+      "numberedQuestions": 17
+    },
+    "electrochemistry-answers.pdf": {
+      "pages": 27,
+      "sha256": "6b3dcf5a0108e6487f3aeaf76ad1764f357108db9dc6f886b73dadad062daae7",
+      "numberedQuestions": 17
+    },
+    "kinetics-questions.pdf": {
+      "pages": 18,
+      "sha256": "2fe1c7f370e136ccf03bacceed00880b0f84bed0e92a53a1c27eaae988feb75c",
+      "numberedQuestions": 13
+    },
+    "kinetics-answers.pdf": {
+      "pages": 22,
+      "sha256": "bad7f11ea1a546d8a61527e0fa0d71ede346d46d2d034665d4f679af570c277b",
+      "numberedQuestions": 13
+    },
+    "analysis-questions.pdf": {
+      "pages": 30,
+      "sha256": "4f90751e57c2b6806f5142b3f11f98cbcb3ef3fa3e323d372f9830c21bb9cdb6",
+      "numberedQuestions": 31
+    },
+    "analysis-answers.pdf": {
+      "pages": 39,
+      "sha256": "e033a704c8f6a7a36e0d405dc97cd593d83e9a90e0cef12037d65dc64a63b396",
+      "numberedQuestions": 31
+    }
+  },
+  "issues": [],
+  "originalDatasetPreserved": true,
+  "passed": true,
+  "visualReviewComplete": true,
+  "visualReview": {
+    "bookletSamples": 18,
+    "longNumberSamples": 2,
+    "scope": "All booklet first pages plus organic question 242, including arrows, label placement and source attribution; not every printed page read manually."
+  },
+  "printPages": 1639
+}

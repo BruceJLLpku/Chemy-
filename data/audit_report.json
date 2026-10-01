@@ -140,5 +140,8 @@
       "bytes": 6372441,
       "sha256": "3b1c74d9637f5af46e767154db8ab88cf86726fa186630e7090d851b589a1e9e"
     }
-  ]
+  ],
+  "sourceRelease": "3da5d197f96c8790741aaf2d62ebe0bc76520a1c",
+  "currentPresentationAudit": "data/numbering-audit.json",
+  "outputPdfsNote": "These PDF hashes record the preceding source-review release. Current numbered print files and hashes are recorded in numbering-audit.json."
 }

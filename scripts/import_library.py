@@ -10,6 +10,7 @@ from pypdf.generic import ContentStream,NameObject,DictionaryObject
 from paper1_manifest import SLUGS
 from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION,paper_key,edition_of
 from import_paper1 import native_blocks,in_box
+from display_numbering import write_numbering
 
 ASSETS=ROOT/'dist/assets'; DATA=ROOT/'data/library_manifest.json'
 SOURCES={'q':Q_SOURCE,'a':A_SOURCE}
@@ -59,7 +60,7 @@ def spans(k,paper,number,heading=False):
     return ranges
 def render_page(k,n):
     dest=CACHE/k/f'{n:03}-clean.png'
-    if dest.exists():return dest
+    if dest.exists() and dest.with_suffix('.pdf').exists():return dest
     if k not in READERS:READERS[k]=PdfReader(SOURCES[k])
     reader=READERS[k];p=copy.copy(reader.pages[n-1]);d=load(k,n)
     stream=ContentStream(p.get_contents(),reader);names={'/'+im['name'] for im in d['images'] if background(im,k)}
@@ -198,6 +199,7 @@ def import_paper(paper,topics):
         assert path.exists() and hashlib.sha256(path.read_bytes()).hexdigest()==capture['sha256']
         with Image.open(path) as im:im.verify()
     (ROOT/'dist/questions.json').write_text(json.dumps(bank,ensure_ascii=False,indent=2),encoding='utf8')
+    write_numbering(bank)
     notes_path=ROOT/'dist/papers.json';notes=json.loads(notes_path.read_text(encoding='utf8')) if notes_path.exists() else {}
     notes[paper_key(paper)]={'instructions':instructions,'scoring':''};notes_path.write_text(json.dumps(notes,ensure_ascii=False,indent=2),encoding='utf8')
     manifest['papers'][paper_key(paper)]={'edition':EDITION,'paper':paper,'questions':records,'common':{'question':common_ranges,'figures':cf,'coverage':ca},'reviewed':False};DATA.parent.mkdir(exist_ok=True);DATA.write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf8')

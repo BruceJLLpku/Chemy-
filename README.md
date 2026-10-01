@@ -18,27 +18,18 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 
 ## 内容维护
 
-- `dist/questions.json`：网页题目、答案及来源；与打印册共用原卷边界和分类清单。
-- `dist/interface.css`：目录、导航、专题标题和下载入口的界面样式；仅在屏幕上生效。
-- `dist/styles.css`：保留已认可的题目、原图及答案阅读排版。更新界面时保持阅读样式和题目渲染模板不变。
-- `scripts/write_questions.py`：保留已认可的第 6、8 题内容，直接运行时导入完整第一套卷。
-- `scripts/extract_figures.py`：原图图形提取。
-- `scripts/make_pdfs.py`：从原 PDF 保留字体及图形，生成专题题目册与答案册。
-- `dist/downloads`：各专题累计题目册和答案册。
+- `dist/questions.json` 保存原卷题目、答案和来源，不覆盖原始题号。
+- `dist/numbering.json` 是网站与 PDF 共用的专题编号表。每个专题从 1 开始；筛选试卷不会重编号。
+- `dist/presentation.json` 保存展示内容：大题第 N 题，小问 N-1、N-2，多层小问 N-2-1。原题号只在来源中标注。
+- `dist/downloads` 提供九个专题的题目册、答案册，共 18 份。卷首提示、常数及评分说明不展示；题干内必要提示和逐题评分保留。
+- `scripts/rebuild_numbering.py` 批量更新编号、含题号的原图局部标签和 PDF。只复用或替换编号字形，化学结构、反应箭头与图表不重绘。缓存按编号计划复用。
+- `scripts/audit_numbering.py` 核对网站和打印编号，检查原数据未变、编号区域之外原图像素一致，以及 713 题的题答打印索引。
+- `data/print_index.json` 记录各题在累计打印册中的编号、来源和页码。
 
-第一套卷批量导入工具：`scripts/paper1_manifest.py` 保存 10 道大题的主专题、原卷页码、原图和答案区域；`scripts/import_paper1.py` 提取网页文字和原图。三届六个原始 PDF 完整保存在 `sources/`，与用户提供的原文件字节一致，SHA-256 记录在 `sources/manifest.json`。也可通过 `CHEMY_SOURCE_DIR` 指定其他源目录。安装 `requirements.txt` 并确保 `pdftoppm` 在 PATH 后，依次运行 `scripts/extract_figures.py`、`scripts/import_paper1.py`、`scripts/make_pdfs.py`；打印册页眉使用 Windows 宋体。临时渲染与核对缓存留在被忽略的 `tmp/`，供后续检查复用。
+三届六份原始 PDF 完整保存在 `sources/`，原文件字节不改；归档的首套打印册保留在 `data/book_bases/`。原始完整图文复核见 `data/audit_report.json`；此次展示编号与打印册检查见 `data/numbering-audit.json`。
 
-录入流程：确认整道大题及主专题 → 一次缓存原卷文本与页面 → 批量提取原图和原生文字 → 按套生成打印册并发布 → 全部录完后集中核对图文、题答配对和打印版面；只重跑有异常的部分。无需逐题重新 OCR、重新绘图或重新编写页面。跨页题干会连续显示，原卷题号和来源页码保持可追溯。
+更新来源内容或分类后，先运行对应录入工具，再执行 `python scripts/rebuild_numbering.py`，最后执行 `python scripts/audit_numbering.py`。当前完整题库不能直接运行旧的首套专用脚本覆盖，旧脚本与归档保留供来源追溯。
 
-分类与批量录入细则见 [录入规范](docs/ingestion.md)。原生文本及页面缓存会核对原文件 SHA-256、处理范围与版本；原图裁切记录源文件、坐标与输出摘要，未变动的原图直接复用。
-
-仅修改分类或标题时，编辑清单后运行 `python scripts/import_paper1.py --metadata-only`，保留现有全部题干、答案及图形。此次分类调整只需运行 `python scripts/make_pdfs.py --topics elements inference`，生成受影响的四份 PDF；其余专题打印册不重生成。专题名称与归属调整不会改变原卷题目标题。
-
-原答案第 7 题 Na-O 高度计算的“解得”行将 h1 写成了 h2；网页与 PDF 保留原文并加注说明。该注记不改变原答案数值。
-
-原参考答案第 6 题最后一问写成了 6-5，而题目册写成 6-4；网页展示时按题目册对应，并保留说明。原标准电势代入式遗漏的负号已补回，数值保持原答案 −0.679 V；PDF 保留原式并附说明。
+原参考答案中已确认的编号笔误按原题对应：39 届第 1 套第 6 题答案的 6-5 对应原题 6-4；36 届第 25 套第 4 题答案单列的 9-4 对应该题第 4 小问。原电势代入式和 Na-O 高度的既有来源校注继续保留。试剂当量、反应编号、谱线编号与化学结构标号不作为小问题号替换。
 
 题目与答案版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。
-
-
-全套增量命令：先运行 `python scripts/scan_library.py` 缓存原卷，再按顺序运行 `python scripts/process_paper.py N`，或运行 `python scripts/process_batch.py --start N --end 22`。每套同步 GitHub、等待 Pages 成功后再开始下一套。`data/book_bases/` 保存第一套已认可的打印册原始章节，后续章节从原卷重新提取并累加；缓存不上传。`data/library_manifest.json` 保存各大题边界、主专题、图形坐标和复核状态。
