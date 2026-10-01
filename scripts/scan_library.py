@@ -12,6 +12,8 @@ def header_paper(text):
     if config.get('series')=='league':
         m=re.match(r'^第\s*(\d+)\s*届.*联赛',text)
         return int(m[1]) if m else None
+    if '练习题目集锦' in text:
+        return next((int(k) for k,v in config.get('paperLabels',{}).items() if v=='练习题目集锦'),None)
     m=re.search(r'决赛模拟(?:试[题卷])?\s*(\d*)',text)
     if m:label='决赛模拟试题'+m[1]
     else:
@@ -67,13 +69,14 @@ def scan(kind,path):
             pages.append(n)
             for r in lines:
                 match=re.match(r'^第\s*(\d+)\s*题(.*)',r['text'])
-                if match and '分' in match[2] and '评判' not in match[2]:
+                unscored=config.get('paperLabels',{}).get(str(paper))=='练习题目集锦'
+                if match and ('分' in match[2] or unscored) and '评判' not in match[2]:
                     pts=re.search(r'[（(]\s*([\d.]+)\s*分',match[2])
-                    if pts and not any((h['paper'],h['number'])==(paper,int(match[1])) for h in headings):
+                    if (pts or unscored) and not any((h['paper'],h['number'])==(paper,int(match[1])) for h in headings):
                         pct=re.search(r'占(?:比)?\s*([\d.]+)\s*[%％]',match[2])
                         title=re.sub(r'[（(]\s*[\d.]+\s*分.*?[）)]','',match[2]).strip()
                         headings.append({'paper':paper,'number':int(match[1]),'title':title,
-                                         'points':float(pts[1]) if '.' in pts[1] else int(pts[1]),'percent':float(pct[1]) if pct else None,'page':n,'top':r['top'],'bottom':r['bottom']})
+                                         'points':(float(pts[1]) if '.' in pts[1] else int(pts[1])) if pts else None,'percent':float(pct[1]) if pct else None,'page':n,'top':r['top'],'bottom':r['bottom']})
             if n%25==0:print(kind,n,'/',len(doc.pages),flush=True)
             p.close()
     result={'sha256':fingerprint,'pages':pages,'papers':starts,'questions':headings,'imageFrequency':dict(image_frequency)}
