@@ -4,9 +4,23 @@ from collections import Counter
 from pathlib import Path
 import pdfplumber
 from pypdf import PdfReader
-from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION
+from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION,config
 
 CACHE.mkdir(parents=True,exist_ok=True)
+
+def header_paper(text):
+    if config.get('series')=='league':
+        m=re.match(r'^第\s*(\d+)\s*届.*联赛',text)
+        return int(m[1]) if m else None
+    m=re.search(r'决赛模拟(?:试[题卷])?\s*(\d*)',text)
+    if m:label='决赛模拟试题'+m[1]
+    else:
+        m=re.search(r'((?:有机|无机)化学专题|计算题专题)\s*(\d*)',text)
+        if m:label=m[1]+m[2]
+        else:
+            m=re.search(r'模拟试[题卷]\s*(\d+)',text)
+            return int(m[1]) if m else None
+    return next((int(k) for k,v in config.get('paperLabels',{}).items() if v==label),None)
 
 def rows(chars):
     groups=[]
@@ -43,9 +57,9 @@ def scan(kind,path):
             lines=rows(chars)
             header=''.join(r['text'] for r in lines if r['top']<130)
             candidates=[r for r in lines if r['top']<130 and re.match(r'^第\s*\d+\s*届',r['text'])]
-            match=None if '目录' in header else next((m for r in candidates if (m:=re.search(r'模拟试题\s*(\d+)',r['text']))),None)
-            if match and int(match[1])!=paper:
-                paper=int(match[1]);starts[paper]=n
+            matched=None if '目录' in header else next((value for r in candidates if (value:=header_paper(r['text'])) is not None),None)
+            if matched is not None and matched!=paper:
+                paper=matched;starts[paper]=n
             shape_keys=('x0','x1','top','bottom','width','height','stroke','fill','linewidth','non_stroking_color','stroking_color')
             shapes=[{k:o.get(k) for k in shape_keys} for o in p.curves+p.lines+p.rects]
             payload={'page':n,'paper':paper,'width':p.width,'height':p.height,'chars':chars,'shapes':shapes,'images':images,'rows':lines}
