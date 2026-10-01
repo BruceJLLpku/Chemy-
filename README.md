@@ -8,7 +8,7 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 
 九个专题：有机化学、高分子化学、晶体化学、无机综合与结构推断、方程式与元素化学、热力学与化学平衡、电化学、动力学、分析化学。
 
-当前完整收录第39届模拟试题1–4，共39道完整大题。每道大题只设置一个主专题。已有题目的专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。图文与对应关系将在全套录入结束后统一复核。
+当前完整收录第39届模拟试题1–5，共48道完整大题。每道大题只设置一个主专题。已有题目的专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。图文与对应关系将在全套录入结束后统一复核。
 
 网页正文与表格为 HTML；图形从原 PDF 提取，未使用 AI 生成或人工重绘化学结构。电化学图从原 PDF 的显示内容提取，保留原题对纵轴的处理；有机图保留原矢量路径及原图标签。页面背景装饰不属于题目图形，不随图导入。原文件未修改。
 
@@ -24,7 +24,7 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 - `scripts/write_questions.py`：保留已认可的第 6、8 题内容，直接运行时导入完整第一套卷。
 - `scripts/extract_figures.py`：原图图形提取。
 - `scripts/make_pdfs.py`：从原 PDF 保留字体及图形，生成专题题目册与答案册。
-- `dist/downloads`：可下载的 12 份专题题目册和答案册。
+- `dist/downloads`：各专题累计题目册和答案册。
 
 第一套卷批量导入工具：`scripts/paper1_manifest.py` 保存 10 道大题的主专题、原卷页码、原图和答案区域；`scripts/import_paper1.py` 提取网页文字和原图。两个原始 PDF 完整保存在 `sources/`，与用户提供的原文件字节一致，SHA-256 记录在 `sources/manifest.json`。也可通过 `CHEMY_SOURCE_DIR` 指定其他源目录。安装 `requirements.txt` 并确保 `pdftoppm` 在 PATH 后，依次运行 `scripts/extract_figures.py`、`scripts/import_paper1.py`、`scripts/make_pdfs.py`；打印册页眉使用 Windows 宋体。临时渲染与核对缓存留在被忽略的 `tmp/`，供后续检查复用。
 
@@ -39,3 +39,6 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 原参考答案第 6 题最后一问写成了 6-5，而题目册写成 6-4；网页展示时按题目册对应，并保留说明。原标准电势代入式遗漏的负号已补回，数值保持原答案 −0.679 V；PDF 保留原式并附说明。
 
 题目与答案版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。
+
+
+全套增量命令：先运行 `python scripts/scan_library.py` 缓存原卷，再按顺序运行 `python scripts/process_paper.py N`，或运行 `python scripts/process_batch.py --start N --end 22`。每套同步 GitHub、等待 Pages 成功后再开始下一套。`data/book_bases/` 保存第一套已认可的打印册原始章节，后续章节从原卷重新提取并累加；缓存不上传。`data/library_manifest.json` 保存各大题边界、主专题、图形坐标和复核状态。

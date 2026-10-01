@@ -58,7 +58,9 @@ def build(paper):
         slug=SLUGS[topic]
         for k,kind in [('q','questions'),('a','answers')]:
             target=OUT/f'{slug}-{kind}.pdf';base=PARTS/f'01-{slug}-{k}.pdf'
-            if base.exists() is False and target.exists() and any(q['topic']==topic for q in PAPER):base.write_bytes(target.read_bytes())
+            saved=ROOT/'data/book_bases'/base.name
+            if not base.exists() and saved.exists():base.write_bytes(saved.read_bytes())
+            elif not base.exists() and target.exists() and any(q['topic']==topic for q in PAPER):base.write_bytes(target.read_bytes())
             ss=[s for s in specs if s['topic']==topic]
             if k=='q' and chapter.get('common',{}).get('question'):
                 ss=[{'printQuestion':chapter['common']['question'],'figures':{'q':chapter['common']['figures']}}]+ss
