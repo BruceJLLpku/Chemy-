@@ -4,9 +4,9 @@ from collections import Counter
 from pathlib import Path
 import pdfplumber
 from pypdf import PdfReader
-from paper1_manifest import ROOT,Q_SOURCE,A_SOURCE
+from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION
 
-CACHE=ROOT/'tmp'/'library';CACHE.mkdir(parents=True,exist_ok=True)
+CACHE.mkdir(parents=True,exist_ok=True)
 
 def rows(chars):
     groups=[]
@@ -42,7 +42,8 @@ def scan(kind,path):
             chars=[{k:c[k] for k in ('text','x0','x1','top','bottom','size','fontname','non_stroking_color')} for c in p.chars]
             lines=rows(chars)
             header=''.join(r['text'] for r in lines if r['top']<130)
-            match=re.search(r'模拟试题\s*(\d+)',header)
+            candidates=[r for r in lines if r['top']<130 and re.match(r'^第\s*\d+\s*届',r['text'])]
+            match=None if '目录' in header else next((m for r in candidates if (m:=re.search(r'模拟试题\s*(\d+)',r['text']))),None)
             if match and int(match[1])!=paper:
                 paper=int(match[1]);starts[paper]=n
             shape_keys=('x0','x1','top','bottom','width','height','stroke','fill','linewidth','non_stroking_color','stroking_color')
@@ -53,12 +54,12 @@ def scan(kind,path):
             for r in lines:
                 match=re.match(r'^第\s*(\d+)\s*题(.*)',r['text'])
                 if match and '分' in match[2] and '评判' not in match[2]:
-                    pts=re.search(r'[（(]\s*(\d+)\s*分',match[2])
+                    pts=re.search(r'[（(]\s*([\d.]+)\s*分',match[2])
                     if pts:
                         pct=re.search(r'占(?:比)?\s*([\d.]+)\s*[%％]',match[2])
-                        title=re.sub(r'[（(]\s*\d+\s*分.*?[）)]','',match[2]).strip()
+                        title=re.sub(r'[（(]\s*[\d.]+\s*分.*?[）)]','',match[2]).strip()
                         headings.append({'paper':paper,'number':int(match[1]),'title':title,
-                                         'points':int(pts[1]),'percent':float(pct[1]) if pct else None,'page':n,'top':r['top'],'bottom':r['bottom']})
+                                         'points':float(pts[1]) if '.' in pts[1] else int(pts[1]),'percent':float(pct[1]) if pct else None,'page':n,'top':r['top'],'bottom':r['bottom']})
             if n%25==0:print(kind,n,'/',len(doc.pages),flush=True)
             p.close()
     result={'sha256':fingerprint,'pages':pages,'papers':starts,'questions':headings,'imageFrequency':dict(image_frequency)}
@@ -70,5 +71,6 @@ if __name__=='__main__':
     for kind,path in [('q',Q_SOURCE),('a',A_SOURCE)]:
         index=scan(kind,path)
         print(kind,'papers:',index['papers'],'question headings:',len(index['questions']),flush=True)
-    q=json.loads((CACHE/'q'/'index.json').read_text(encoding='utf8'))
-    print('PAPER 2:',[x for x in q['questions'] if x['paper']==2])
+    q=json.loads((CACHE/'q'/'index.json').read_text(encoding='utf8'));a=json.loads((CACHE/'a'/'index.json').read_text(encoding='utf8'))
+    qkeys={(h['paper'],h['number']) for h in q['questions']};akeys={(h['paper'],h['number']) for h in a['questions']}
+    print('EDITION',EDITION,'matching',len(qkeys&akeys),'question-only',sorted(qkeys-akeys),'answer-only',sorted(akeys-qkeys),flush=True)

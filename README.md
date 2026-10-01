@@ -8,7 +8,7 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 
 九个专题：有机化学、高分子化学、晶体化学、无机综合与结构推断、方程式与元素化学、热力学与化学平衡、电化学、动力学、分析化学。
 
-当前完整收录第39届模拟试题1–5，共48道完整大题。每道大题只设置一个主专题。已有题目的专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。图文与对应关系将在全套录入结束后统一复核。
+当前完整收录第39届22套、第36届25套、第35届26套模拟试题，共713道完整大题。每道大题只设置一个主专题。九个专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。已完成全量来源、字形、原图及题答配对检查，并复核边界异常和各专题打印册样页；记录见data/audit_report.json。
 
 网页正文与表格为 HTML；图形从原 PDF 提取，未使用 AI 生成或人工重绘化学结构。电化学图从原 PDF 的显示内容提取，保留原题对纵轴的处理；有机图保留原矢量路径及原图标签。页面背景装饰不属于题目图形，不随图导入。原文件未修改。
 
@@ -26,9 +26,9 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 - `scripts/make_pdfs.py`：从原 PDF 保留字体及图形，生成专题题目册与答案册。
 - `dist/downloads`：各专题累计题目册和答案册。
 
-第一套卷批量导入工具：`scripts/paper1_manifest.py` 保存 10 道大题的主专题、原卷页码、原图和答案区域；`scripts/import_paper1.py` 提取网页文字和原图。两个原始 PDF 完整保存在 `sources/`，与用户提供的原文件字节一致，SHA-256 记录在 `sources/manifest.json`。也可通过 `CHEMY_SOURCE_DIR` 指定其他源目录。安装 `requirements.txt` 并确保 `pdftoppm` 在 PATH 后，依次运行 `scripts/extract_figures.py`、`scripts/import_paper1.py`、`scripts/make_pdfs.py`；打印册页眉使用 Windows 宋体。临时渲染与核对缓存留在被忽略的 `tmp/`，供后续检查复用。
+第一套卷批量导入工具：`scripts/paper1_manifest.py` 保存 10 道大题的主专题、原卷页码、原图和答案区域；`scripts/import_paper1.py` 提取网页文字和原图。三届六个原始 PDF 完整保存在 `sources/`，与用户提供的原文件字节一致，SHA-256 记录在 `sources/manifest.json`。也可通过 `CHEMY_SOURCE_DIR` 指定其他源目录。安装 `requirements.txt` 并确保 `pdftoppm` 在 PATH 后，依次运行 `scripts/extract_figures.py`、`scripts/import_paper1.py`、`scripts/make_pdfs.py`；打印册页眉使用 Windows 宋体。临时渲染与核对缓存留在被忽略的 `tmp/`，供后续检查复用。
 
-录入流程：确认整道大题及主专题 → 一次缓存原卷文本与页面 → 批量提取原图和原生文字 → 核对化学式上下标、反应箭头、立体化学、所有小问及评分 → 生成并逐页检查专题 PDF → 提交并发布。无需逐题重新 OCR、重新绘图或重新编写页面。跨页题干会连续显示，原卷题号和来源页码保持可追溯。
+录入流程：确认整道大题及主专题 → 一次缓存原卷文本与页面 → 批量提取原图和原生文字 → 按套生成打印册并发布 → 全部录完后集中核对图文、题答配对和打印版面；只重跑有异常的部分。无需逐题重新 OCR、重新绘图或重新编写页面。跨页题干会连续显示，原卷题号和来源页码保持可追溯。
 
 分类与批量录入细则见 [录入规范](docs/ingestion.md)。原生文本及页面缓存会核对原文件 SHA-256、处理范围与版本；原图裁切记录源文件、坐标与输出摘要，未变动的原图直接复用。
 

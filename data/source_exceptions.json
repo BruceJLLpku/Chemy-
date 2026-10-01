@@ -1,0 +1,23 @@
+{
+  "backgroundHashes": [
+    "18f5d9440b5dc767fcd738b30fdbd60573e46f95178d6ecb4ed69605ec8385d0",
+    "48a3ef6c2e2399bf4a6e9bf827eae6b8730ea572ced1f7350345d860dc9d51b6",
+    "910e2b2c614e61aa6622cf5b65b0737fb8e928f6c8629619a3f1965f851c38aa",
+    "acec9f7a2dac3aab28cb9d9f69a22dc76426bc7f77c290d628490d8f36f9af62",
+    "c0fb598ed00a69c53710886905d64d83cf84bee1f0f2923a89a909cb53625a83",
+    "c3200049973cee1482e08a05131e2150a8c38e3825989ee028b009be53747a9d",
+    "d6c09f32922baffe11ea7471eb6f3ea69ae2dd435ff669380309ba28954caf74"
+  ],
+  "captures": [
+    {"edition":39,"paper":10,"number":1,"kind":"q","page":82,"box":[455,584,508,716],"mode":"float"},
+    {"edition":39,"paper":15,"number":2,"kind":"q","page":125,"box":[347,76,506,167],"mode":"float"},
+    {"edition":36,"paper":4,"number":4,"kind":"q","page":20,"box":[392,71,508,182],"mode":"float"},
+    {"edition":36,"paper":10,"number":6,"kind":"q","page":52,"box":[396,70,508,247],"mode":"float"},
+    {"edition":36,"paper":20,"number":7,"kind":"q","page":103,"box":[353,70,508,212],"mode":"float"},
+    {"edition":36,"paper":21,"number":3,"kind":"q","page":106,"box":[347,458,507,563],"mode":"float"},
+    {"edition":35,"paper":10,"number":5,"kind":"q","page":55,"box":[413,75,498,183],"mode":"float"},
+    {"edition":35,"paper":19,"number":1,"kind":"q","page":100,"box":[387,101,508,236],"mode":"float"},
+    {"edition":36,"paper":23,"number":6,"kind":"a","page":239,"box":[178,374,437,498],"mode":"band"}
+  ],
+  "reviewNotes": "All listed boundary exceptions were reviewed against original page renders. Background hashes identify only verified pale watermark tiles; no chemistry diagram is redrawn. White fill-only rectangles behind heading text are not diagrams."
+}

@@ -1,0 +1,144 @@
+{
+  "scope": {
+    "39": {
+      "papers": 22,
+      "questions": 210
+    },
+    "36": {
+      "papers": 25,
+      "questions": 253
+    },
+    "35": {
+      "papers": 26,
+      "questions": 250
+    }
+  },
+  "methods": {
+    "losslessSourcePixelComparison": true,
+    "printChapterContentComparison": true,
+    "nativeGlyphCoverage": true,
+    "sourcePairingAndHashes": true
+  },
+  "checks": {
+    "source_questions": 713,
+    "decodable_images": 3115,
+    "paired_sections": 1406,
+    "original_captures": 3073,
+    "topic_pdfs": 18,
+    "print_pages": 1592
+  },
+  "issues": [],
+  "reviewCandidates": [],
+  "automatedPassed": true,
+  "visualReviewComplete": true,
+  "visualReview": {
+    "method": "targeted source-boundary review plus representative rendered print-page review",
+    "sourceBoundaryCandidatesReviewed": 24,
+    "correctedCapturesReviewed": 11,
+    "topicPdfSamplesReviewed": 18,
+    "renderedSamplePages": 36,
+    "webChecks": [
+      "73-paper selector and 713-question total",
+      "reference answer expansion",
+      "original restored floating crystal image with no horizontal overflow",
+      "39-4-8 original image decoding in browser"
+    ],
+    "limitations": [
+      "Printed pages were checked automatically in full; visual inspection covered exceptions and representative samples, not a manual reading of every page.",
+      "Mobile viewport override did not take effect in this browser; no mobile visual pass is claimed."
+    ]
+  },
+  "completedAt": "2026-10-01T06:29:05.715962+00:00",
+  "outputPdfs": [
+    {
+      "path": "dist/downloads/analysis-answers.pdf",
+      "bytes": 7269675,
+      "sha256": "f43098b5bc2c586573d28b75313c21c620f7e12ab94de664141401be9f545b9f"
+    },
+    {
+      "path": "dist/downloads/analysis-questions.pdf",
+      "bytes": 7441081,
+      "sha256": "ba7eb0af54537f93f75c2909fa412d3009e858267ab17402fda864acf8e6477c"
+    },
+    {
+      "path": "dist/downloads/crystal-answers.pdf",
+      "bytes": 14636068,
+      "sha256": "89290a5ea1a228ec2b75b95fc8f7bea82509dc5e76c91f110933aaaecf300b48"
+    },
+    {
+      "path": "dist/downloads/crystal-questions.pdf",
+      "bytes": 12143251,
+      "sha256": "f8c390f0006f73ea63166947ba725f599466052769f94ad9b829d02f501dcfbe"
+    },
+    {
+      "path": "dist/downloads/electrochemistry-answers.pdf",
+      "bytes": 7329011,
+      "sha256": "df213aa7961f3963270d5d0cf490159f4a565b66b6cb9ee90f49dd62ee24a164"
+    },
+    {
+      "path": "dist/downloads/electrochemistry-questions.pdf",
+      "bytes": 6659160,
+      "sha256": "e6fae5bf591648a5cf1a8ccc7ea3d0630bdf5ebb0ec8fcc39323b4b70fa3f321"
+    },
+    {
+      "path": "dist/downloads/elements-answers.pdf",
+      "bytes": 12645490,
+      "sha256": "cb8c381bd2cc9684a6c47b9f001fae180c4937111483074c103a220e98460e5f"
+    },
+    {
+      "path": "dist/downloads/elements-questions.pdf",
+      "bytes": 10316642,
+      "sha256": "7e861b5c6e11f014489c705d986cf7e78d37775bf4e3ac3ff6928fe80f58b311"
+    },
+    {
+      "path": "dist/downloads/equilibrium-answers.pdf",
+      "bytes": 10449328,
+      "sha256": "5450e85589b5f8b2d825f8d27eaeefb840b23400b1f6d1985493253866ca06bf"
+    },
+    {
+      "path": "dist/downloads/equilibrium-questions.pdf",
+      "bytes": 8772059,
+      "sha256": "54a303d14c1294120713f994acb20788ae120342016c7484788c2fb9360a7627"
+    },
+    {
+      "path": "dist/downloads/inference-answers.pdf",
+      "bytes": 30048430,
+      "sha256": "10a52c903e566a63b40b32afbdd8fdadef62c4ca94f18254f06029cfc443f9bb"
+    },
+    {
+      "path": "dist/downloads/inference-questions.pdf",
+      "bytes": 19376712,
+      "sha256": "d896d29b1057ea2ee1bd34cdba89d0bfacef6205f5681552a23014289b4bf42a"
+    },
+    {
+      "path": "dist/downloads/kinetics-answers.pdf",
+      "bytes": 6828345,
+      "sha256": "5eb840b4aa212df91ee3c36dc66fec92ac5ac72d4519f14c5d799259d33e89eb"
+    },
+    {
+      "path": "dist/downloads/kinetics-questions.pdf",
+      "bytes": 5804234,
+      "sha256": "54042129d370ae5d1423fa84314ab78d79ba8e9f2cbe604aae241d37471440c2"
+    },
+    {
+      "path": "dist/downloads/organic-answers.pdf",
+      "bytes": 41879906,
+      "sha256": "33d165d2c886939df5cf328dc8306e5461f55096c3e58b6c7039a23637466e11"
+    },
+    {
+      "path": "dist/downloads/organic-questions.pdf",
+      "bytes": 30954396,
+      "sha256": "30a3627a8188a291365bd5950efd36bc007947d335b7541c818a5513c83c2fad"
+    },
+    {
+      "path": "dist/downloads/polymer-answers.pdf",
+      "bytes": 7276403,
+      "sha256": "a2ca71b94d3135e7f32abc6b5d85fb1e8e60b9aeabaad21d370d2e32c4302d0f"
+    },
+    {
+      "path": "dist/downloads/polymer-questions.pdf",
+      "bytes": 6372441,
+      "sha256": "3b1c74d9637f5af46e767154db8ab88cf86726fa186630e7090d851b589a1e9e"
+    }
+  ]
+}
