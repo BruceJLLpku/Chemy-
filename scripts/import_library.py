@@ -142,7 +142,15 @@ def import_paper(paper,topics):
     bank=[q for q in bank if q['paper']!=paper]+items;bank.sort(key=lambda q:(q['paper'],q['number']))
     assert [q for q in bank if q['paper']==1]==original
     (ROOT/'dist/questions.json').write_text(json.dumps(bank,ensure_ascii=False,indent=2),encoding='utf8')
-    manifest['papers'][str(paper)]={'questions':records,'reviewed':False};DATA.parent.mkdir(exist_ok=True);DATA.write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf8')
+    first=specs[0];begin=int(INDEX['q']['papers'][str(paper)])
+    common_ranges=[]
+    for n in range(begin,first['page']+1):
+        lo=95 if n==begin else 70;hi=first['top']-3 if n==first['page'] else 766
+        if hi>lo+15:common_ranges.append([n,lo,hi])
+    instructions,cf,ca=section('q',common_ranges,paper,0,'原卷提示') if common_ranges else ('',[],[])
+    notes_path=ROOT/'dist/papers.json';notes=json.loads(notes_path.read_text(encoding='utf8')) if notes_path.exists() else {}
+    notes[str(paper)]={'instructions':instructions,'scoring':''};notes_path.write_text(json.dumps(notes,ensure_ascii=False,indent=2),encoding='utf8')
+    manifest['papers'][str(paper)]={'questions':records,'common':{'question':common_ranges,'figures':cf,'coverage':ca},'reviewed':False};DATA.parent.mkdir(exist_ok=True);DATA.write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf8')
     print('Imported paper',paper,len(items),'questions',dict(Counter(q['topic'] for q in items)),flush=True)
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('paper',type=int);ap.add_argument('--topics',nargs='+');args=ap.parse_args()

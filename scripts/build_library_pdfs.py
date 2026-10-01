@@ -53,13 +53,16 @@ def create(paper,topic,k,specs):
     writer.compress_identical_objects(remove_duplicates=True,remove_unreferenced=True)
     path=PARTS/f'{paper:02}-{SLUGS[topic]}-{k}.pdf';writer.write(path);return path
 def build(paper):
-    manifest=json.loads(DATA.read_text(encoding='utf8'));specs=manifest['papers'][str(paper)]['questions']
+    manifest=json.loads(DATA.read_text(encoding='utf8'));chapter=manifest['papers'][str(paper)];specs=chapter['questions']
     for topic in dict.fromkeys(s['topic'] for s in specs):
         slug=SLUGS[topic]
         for k,kind in [('q','questions'),('a','answers')]:
             target=OUT/f'{slug}-{kind}.pdf';base=PARTS/f'01-{slug}-{k}.pdf'
             if base.exists() is False and target.exists() and any(q['topic']==topic for q in PAPER):base.write_bytes(target.read_bytes())
-            create(paper,topic,k,[s for s in specs if s['topic']==topic])
+            ss=[s for s in specs if s['topic']==topic]
+            if k=='q' and chapter.get('common',{}).get('question'):
+                ss=[{'printQuestion':chapter['common']['question'],'figures':{'q':chapter['common']['figures']}}]+ss
+            create(paper,topic,k,ss)
             writer=PdfWriter()
             for n in range(1,paper+1):
                 path=PARTS/f'{n:02}-{slug}-{k}.pdf'
