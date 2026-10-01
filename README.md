@@ -30,6 +30,8 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 ## 内容维护
 
 - `dist/questions.json`：网页题目、答案及来源；与打印册共用原卷边界和分类清单。
+- `dist/interface.css`：目录、导航、专题标题和下载入口的界面样式；仅在屏幕上生效。
+- `dist/styles.css`：保留已认可的题目、原图及答案阅读排版。更新界面时保持阅读样式和题目渲染模板不变。
 - `scripts/write_questions.py`：保留已认可的第 6、8 题内容，直接运行时导入完整第一套卷。
 - `scripts/extract_figures.py`：原图图形提取。
 - `scripts/make_pdfs.py`：从原 PDF 保留字体及图形，生成专题题目册与答案册。
