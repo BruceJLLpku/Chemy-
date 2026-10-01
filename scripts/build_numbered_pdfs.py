@@ -137,6 +137,8 @@ def create(paper,topic,k,specs):
         writer.compress_identical_objects(remove_duplicates=True,remove_unreferenced=True);writer.write(template)
         layout={'ledger':ledger,'heads':heads,'placements':placements};layout_path.write_text(json.dumps(layout,ensure_ascii=False),encoding='utf8');template_stamp.write_text(fingerprint)
     else:layout=json.loads(layout_path.read_text(encoding='utf8'))
+    from pdf_form_cache import wrap_template
+    wrap_template(template,fingerprint)
     writer=PdfWriter();writer.append(template);buf=BytesIO();c=canvas.Canvas(buf,pagesize=(W,H))
     for page_number in range(1,len(writer.pages)+1):
         for h in layout['heads']:
