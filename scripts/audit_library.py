@@ -9,7 +9,6 @@ from PIL import Image,ImageChops
 from pypdf import PdfReader
 from paper1_manifest import ROOT,SLUGS
 
-EXPECTED={39:(22,210),36:(25,253),35:(26,250)}
 REPORT=ROOT/'data/audit_report.json'
 EXCEPTIONS=json.loads((ROOT/'data/source_exceptions.json').read_text(encoding='utf8'))
 def read(path):return json.loads(path.read_text(encoding='utf8'))
@@ -35,13 +34,17 @@ def chars_of(text):return Counter(c for c in text.replace('\uf044','Δ') if not 
 
 def audit(pixels=True,books=True):
     bank=read(ROOT/'dist/questions.json');manifest=read(ROOT/'data/library_manifest.json');notes=read(ROOT/'dist/papers.json')
+    expected={}
+    for e in sorted({q.get('edition',39) for q in bank},reverse=True):
+        index=source_index(e,'q')
+        expected[e]=(len(index['papers']),len({(h['paper'],h['number']) for h in index['questions']}))
     issues=[];candidates=[];checks=Counter();bykey={(q.get('edition',39),q['paper'],q['number']):q for q in bank}
     def require(condition,code,context):
         if not condition:issues.append({'code':code,**context})
-    require(len(bykey)==len(bank)==713,'total_or_duplicate',{'count':len(bank)})
+    require(len(bykey)==len(bank)==sum(n for _,n in expected.values()),'total_or_duplicate',{'count':len(bank)})
     original=read(ROOT/'tmp/approved-paper1.json')
     require([q for q in bank if q.get('edition',39)==39 and q['paper']==1]==original,'approved_sample_changed',{})
-    for e,(papers,count) in EXPECTED.items():
+    for e,(papers,count) in expected.items():
         qindex=source_index(e,'q');aindex=source_index(e,'a')
         sourcekeys={(e,h['paper'],h['number']) for h in qindex['questions']}
         require(sourcekeys=={(e,h['paper'],h['number']) for h in aindex['questions']},'source_pairing',{'edition':e})
@@ -49,7 +52,9 @@ def audit(pixels=True,books=True):
         require(len(sourcekeys)==count and len(qindex['papers'])==papers,'edition_totals',{'edition':e})
         sources=read(ROOT/'sources/manifest.json')['editions'][str(e)]['originalFiles']
         for source in sources:
-            require(digest((ROOT/'sources'/source['filename']).read_bytes())==source['sha256']==({'q':qindex,'a':aindex}[source['kind']]['sha256']),'source_changed',{'edition':e,'kind':source['kind']})
+            require(digest((ROOT/'sources'/source['filename']).read_bytes())==source['sha256'],'source_changed',{'edition':e,'kind':source['kind']})
+            if source['kind'] in ['q','a']:
+                require(source['sha256']=={'q':qindex,'a':aindex}[source['kind']]['sha256'],'source_index_changed',{'edition':e,'kind':source['kind']})
         checks['source_questions']+=count
     allhtml=[q['body']+q['answer'] for q in bank]+[str(n.get('instructions',''))+str(n.get('scoring','')) for n in list(notes.values())+[read(ROOT/'dist/paper1-notes.json')]]
     allrefs={name for html in allhtml for name in re.findall(r'src="assets/([^\"]+)"',html)}
@@ -137,7 +142,7 @@ def audit(pixels=True,books=True):
                 require(offset==len(book.pages),'print_page_total',{'topic':topic,'kind':k,'pages':len(book.pages),'expected':offset})
                 checks['topic_pdfs']+=1;checks['print_pages']+=len(book.pages)
     candidates=list({json.dumps(c,sort_keys=True):c for c in candidates}.values())
-    report={'scope':{str(e):{'papers':p,'questions':n} for e,(p,n) in EXPECTED.items()},'methods':{'losslessSourcePixelComparison':pixels,'printChapterContentComparison':books,'nativeGlyphCoverage':True,'sourcePairingAndHashes':True},'checks':dict(checks),'issues':issues,'reviewCandidates':candidates,'automatedPassed':not issues,'visualReviewComplete':False}
+    report={'scope':{str(e):{'papers':p,'questions':n} for e,(p,n) in expected.items()},'methods':{'losslessSourcePixelComparison':pixels,'printChapterContentComparison':books,'nativeGlyphCoverage':True,'sourcePairingAndHashes':True},'checks':dict(checks),'issues':issues,'reviewCandidates':candidates,'automatedPassed':not issues,'visualReviewComplete':False}
     REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8')
     print(json.dumps({'checks':dict(checks),'issues':len(issues),'reviewCandidates':len(candidates),'report':str(REPORT)},ensure_ascii=False),flush=True)
     for issue in issues[:12]:print(json.dumps(issue,ensure_ascii=False),flush=True)

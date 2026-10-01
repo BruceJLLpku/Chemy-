@@ -15,10 +15,12 @@ def run(script,args,e):
         if process.wait():raise RuntimeError(''.join(tail))
         return sha
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--first-built',action='store_true');args=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('--first-built',action='store_true');ap.add_argument('--editions',nargs='+',type=int,default=[38,37]);args=ap.parse_args()
     state=json.loads(STATE.read_text(encoding='utf8')) if STATE.exists() else {'completed':[]}
     completed={(x['edition'],x['paper']) for x in state['completed']}
-    for e,total in [(38,24),(37,28)]:
+    for e in args.editions:
+        plan=json.loads((ROOT/f'data/import_plan{e}.json').read_text(encoding='utf8'))
+        total=len(plan['papers']) if 'papers' in plan else len(plan)
         for paper in range(1,total+1):
             if (e,paper) in completed:continue
             started=time.monotonic();print('START',e,paper,flush=True)

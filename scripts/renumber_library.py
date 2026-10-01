@@ -27,7 +27,8 @@ pdfmetrics.registerFont(TTFont('LabelRegular','C:/Windows/Fonts/times.ttf'))
 pdfmetrics.registerFont(TTFont('LabelBold','C:/Windows/Fonts/timesbd.ttf'))
 pdfmetrics.registerFont(TTFont('LabelSong','C:/Windows/Fonts/simsun.ttc',subfontIndex=0))
 BANK=json.loads((ROOT/'dist/questions.json').read_text(encoding='utf8'))
-NUMBER=write_numbering(BANK)['numberById'];QUESTIONS={q['id']:q for q in BANK}
+NUMBER=json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))['numberById'];QUESTIONS={q['id']:q for q in BANK}
+assert set(NUMBER)==set(QUESTIONS), 'Import must create the shared numbering table before parallel workers start'
 # Verified cross-question reference; ordinary reaction/spectrum ranges are not labels.
 CROSS_REFERENCES={('chemy39-8-2','1-2-2'):'chemy39-8-1'}
 LABEL_CORRECTIONS={('chemy39-1-6','a','6-5'):'6-4',('chemy36-25-4','a','9-4'):'4-4'}

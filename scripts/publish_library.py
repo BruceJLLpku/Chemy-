@@ -10,7 +10,7 @@ from library_config import EDITION,edition_of
 
 GIT='C:/Users/Prettibruce/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd/git.exe'
 REPO='BruceJLLpku/Chemy-';BASE='https://brucejllpku.github.io/Chemy-/'
-env=os.environ.copy();env.update(GCM_INTERACTIVE='never',GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='safe.directory',GIT_CONFIG_VALUE_0=ROOT.as_posix())
+env=os.environ.copy();env.update(GCM_INTERACTIVE='never',GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='3',GIT_CONFIG_KEY_0='safe.directory',GIT_CONFIG_VALUE_0=ROOT.as_posix(),GIT_CONFIG_KEY_1='gc.auto',GIT_CONFIG_VALUE_1='0',GIT_CONFIG_KEY_2='maintenance.auto',GIT_CONFIG_VALUE_2='false')
 def git(*args):
     return subprocess.run([GIT,*args],cwd=ROOT,env=env,text=True,capture_output=True,check=True,encoding='utf8').stdout.strip()
 
