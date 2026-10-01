@@ -62,7 +62,7 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
         status='已完成全量来源、字形、原图及题答配对检查，并复核边界异常和各专题打印册样页；记录见data/audit_report.json。' if reviewed else '图文与对应关系将在全部录入结束后统一复核。'
         s=s[:start]+f'当前完整收录{scope}模拟试题，共{len(bank)}道完整大题。每道大题只设置一个主专题。九个专题提供累计题目册、答案册，保留原卷字体、结构式、评分和来源。{status}\n\n'+s[end:]
         readme.write_text(s,encoding='utf8')
-        git('add','dist','scripts','data','docs','sources','README.md','WORK_STATE.md')
+        git('add','dist','scripts','data','docs','sources','README.md','WORK_STATE.md','.github/workflows/pages.yml')
         git('commit','-m',message or f'Import Chemy {EDITION} mock paper {paper} with cumulative topic PDFs')
     sha=git('rev-parse','HEAD')
     snapshot_names=['index.html','questions.json','app.js','papers.json','numbering.json','presentation.json']
