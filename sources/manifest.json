@@ -133,6 +133,19 @@
           "sha256": "5d168b984bfdafa6985b10b619fda5c4692065e559c7b60ba48797ea3c38dfe9",
           "bytes": 755066
         }
+      ],
+      "workingFiles": [
+        {
+          "kind": "a",
+          "filename": "第32届Chemy答案（含官方补正工作源）.pdf",
+          "sha256": "d96ed2cd6794b0819f149a49aff6e690b65ef584b0b0be6e5a735bd8ed9e6d8d",
+          "bytes": 5439815,
+          "derivedFrom": [
+            "第32届中国化学奥林匹克Chemy题目合集答案.pdf",
+            "第32届Chemy化学奥林匹克答案补正.pdf"
+          ],
+          "recipe": "data/answer_corrections32.json"
+        }
       ]
     },
     "0": {
