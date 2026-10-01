@@ -1,4 +1,5 @@
 """Topic workbooks retaining original PDF fonts, diagrams, and scoring rules."""
+import argparse
 from copy import deepcopy
 from io import BytesIO
 from pathlib import Path
@@ -19,14 +20,14 @@ A=PdfReader(A_SOURCE)
 pdfmetrics.registerFont(TTFont('SampleSong','C:/Windows/Fonts/simsun.ttc',subfontIndex=0))
 W,H=A4
 ANSWER_GEOMETRY={}
-with pdfplumber.open(A_SOURCE) as doc:
-    for n in range(3,17):
-        p=doc.pages[n-1]
-        ANSWER_GEOMETRY[n]=(p.chars,[o for o in p.lines+p.rects
-                                   if o['width']>400 and o['height']<1])
+GEOMETRY_SOURCE=pdfplumber.open(A_SOURCE)
 
 def print_bounds(reader,n,y0,y1):
     if reader is not A:return y0,y1
+    if n not in ANSWER_GEOMETRY:
+        p=GEOMETRY_SOURCE.pages[n-1]
+        ANSWER_GEOMETRY[n]=(p.chars,[o for o in p.lines+p.rects
+                                   if o['width']>400 and o['height']<1])
     chars,rules=ANSWER_GEOMETRY[n]
     selected=[c for c in chars if y0-1.1<=c['top']<y1 and c['text'].strip()
               and 84<=c['x0']<512]
@@ -80,7 +81,12 @@ def create(topic,kind,slug,reader,segments,note=''):
     print(f'{dest.name}: {len(writer.pages)} page(s)')
 
 if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--topics',nargs='+',choices=list(SLUGS.values()),
+                        help='Only regenerate these topic slugs; omit to build all topics.')
+    args=parser.parse_args()
     for topic,slug in SLUGS.items():
+        if args.topics and slug not in args.topics:continue
         specs=[p for p in PAPER if p['topic']==topic]
         if not specs:continue
         question_ranges=[r for p in specs for r in p['printQuestion']]
@@ -96,5 +102,8 @@ if __name__=='__main__':
     data_path=ROOT/'dist'/'questions.json'
     data=json.loads(data_path.read_text(encoding='utf-8'))
     assert len(data)==10 and {x['number'] for x in data}==set(range(1,11))
-    for item in data:item['pdfReady']=True
+    for item in data:
+        item['pdfReady']=all((OUT/f'{SLUGS[item["topic"]]}-{kind}.pdf').exists()
+                             for kind in ('questions','answers'))
     data_path.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+    GEOMETRY_SOURCE.close()

@@ -1,5 +1,5 @@
-const topics=['有机化学','高分子化学','晶体化学','结构推断','方程式与元素化学','热力学与化学平衡','电化学','动力学','分析化学'];
-const slugByTopic={'有机化学':'organic','高分子化学':'polymer','晶体化学':'crystal','结构推断':'inference','方程式与元素化学':'elements','热力学与化学平衡':'equilibrium','电化学':'electrochemistry','动力学':'kinetics','分析化学':'analysis'};
+const topics=['有机化学','高分子化学','晶体化学','无机综合与结构推断','方程式与元素化学','热力学与化学平衡','电化学','动力学','分析化学'];
+const slugByTopic={'有机化学':'organic','高分子化学':'polymer','晶体化学':'crystal','无机综合与结构推断':'inference','方程式与元素化学':'elements','热力学与化学平衡':'equilibrium','电化学':'electrochemistry','动力学':'kinetics','分析化学':'analysis'};
 const chevron='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 const downloadIcon='<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10m-4-4 4 4 4-4M3 13v4h14v-4"/></svg>';
 let notes={};let questions=[];let activeTopic='电化学';

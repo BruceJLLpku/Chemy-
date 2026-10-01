@@ -4,6 +4,8 @@ Extract native PDF characters into flowing HTML; render ONLY source diagram
 regions as lossless images. Source PDFs stay unchanged. The manifest records
 every reviewed boundary so a correction only regenerates affected content.
 """
+import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -28,7 +30,15 @@ END = {'q':10, 'a':16}
 def prepare(kind):
     """One native extraction and one render per source page, reused for all crops."""
     cache_path = TMP / f'{kind}-characters.json'
-    if cache_path.exists():
+    signature_path = TMP / f'{kind}-cache-signature.json'
+    signature={'sourceSha256':hashlib.sha256(SOURCES[kind].read_bytes()).hexdigest(),
+               'start':START[kind],'end':END[kind],'profile':'native-and-clean-render-v1'}
+    def page_path(n):
+        digits=len(str(END[kind]-START[kind]+1))
+        return TMP/f'{kind}-page-{n-START[kind]+1:0{digits}d}.png'
+    if (cache_path.exists() and signature_path.exists()
+            and json.loads(signature_path.read_text(encoding='utf8'))==signature
+            and all(page_path(f[1]).exists() for f in FIGURES if f[0]==kind)):
         return json.loads(cache_path.read_text(encoding='utf8'))
     reader = PdfReader(SOURCES[kind])
     writer = PdfWriter()
@@ -53,6 +63,7 @@ def prepare(kind):
     subprocess.run(['pdftoppm','-r','252','-png',str(TMP/f'{kind}-clean.pdf'),
                     str(TMP/f'{kind}-page')],check=True,stdout=subprocess.DEVNULL)
     cache_path.write_text(json.dumps(cache,ensure_ascii=False),encoding='utf8')
+    signature_path.write_text(json.dumps(signature),encoding='utf8')
     return {str(k):v for k,v in cache.items()}
 
 def in_box(c, box):
@@ -60,14 +71,33 @@ def in_box(c, box):
     return x0 <= (c['x0']+c['x1'])/2 <= x1 and y0 <= (c['top']+c['bottom'])/2 <= y1
 
 def export_crops():
+    ledger_path=TMP/'crop-cache.json'
+    ledger=json.loads(ledger_path.read_text(encoding='utf8')) if ledger_path.exists() else {}
+    fingerprints={kind:hashlib.sha256(path.read_bytes()).hexdigest() for kind,path in SOURCES.items()}
+    generated=0
+    active_path=None
+    im=None
     for kind,n,x0,y0,x1,y1,name,label in FIGURES:
+        target=ASSETS/f'{name}.webp'
+        signature=[fingerprints[kind],n,x0,y0,x1,y1,'lossless-252dpi-v1']
+        previous=ledger.get(name,{})
+        if (previous.get('input')==signature and target.exists()
+                and previous.get('sha256')==hashlib.sha256(target.read_bytes()).hexdigest()):
+            continue
         index = n - START[kind] + 1
         digits = len(str(END[kind]-START[kind]+1))
         page_path = TMP / f'{kind}-page-{index:0{digits}d}.png'
-        with Image.open(page_path) as im:
-            scale = im.width / 595.32
-            crop = im.crop(tuple(round(v*scale) for v in (x0,y0,x1,y1)))
-            crop.save(ASSETS/f'{name}.webp',lossless=True,method=6)
+        if page_path!=active_path:
+            if im is not None:im.close()
+            im=Image.open(page_path);active_path=page_path
+        scale = im.width / 595.32
+        crop = im.crop(tuple(round(v*scale) for v in (x0,y0,x1,y1)))
+        crop.save(target,lossless=True,method=6)
+        ledger[name]={'input':signature,'sha256':hashlib.sha256(target.read_bytes()).hexdigest()}
+        generated+=1
+    if im is not None:im.close()
+    ledger_path.write_text(json.dumps(ledger,ensure_ascii=False),encoding='utf8')
+    print('Original diagram captures regenerated:',generated,'; reused:',len(FIGURES)-generated)
 
 def line_html(chars):
     anchors = [c for c in chars if c['size'] >= 9.8 and c['text'].strip()]
@@ -177,16 +207,12 @@ def section(kind, ranges):
                       'figureCharacters':len(chars)-len(text_chars),'figures':[f[6] for f in figures]})
     return ''.join(parts)
 
-if __name__ == '__main__':
-    CACHE = {kind:prepare(kind) for kind in SOURCES}
-    export_crops()
-    approved = {6:electro,8:organic}
-    items = []
+def sync_metadata(items):
+    by_number={item['number']:item for item in items}
+    if len(items)!=len(PAPER) or set(by_number)!={spec['number'] for spec in PAPER}:
+        raise ValueError('Metadata sync requires the existing complete first-paper bank.')
     for spec in PAPER:
-        n=spec['number']
-        item = dict(approved[n]) if spec.get('approved') else {
-            'id':f'chemy39-1-{n}', 'body':section('q',spec['question']),
-            'answer':section('a',spec['answer'])}
+        n=spec['number'];item=by_number[n]
         item.update({k:spec[k] for k in ('number','title','topic','points','percent')})
         item['paper']=1
         item['pdfReady']=all((ROOT/'dist'/'downloads'/f'{SLUGS[spec["topic"]]}-{kind}.pdf').exists()
@@ -199,13 +225,35 @@ if __name__ == '__main__':
         if n==6:item['answerPages']='7–9'
         if n==8:item['answerPages']='10–11'
         if n==9:item['answerPages']='11–13'
-        if n==7:
-            item['answer']+='<div class="note">原答案在 Na-O 高度计算的“解得”行将 h₁ 写成了 h₂；这里保留原文，数值与后续晶胞参数按原答案展示。</div>'
-        items.append(item)
+    return items
+
+if __name__ == '__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--metadata-only',action='store_true',
+                        help='Sync classification and metadata without extracting text or images.')
+    args=parser.parse_args()
+    if args.metadata_only:
+        items=json.loads((ROOT/'dist'/'questions.json').read_text(encoding='utf8'))
+    else:
+        CACHE = {kind:prepare(kind) for kind in SOURCES}
+        export_crops()
+        approved = {6:electro,8:organic}
+        items=[]
+        for spec in PAPER:
+            n=spec['number']
+            item = dict(approved[n]) if spec.get('approved') else {
+                'id':f'chemy39-1-{n}', 'body':section('q',spec['question']),
+                'answer':section('a',spec['answer'])}
+            item['number']=n
+            if n==7:
+                item['answer']+='<div class="note">原答案在 Na-O 高度计算的“解得”行将 h₁ 写成了 h₂；这里保留原文，数值与后续晶胞参数按原答案展示。</div>'
+            items.append(item)
+        common={'instructions':section('q',[(4,132,289)]),
+                'scoring':section('a',[(3,320,459)])}
+        (ROOT/'dist'/'paper1-notes.json').write_text(json.dumps(common,ensure_ascii=False,indent=2),encoding='utf8')
+        (TMP/'coverage.json').write_text(json.dumps(AUDIT,ensure_ascii=False,indent=2),encoding='utf8')
+    items=sync_metadata(items)
     (ROOT/'dist'/'questions.json').write_text(json.dumps(items,ensure_ascii=False,indent=2),encoding='utf8')
-    common={'instructions':section('q',[(4,132,289)]),
-            'scoring':section('a',[(3,320,459)])}
-    (ROOT/'dist'/'paper1-notes.json').write_text(json.dumps(common,ensure_ascii=False,indent=2),encoding='utf8')
-    (TMP/'coverage.json').write_text(json.dumps(AUDIT,ensure_ascii=False,indent=2),encoding='utf8')
     print('Imported',len(items),'complete questions;',dict(Counter(q['topic'] for q in items)))
-    print('Original diagram captures:',len(FIGURES),'; native extraction ranges:',len(AUDIT))
+    if args.metadata_only:print('Metadata only: existing question text, answers and all assets retained.')
+    else:print('Original diagram captures:',len(FIGURES),'; native extraction ranges:',len(AUDIT))
