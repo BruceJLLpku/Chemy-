@@ -16,6 +16,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from build_library_pdfs import ROOT,CACHE,DATA,SLUGS,W,H,bands,part_path,render_page
 from paper1_manifest import PAPER,FIGURES
 from library_config import EDITION
+from fast_pdf import page_count,stamp_template,merge_parts
 
 pdfmetrics.registerFont(TTFont('LabelRegular','C:/Windows/Fonts/times.ttf'))
 pdfmetrics.registerFont(TTFont('LabelBold','C:/Windows/Fonts/timesbd.ttf'))
@@ -139,8 +140,8 @@ def create(paper,topic,k,specs):
     else:layout=json.loads(layout_path.read_text(encoding='utf8'))
     from pdf_form_cache import wrap_template
     wrap_template(template,fingerprint)
-    writer=PdfWriter();writer.append(template);buf=BytesIO();c=canvas.Canvas(buf,pagesize=(W,H))
-    for page_number in range(1,len(writer.pages)+1):
+    total_pages=page_count(template);buf=BytesIO();c=canvas.Canvas(buf,pagesize=(W,H))
+    for page_number in range(1,total_pages+1):
         for h in layout['heads']:
             if h['page']==page_number:c.saveState();draw_heading(c,QUESTIONS[h['id']],h['cursor']);c.restoreState()
         for place in layout['placements']:
@@ -149,28 +150,25 @@ def create(paper,topic,k,specs):
             c.saveState();c.setFillColorRGB(*color[:3]) if isinstance(color,list) else c.setFillGray(color or 0)
             c.translate(place['tx']+label['x']*sc,place['ty']+label['baseline']*sc);c.scale(sc*label['horizontalScale'],sc);c.setFont(label['font'],label['size']);c.drawString(0,0,label['new']);c.restoreState()
         c.showPage()
-    c.save();overlay=PdfReader(buf)
-    for page,extra in zip(writer.pages,overlay.pages):page.merge_page(extra)
-    writer.write(dest)
+    c.save();stamp_template(template,buf.getvalue(),dest)
     ledger=[{**record,'number':NUMBERS[record['id']]} for record in layout['ledger']]
     dest.with_suffix('.json').write_text(json.dumps(ledger,ensure_ascii=False,indent=2),encoding='utf8');stamp.write_text(signature)
 
 def merge_book(job):
     topic,slug,k,kind=job
     chapters=sorted({(q.get('edition',39),q['paper']) for q in BANK},key=lambda p:(-p[0],p[1]))
-    writer=PdfWriter();records=[]
+    records=[];paths=[];offset=0
     for e,paper in chapters:
         if not any(q['topic']==topic and q.get('edition',39)==e and q['paper']==paper for q in BANK):continue
-        path=part_path(e,paper,slug,k);offset=len(writer.pages);writer.append(path)
+        path=part_path(e,paper,slug,k);paths.append(path)
         entries=json.loads(path.with_suffix('.json').read_text(encoding='utf8'))
-        for entry in entries:
-            entry={**entry,'firstPage':offset+entry['firstPage'],'lastPage':offset+entry['lastPage']};records.append(entry)
-            writer.add_outline_item(f'第{entry["number"]}题 · 第{e}届模拟试题{paper}原第{entry["sourceNumber"]}题',entry['firstPage']-1)
+        for entry in entries:records.append({**entry,'firstPage':offset+entry['firstPage'],'lastPage':offset+entry['lastPage']})
+        offset+=page_count(path)
     expected=[q['id'] for q in BANK if q['topic']==topic];assert [r['id'] for r in records]==expected,(topic,kind)
     assert [r['number'] for r in records]==list(range(1,len(expected)+1))
-    writer.add_metadata({'/Title':f'Chemy {topic}专题'+('题目册' if k=='q' else '答案册'),'/Author':'Chemy 化学奥林匹克团队（原题与答案）','/Subject':'专题连续编号，题目与小问统一编号；来源单独标注'})
-    writer.compress_identical_objects(remove_duplicates=True,remove_unreferenced=True);dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf';writer.write(dest)
-    return f'{slug}-{kind}',records,len(writer.pages)
+    metadata={'/Title':f'Chemy {topic}专题'+('题目册' if k=='q' else '答案册'),'/Author':'Chemy 化学奥林匹克团队（原题与答案）','/Subject':'专题连续编号，题目与小问统一编号；来源单独标注'}
+    dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf';pages=merge_parts(paths,records,dest,metadata);assert pages==offset
+    return f'{slug}-{kind}',records,pages
 
 def merge_all():
     all_index={};total=0;jobs=[(topic,slug,k,kind) for topic,slug in SLUGS.items() for k,kind in [('q','questions'),('a','answers')]]

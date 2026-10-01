@@ -11,7 +11,7 @@ def edition(e):
     items=[q for q in bank if q.get('edition',39)==e]
     cache=ROOT/'tmp'/('library' if e==39 else f'library{e}')/'numbered'
     stamp=cache/'edition.sha256'
-    source=hashlib.sha256(b''.join((ROOT/'scripts'/s).read_bytes() for s in ['renumber_library.py','build_numbered_pdfs.py','import_library.py','display_numbering.py'])).hexdigest()
+    source=hashlib.sha256(b''.join((ROOT/'scripts'/s).read_bytes() for s in ['renumber_library.py','build_numbered_pdfs.py','import_library.py','display_numbering.py','fast_pdf.py','pdf_form_cache.py'])).hexdigest()
     signature=hashlib.sha256(json.dumps({'q':items,'n':{q['id']:numbers[q['id']] for q in items},'scripts':source},sort_keys=True).encode()).hexdigest()
     if stamp.exists() and stamp.read_text()==signature and (cache/'presentation.json').exists():
         return

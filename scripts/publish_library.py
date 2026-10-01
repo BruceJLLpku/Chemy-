@@ -50,6 +50,7 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
         path=ROOT/'dist'/name;assert path.is_file(),name
         if path.suffix=='.webp':
             with Image.open(path) as im:im.verify()
+    assert all(p.stat().st_size<100*1024*1024 for p in (ROOT/'dist/downloads').glob('*.pdf')),'PDF exceeds repository file-size limit'
     old=json.loads(git('show','HEAD:dist/questions.json'));assert [q for q in bank if edition_of(q)==39 and q['paper']==1]==[q for q in old if edition_of(q)==39 and q['paper']==1]
     if not verify_only:
         readme=ROOT/'README.md';s=readme.read_text(encoding='utf8')
