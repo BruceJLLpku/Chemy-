@@ -80,6 +80,76 @@
           "bytes": 13921075
         }
       ]
+    },
+    "34": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "第34届Chemy化学奥林匹克题目合集.pdf",
+          "sha256": "153ecd0eb0d9111c53138b25afac90e14a73eb16fc4849a4374a3a6fd245cbd5",
+          "bytes": 5630073
+        },
+        {
+          "kind": "a",
+          "filename": "第34届Chemy化学奥林匹克题目合集答案.pdf",
+          "sha256": "3c1af58fa1bd5b28998a13015bf12c1d86535bdfbfcc3e3499dfe3227502b7ad",
+          "bytes": 8144371
+        }
+      ]
+    },
+    "33": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "第33届Chemy化学奥林匹克题目合集.pdf",
+          "sha256": "f9fc362542ebced77eccfcfa9cbca761516f43c74cb7804d6391c8ecaca24dd4",
+          "bytes": 2789769
+        },
+        {
+          "kind": "a",
+          "filename": "第33届Chemy化学奥林匹克题目合集答案.pdf",
+          "sha256": "147c2cc6a70faaf01ebe2b6b1db1ebb1efdd9eaf98c4948400c0a4030dd73775",
+          "bytes": 8586863
+        }
+      ]
+    },
+    "32": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "第32届中国化学奥林匹克Chemy题目合集.pdf",
+          "sha256": "fb320c9d05824fe5c8ed7982c312bcb18978b6692402584fc9088cc4cd432550",
+          "bytes": 3045999
+        },
+        {
+          "kind": "a",
+          "filename": "第32届中国化学奥林匹克Chemy题目合集答案.pdf",
+          "sha256": "e33b37f2eaec31411483a84c08e1de633d142c3ebfdc8d5248d39f9341452fdf",
+          "bytes": 4849105
+        },
+        {
+          "kind": "errata",
+          "filename": "第32届Chemy化学奥林匹克答案补正.pdf",
+          "sha256": "5d168b984bfdafa6985b10b619fda5c4692065e559c7b60ba48797ea3c38dfe9",
+          "bytes": 755066
+        }
+      ]
+    },
+    "0": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "Chemy化学奥林匹克竞赛联赛试题合集(1~24).pdf",
+          "sha256": "f12a8fa6a2b1c4eb9db01eec2133f7743123cbe1c363ba0a23c2a4f38f94afae",
+          "bytes": 7152278
+        },
+        {
+          "kind": "a",
+          "filename": "Chemy化学奥林匹克竞赛联赛参考答案合集(1~24).pdf",
+          "sha256": "18dce4b5774abff8e7c94f4a0b181b2a32adf2fc01e75e7632c8e4b6e75aa7bb",
+          "bytes": 10061154
+        }
+      ]
     }
   }
 }

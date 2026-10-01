@@ -41,4 +41,13 @@ if __name__=='__main__':
         assert path.resolve().parent==assets_root
         if path.name not in active:path.unlink()
     print('WEBSITE',len(display),'presentation entries ready',flush=True)
-    if not args.presentation_only:subprocess.run([sys.executable,'-X','utf8',str(ROOT/'scripts/build_numbered_pdfs.py'),'--merge-only'],cwd=ROOT,check=True)
+    if not args.presentation_only:
+        subprocess.run([sys.executable,'-X','utf8',str(ROOT/'scripts/build_numbered_pdfs.py'),'--merge-only'],cwd=ROOT,check=True)
+        # Only scratch render files; retain source pages, labels, templates and final books.
+        scratch=(ROOT/'tmp').resolve()
+        transient=[p for p in scratch.glob('library*/numbered/*') if p.is_file() and p.suffix.lower() in {'.pdf','.png'}]
+        for p in transient:
+            resolved=p.resolve()
+            assert resolved.is_relative_to(scratch) and resolved.parent.name=='numbered'
+        for p in transient:p.unlink()
+        print('CACHE',len(transient),'temporary render files released',flush=True)
