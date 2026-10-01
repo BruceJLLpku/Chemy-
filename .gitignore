@@ -1,0 +1,6 @@
+tmp/
+.sites-runtime/
+*.tar.gz
+__pycache__/
+.openai/
+output/
