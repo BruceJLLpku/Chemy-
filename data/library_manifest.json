@@ -101454,6 +101454,1211 @@
         "coverage": []
       },
       "reviewed": false
+    },
+    "38-11": {
+      "edition": 38,
+      "paper": 11,
+      "questions": [
+        {
+          "number": 1,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              77,
+              114.48003245000007,
+              493.6794675
+            ]
+          ],
+          "printQuestion": [
+            [
+              77,
+              101.31948175000002,
+              493.6794675
+            ]
+          ],
+          "answer": [
+            [
+              136,
+              111.48003245000007,
+              722.0
+            ],
+            [
+              137,
+              70,
+              261.5670847913959
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 77,
+                "box": [
+                  84,
+                  359.879997,
+                  514,
+                  429.0
+                ],
+                "asset": "e38-p11-q01-01-819d62993bc1.webp",
+                "mode": "band",
+                "sha256": "819d62993bc190c1ea3619b57ee838754674635ed261ab6da6e4def9ef8145ad"
+              }
+            ],
+            "a": [
+              {
+                "page": 137,
+                "box": [
+                  84,
+                  82.20000449999998,
+                  514,
+                  214.86015905
+                ],
+                "asset": "e38-p11-a01-01-01aec2912704.webp",
+                "mode": "band",
+                "sha256": "01aec29127048254bd09f44a0f7b739a0cb74c51a53e23bc9374df87a41c913e"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 77,
+                "range": [
+                  114.48003245000007,
+                  493.6794675
+                ],
+                "selectedCharacters": 651,
+                "nativeCharacters": 651,
+                "figures": 1
+              }
+            ],
+            "a": [
+              {
+                "page": 136,
+                "range": [
+                  111.48003245000007,
+                  722.0
+                ],
+                "selectedCharacters": 434,
+                "nativeCharacters": 434,
+                "figures": 0
+              },
+              {
+                "page": 137,
+                "range": [
+                  70,
+                  261.5670847913959
+                ],
+                "selectedCharacters": 80,
+                "nativeCharacters": 76,
+                "figures": 1
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 2,
+          "topic": "方程式与元素化学",
+          "question": [
+            [
+              77,
+              507.8400182,
+              722.0
+            ]
+          ],
+          "printQuestion": [
+            [
+              77,
+              494.6794675,
+              722.0
+            ]
+          ],
+          "answer": [
+            [
+              137,
+              275.7601688,
+              722.0
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": [
+              {
+                "page": 137,
+                "box": [
+                  84,
+                  575.001662746859,
+                  514,
+                  650.58015305
+                ],
+                "asset": "e38-p11-a02-01-aafa2741fb05.webp",
+                "mode": "band",
+                "sha256": "aafa2741fb05fc46a50a77c68350a74749f21adfe61c9dfe5069c508b41878c8"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 77,
+                "range": [
+                  507.8400182,
+                  722.0
+                ],
+                "selectedCharacters": 355,
+                "nativeCharacters": 355,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 137,
+                "range": [
+                  275.7601688,
+                  722.0
+                ],
+                "selectedCharacters": 249,
+                "nativeCharacters": 239,
+                "figures": 1
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 3,
+          "topic": "方程式与元素化学",
+          "question": [
+            [
+              78,
+              81.24003845000004,
+              157.919484
+            ]
+          ],
+          "printQuestion": [
+            [
+              78,
+              68.07948775,
+              157.919484
+            ]
+          ],
+          "answer": [
+            [
+              138,
+              81.24003845000004,
+              360.71949075
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 78,
+                "range": [
+                  81.24003845000004,
+                  157.919484
+                ],
+                "selectedCharacters": 191,
+                "nativeCharacters": 191,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 138,
+                "range": [
+                  81.24003845000004,
+                  360.71949075
+                ],
+                "selectedCharacters": 382,
+                "nativeCharacters": 382,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 4,
+          "topic": "有机化学",
+          "question": [
+            [
+              78,
+              172.08003470000006,
+              722.0
+            ]
+          ],
+          "printQuestion": [
+            [
+              78,
+              158.919484,
+              722.0
+            ]
+          ],
+          "answer": [
+            [
+              138,
+              374.88004144999996,
+              722.0
+            ],
+            [
+              139,
+              70,
+              722.0
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 78,
+                "box": [
+                  84,
+                  224.16000375,
+                  514,
+                  389.76000525
+                ],
+                "asset": "e38-p11-q04-01-67a5e887eb7c.webp",
+                "mode": "band",
+                "sha256": "67a5e887eb7ce902b4e91cf98ceee3b2f46767b338dc82b88bfebed538d0d2c8"
+              }
+            ],
+            "a": [
+              {
+                "page": 139,
+                "box": [
+                  84,
+                  111.72000449999996,
+                  514,
+                  230.9401613
+                ],
+                "asset": "e38-p11-a04-01-b50f288182af.webp",
+                "mode": "band",
+                "sha256": "b50f288182af697479ecd44c52f925de347a727abee2812d1771531148520092"
+              },
+              {
+                "page": 139,
+                "box": [
+                  84,
+                  307.0799902499999,
+                  514,
+                  424.38017105
+                ],
+                "asset": "e38-p11-a04-02-878663b6668b.webp",
+                "mode": "band",
+                "sha256": "878663b6668b8d93d44b115de0ce53b8373de8ffd59fd4ea65060a94b6e2aab8"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 78,
+                "range": [
+                  172.08003470000006,
+                  722.0
+                ],
+                "selectedCharacters": 566,
+                "nativeCharacters": 566,
+                "figures": 1
+              }
+            ],
+            "a": [
+              {
+                "page": 138,
+                "range": [
+                  374.88004144999996,
+                  722.0
+                ],
+                "selectedCharacters": 0,
+                "nativeCharacters": 0,
+                "figures": 0
+              },
+              {
+                "page": 139,
+                "range": [
+                  70,
+                  722.0
+                ],
+                "selectedCharacters": 346,
+                "nativeCharacters": 338,
+                "figures": 2
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 5,
+          "topic": "方程式与元素化学",
+          "question": [
+            [
+              79,
+              81.24003845000004,
+              376.799493
+            ]
+          ],
+          "printQuestion": [
+            [
+              79,
+              68.07948775,
+              376.799493
+            ]
+          ],
+          "answer": [
+            [
+              140,
+              81.24003845000004,
+              722.0
+            ],
+            [
+              141,
+              70,
+              223.07947650000006
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 79,
+                "box": [
+                  84,
+                  172.5994885,
+                  514,
+                  301.44000975
+                ],
+                "asset": "e38-p11-q05-01-601f8f8051e0.webp",
+                "mode": "band",
+                "sha256": "601f8f8051e0076b3d05404f57526774bb97f0170d8a86c074309dc25722d1d4"
+              },
+              {
+                "page": 79,
+                "box": [
+                  84,
+                  315.39948400000003,
+                  514,
+                  361.49048366
+                ],
+                "asset": "e38-p11-q05-02-b0443c38ac20.webp",
+                "mode": "band",
+                "sha256": "b0443c38ac2016eea8a8ad6bfd3b0445349dc6f6d30f7657b1dffb0ddfdd14c2"
+              }
+            ],
+            "a": [
+              {
+                "page": 140,
+                "box": [
+                  84,
+                  408.99947425000005,
+                  514,
+                  439.37050391
+                ],
+                "asset": "e38-p11-a05-01-8ab40a0496d7.webp",
+                "mode": "band",
+                "sha256": "8ab40a0496d73950f99f3e0670612be819d83b921dee48cfe669ffb77885f228"
+              },
+              {
+                "page": 140,
+                "box": [
+                  84,
+                  454.1660739,
+                  514,
+                  575.9400542000001
+                ],
+                "asset": "e38-p11-a05-02-808874cf34bf.webp",
+                "mode": "band",
+                "sha256": "808874cf34bf53fd7e9a1f3d4bd4ef95ce10487d67418e4fb1012207de4abc32"
+              },
+              {
+                "page": 140,
+                "box": [
+                  84,
+                  592.4794855,
+                  514,
+                  607.37050391
+                ],
+                "asset": "e38-p11-a05-03-812b5d0f81df.webp",
+                "mode": "band",
+                "sha256": "812b5d0f81df76d7d09ef791967ad119fa5d89bf770841c2147ba998b5d903e8"
+              },
+              {
+                "page": 140,
+                "box": [
+                  84,
+                  623.6794675,
+                  514,
+                  685.25047841
+                ],
+                "asset": "e38-p11-a05-04-127c51f69fab.webp",
+                "mode": "band",
+                "sha256": "127c51f69fabf283dbb45bfd8993797d69c4d8c8999ce0b543c73ae774db5a5e"
+              },
+              {
+                "page": 141,
+                "box": [
+                  84,
+                  99.27948100000003,
+                  514,
+                  176.57048591
+                ],
+                "asset": "e38-p11-a05-05-3dae7ccf6695.webp",
+                "mode": "band",
+                "sha256": "3dae7ccf66955426ea39917c76122969fab4f2e25572f0bc1ceb8a30b52cfeb0"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 79,
+                "range": [
+                  81.24003845000004,
+                  376.799493
+                ],
+                "selectedCharacters": 551,
+                "nativeCharacters": 275,
+                "figures": 2
+              }
+            ],
+            "a": [
+              {
+                "page": 140,
+                "range": [
+                  81.24003845000004,
+                  722.0
+                ],
+                "selectedCharacters": 679,
+                "nativeCharacters": 247,
+                "figures": 4
+              },
+              {
+                "page": 141,
+                "range": [
+                  70,
+                  223.07947650000006
+                ],
+                "selectedCharacters": 231,
+                "nativeCharacters": 72,
+                "figures": 1
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 6,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              79,
+              390.96004369999997,
+              722.0
+            ]
+          ],
+          "printQuestion": [
+            [
+              79,
+              377.799493,
+              722.0
+            ]
+          ],
+          "answer": [
+            [
+              141,
+              237.2400272000001,
+              722.0
+            ],
+            [
+              142,
+              70,
+              464.3691330667541
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": [
+              {
+                "page": 141,
+                "box": [
+                  84,
+                  558.9600075,
+                  514,
+                  621.1769488576447
+                ],
+                "asset": "e38-p11-a06-01-4144aed9c527.webp",
+                "mode": "band",
+                "sha256": "4144aed9c5279a4355b63622c262336a700cefdb405585839e04db2412fa34a5"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 79,
+                "range": [
+                  390.96004369999997,
+                  722.0
+                ],
+                "selectedCharacters": 767,
+                "nativeCharacters": 767,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 141,
+                "range": [
+                  237.2400272000001,
+                  722.0
+                ],
+                "selectedCharacters": 269,
+                "nativeCharacters": 251,
+                "figures": 1
+              },
+              {
+                "page": 142,
+                "range": [
+                  70,
+                  464.3691330667541
+                ],
+                "selectedCharacters": 372,
+                "nativeCharacters": 372,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 7,
+          "topic": "晶体化学",
+          "question": [
+            [
+              80,
+              81.24003845000004,
+              480.83947049999995
+            ]
+          ],
+          "printQuestion": [
+            [
+              80,
+              68.07948775,
+              480.83947049999995
+            ]
+          ],
+          "answer": [
+            [
+              142,
+              478.56016429999994,
+              722.0
+            ],
+            [
+              143,
+              70,
+              722.0
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 80,
+                "range": [
+                  81.24003845000004,
+                  480.83947049999995
+                ],
+                "selectedCharacters": 783,
+                "nativeCharacters": 783,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 142,
+                "range": [
+                  478.56016429999994,
+                  722.0
+                ],
+                "selectedCharacters": 134,
+                "nativeCharacters": 134,
+                "figures": 0
+              },
+              {
+                "page": 143,
+                "range": [
+                  70,
+                  722.0
+                ],
+                "selectedCharacters": 543,
+                "nativeCharacters": 543,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 8,
+          "topic": "有机化学",
+          "question": [
+            [
+              80,
+              495.00002119999994,
+              722.0
+            ]
+          ],
+          "printQuestion": [
+            [
+              80,
+              481.83947049999995,
+              722.0
+            ]
+          ],
+          "answer": [
+            [
+              144,
+              81.24003845000004,
+              722.0
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": [
+              {
+                "page": 144,
+                "box": [
+                  84,
+                  160.68000374999997,
+                  514,
+                  231.42004295000004
+                ],
+                "asset": "e38-p11-a08-01-07c1404e8381.webp",
+                "mode": "band",
+                "sha256": "07c1404e8381ecac45ecafa150f3de4d628b2b90468411b59143a00caf89bf4b"
+              },
+              {
+                "page": 144,
+                "box": [
+                  84,
+                  295.32000750000003,
+                  514,
+                  339.90003095000003
+                ],
+                "asset": "e38-p11-a08-02-82a7e02c0a45.webp",
+                "mode": "band",
+                "sha256": "82a7e02c0a455eb08e357c3cb57d582ac69981a304ee55bf587d7e207696d4c0"
+              },
+              {
+                "page": 144,
+                "box": [
+                  84,
+                  358.55999249999996,
+                  514,
+                  426.599991
+                ],
+                "asset": "e38-p11-a08-03-09f8aaea3f5a.webp",
+                "mode": "band",
+                "sha256": "09f8aaea3f5a04a03752bdd92b16de9884aa02ad002fcb072de289ed03f22f64"
+              },
+              {
+                "page": 144,
+                "box": [
+                  84,
+                  481.31998875000005,
+                  514,
+                  532.0200564499999
+                ],
+                "asset": "e38-p11-a08-04-961cb29dbd39.webp",
+                "mode": "band",
+                "sha256": "961cb29dbd39ee17220851ac0881c2f38e9e0218f0a7a928d90dd71c9279f6b6"
+              },
+              {
+                "page": 144,
+                "box": [
+                  84,
+                  553.7999985,
+                  514,
+                  595.4399872500001
+                ],
+                "asset": "e38-p11-a08-05-d242e979aa55.webp",
+                "mode": "band",
+                "sha256": "d242e979aa55dfc14c7561f9e95f03b99aab05c64321c6b4eb91760462727141"
+              },
+              {
+                "page": 144,
+                "box": [
+                  84,
+                  646.5600089999999,
+                  514,
+                  700.7400272
+                ],
+                "asset": "e38-p11-a08-06-294556c037c4.webp",
+                "mode": "band",
+                "sha256": "294556c037c45d07f393ec4c7ec025d775257e3e9a1ea3fbe43c2a4faab2e5fc"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 80,
+                "range": [
+                  495.00002119999994,
+                  722.0
+                ],
+                "selectedCharacters": 196,
+                "nativeCharacters": 196,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 144,
+                "range": [
+                  81.24003845000004,
+                  722.0
+                ],
+                "selectedCharacters": 339,
+                "nativeCharacters": 255,
+                "figures": 6
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 9,
+          "topic": "有机化学",
+          "question": [
+            [
+              81,
+              81.24003845000004,
+              457.6794675
+            ]
+          ],
+          "printQuestion": [
+            [
+              81,
+              68.07948775,
+              457.6794675
+            ]
+          ],
+          "answer": [
+            [
+              145,
+              81.24003845000004,
+              722.0
+            ],
+            [
+              146,
+              70,
+              217.5555588078979
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 81,
+                "box": [
+                  84,
+                  116.51999999999998,
+                  514,
+                  184.79999550000002
+                ],
+                "asset": "e38-p11-q09-01-8cccab9f18e1.webp",
+                "mode": "band",
+                "sha256": "8cccab9f18e1268a9fb948f9aa189c1ed314c7fd595e773d905e12fc19620c7e"
+              },
+              {
+                "page": 81,
+                "box": [
+                  84,
+                  220.92000899999994,
+                  514,
+                  275.28000675
+                ],
+                "asset": "e38-p11-q09-02-6b3c7c7e66af.webp",
+                "mode": "band",
+                "sha256": "6b3c7c7e66af0b12ecadbb95670749a5cad7c8e5e4cb96910b1a6d41d8bd7f24"
+              },
+              {
+                "page": 81,
+                "box": [
+                  84,
+                  328.55999249999996,
+                  514,
+                  362.63999175000004
+                ],
+                "asset": "e38-p11-q09-03-6ced54ce0a3c.webp",
+                "mode": "band",
+                "sha256": "6ced54ce0a3c298f6e99d3f6620aa05567f92ba36ce893252943d98f61b59dc9"
+              }
+            ],
+            "a": [
+              {
+                "page": 145,
+                "box": [
+                  84,
+                  207.95999925,
+                  514,
+                  301.7999955
+                ],
+                "asset": "e38-p11-a09-01-ca5674fe2f87.webp",
+                "mode": "band",
+                "sha256": "ca5674fe2f87ef0dd6ffd4f4fbeef0d0e3b1cc3075042b5b7860616fd30ddbbe"
+              },
+              {
+                "page": 145,
+                "box": [
+                  84,
+                  459.83999625,
+                  514,
+                  530.6400150000001
+                ],
+                "asset": "e38-p11-a09-02-129988b61327.webp",
+                "mode": "band",
+                "sha256": "129988b61327fe6c45192958c1e92b3df33d66ec43a4e6f6a9dff2b2a3e2e6b0"
+              },
+              {
+                "page": 146,
+                "box": [
+                  84,
+                  86.65493398200067,
+                  514,
+                  184.85212943055058
+                ],
+                "asset": "e38-p11-a09-03-9e58f883ba5c.webp",
+                "mode": "band",
+                "sha256": "9e58f883ba5cd5101841ef673d27bcf6475654f41df4f11b7be40e8545d7ce15"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 81,
+                "range": [
+                  81.24003845000004,
+                  457.6794675
+                ],
+                "selectedCharacters": 439,
+                "nativeCharacters": 439,
+                "figures": 3
+              }
+            ],
+            "a": [
+              {
+                "page": 145,
+                "range": [
+                  81.24003845000004,
+                  722.0
+                ],
+                "selectedCharacters": 57,
+                "nativeCharacters": 56,
+                "figures": 2
+              },
+              {
+                "page": 146,
+                "range": [
+                  70,
+                  217.5555588078979
+                ],
+                "selectedCharacters": 16,
+                "nativeCharacters": 8,
+                "figures": 1
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 10,
+          "topic": "有机化学",
+          "question": [
+            [
+              81,
+              471.8400182,
+              722.0
+            ],
+            [
+              82,
+              70,
+              722.0
+            ]
+          ],
+          "printQuestion": [
+            [
+              81,
+              458.6794675,
+              722.0
+            ],
+            [
+              82,
+              70,
+              722.0
+            ]
+          ],
+          "answer": [
+            [
+              146,
+              231.72016729999996,
+              722.0
+            ],
+            [
+              147,
+              70,
+              722.0
+            ],
+            [
+              148,
+              70,
+              722.0
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 81,
+                "box": [
+                  84,
+                  509.15999475,
+                  514,
+                  546.0
+                ],
+                "asset": "e38-p11-q10-01-723699cee0cc.webp",
+                "mode": "band",
+                "sha256": "723699cee0cc5558f8539dd6bc38d3e83db420af169f0deddcac60b19fe66dbd"
+              },
+              {
+                "page": 82,
+                "box": [
+                  84,
+                  113.27999475000001,
+                  514,
+                  159.0
+                ],
+                "asset": "e38-p11-q10-02-229291ef1ef4.webp",
+                "mode": "band",
+                "sha256": "229291ef1ef41b33787ba9e768182bea5a89ca8819955a40da4aa5530a7e510c"
+              },
+              {
+                "page": 82,
+                "box": [
+                  84,
+                  176.879997,
+                  514,
+                  231.24000524999997
+                ],
+                "asset": "e38-p11-q10-03-7d9d262a7f5b.webp",
+                "mode": "band",
+                "sha256": "7d9d262a7f5b1fd73e25a59cf5acfbecee0c6e3087edfee4d1a443dd5892bd60"
+              },
+              {
+                "page": 82,
+                "box": [
+                  84,
+                  252.95999925,
+                  514,
+                  304.7999955
+                ],
+                "asset": "e38-p11-q10-04-ca5b6b9b9282.webp",
+                "mode": "band",
+                "sha256": "ca5b6b9b9282f5abce14342cc0d33211583c5b888b27abe3ff3afc638fcadd14"
+              },
+              {
+                "page": 82,
+                "box": [
+                  84,
+                  326.52,
+                  514,
+                  396.48001124999996
+                ],
+                "asset": "e38-p11-q10-05-d4a0c6b44728.webp",
+                "mode": "band",
+                "sha256": "d4a0c6b44728a5da95edfe0a1ece801f4cd80285ba4923f1c6ed370ddabe232f"
+              },
+              {
+                "page": 82,
+                "box": [
+                  84,
+                  490.68000374999997,
+                  514,
+                  527.6400150000001
+                ],
+                "asset": "e38-p11-q10-06-3eed041a25e0.webp",
+                "mode": "band",
+                "sha256": "3eed041a25e068f45bb2630bb11a2c13cc2981155de5dfe180cc097198da41eb"
+              },
+              {
+                "page": 82,
+                "box": [
+                  84,
+                  545.8800315,
+                  514,
+                  579.48001125
+                ],
+                "asset": "e38-p11-q10-07-f8e2e99ab2d7.webp",
+                "mode": "band",
+                "sha256": "f8e2e99ab2d73cf9826e2d01f874823d93e39e9d0e7aced83bd5508ab4b3d3df"
+              }
+            ],
+            "a": [
+              {
+                "page": 146,
+                "box": [
+                  84,
+                  377.335295398159,
+                  514,
+                  424.5001507999999
+                ],
+                "asset": "e38-p11-a10-01-83d3f1b5da5e.webp",
+                "mode": "band",
+                "sha256": "83d3f1b5da5eb5d4c20dcfa9c274efa3ab9f382d6d6024d49c06f559e50dbe55"
+              },
+              {
+                "page": 147,
+                "box": [
+                  84,
+                  88.92000299999995,
+                  514,
+                  152.39999775
+                ],
+                "asset": "e38-p11-a10-02-58fefa0e4061.webp",
+                "mode": "band",
+                "sha256": "58fefa0e4061ccbd09ae8623514fe46317b02218b0a8d481473a4dea3c1b8d78"
+              },
+              {
+                "page": 147,
+                "box": [
+                  84,
+                  328.200009,
+                  514,
+                  411.90003095
+                ],
+                "asset": "e38-p11-a10-03-3af3b2fcf214.webp",
+                "mode": "band",
+                "sha256": "3af3b2fcf21430a667ebc2c12126ae1fcc570e28731acc1d47dadd5380af1d8c"
+              },
+              {
+                "page": 147,
+                "box": [
+                  84,
+                  434.0399745,
+                  514,
+                  544.5000212
+                ],
+                "asset": "e38-p11-a10-04-80c606154d4d.webp",
+                "mode": "band",
+                "sha256": "80c606154d4d36bf74e7d51efcb8a0dc4d3e55e7c7abbeda4096518dfa45a77e"
+              },
+              {
+                "page": 147,
+                "box": [
+                  84,
+                  583.6799745000001,
+                  514,
+                  664.6799925
+                ],
+                "asset": "e38-p11-a10-05-d8aa18ff2ce8.webp",
+                "mode": "band",
+                "sha256": "d8aa18ff2ce8f085360c1af1dbcfbc5759bdf96d252cc49d37e0029ed090960e"
+              },
+              {
+                "page": 148,
+                "box": [
+                  84,
+                  220.2000089999999,
+                  514,
+                  303.24000524999997
+                ],
+                "asset": "e38-p11-a10-06-0811e902e2e5.webp",
+                "mode": "band",
+                "sha256": "0811e902e2e5ad169d699a1611241b92c5f7e3bbd58c4c7d0071f0401d65bcc3"
+              },
+              {
+                "page": 148,
+                "box": [
+                  84,
+                  324.0000045,
+                  514,
+                  408.7200165
+                ],
+                "asset": "e38-p11-a10-07-cd96241162f9.webp",
+                "mode": "band",
+                "sha256": "cd96241162f9a9c3ef9a5a69d290164f59afa734cbce88fe729782e070192085"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 81,
+                "range": [
+                  471.8400182,
+                  722.0
+                ],
+                "selectedCharacters": 188,
+                "nativeCharacters": 188,
+                "figures": 1
+              },
+              {
+                "page": 82,
+                "range": [
+                  70,
+                  722.0
+                ],
+                "selectedCharacters": 312,
+                "nativeCharacters": 312,
+                "figures": 6
+              }
+            ],
+            "a": [
+              {
+                "page": 146,
+                "range": [
+                  231.72016729999996,
+                  722.0
+                ],
+                "selectedCharacters": 16,
+                "nativeCharacters": 4,
+                "figures": 1
+              },
+              {
+                "page": 147,
+                "range": [
+                  70,
+                  722.0
+                ],
+                "selectedCharacters": 63,
+                "nativeCharacters": 53,
+                "figures": 4
+              },
+              {
+                "page": 148,
+                "range": [
+                  70,
+                  722.0
+                ],
+                "selectedCharacters": 28,
+                "nativeCharacters": 28,
+                "figures": 2
+              }
+            ]
+          },
+          "reviewed": false
+        }
+      ],
+      "common": {
+        "question": [],
+        "figures": [],
+        "coverage": []
+      },
+      "reviewed": false
     }
   }
 }
