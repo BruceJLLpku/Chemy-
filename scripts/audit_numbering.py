@@ -45,7 +45,7 @@ def main(web_only=False):
             report['nativeSections']+=1
     assert dict(counts)==numbers['countsByTopic']
     assert '提示、常数与评分说明' not in (ROOT/'dist/app.js').read_text(encoding='utf8')
-    for e in [39,36,35]:
+    for e in sorted({q.get('edition',39) for q in bank},reverse=True):
         cache=ROOT/'tmp'/('library' if e==39 else f'library{e}')
         assets=json.loads((ROOT/'data'/f'numbering-assets-{e}.json').read_text(encoding='utf8'))
         for record in assets:
@@ -62,7 +62,8 @@ def main(web_only=False):
     env=os.environ.copy();env.update(GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='safe.directory',GIT_CONFIG_VALUE_0=ROOT.as_posix())
     git='C:/Users/Prettibruce/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd/git.exe'
     raw=subprocess.run([git,'show','3da5d197f96c8790741aaf2d62ebe0bc76520a1c:dist/questions.json'],cwd=ROOT,env=env,capture_output=True,check=True).stdout
-    assert json.loads(raw)==bank,'Original source dataset changed'
+    baseline=json.loads(raw); current={q['id']:q for q in bank}
+    assert all(current.get(q['id'])==q for q in baseline),'Original source dataset changed'
     report['originalDatasetPreserved']=True
     if not web_only:
         index=json.loads((ROOT/'data/print_index.json').read_text(encoding='utf8'))

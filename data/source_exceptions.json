@@ -1,23 +1,171 @@
 {
   "backgroundHashes": [
+    "042773e6cf0c205a47604b1a9095ae9a6214a7cd8eded62e3d55328387091630",
+    "06b9719e8d58c5893bc3d837dd0f66b4d60d557f58d76ac1728de283b0f83fdc",
+    "0a7b6521657c8ff97c5c342ffeb80087e3c849803b39ef1216109742c3a112c0",
+    "0b9a76da376b2155638d5773041abeec206e251643992663cfde66d31cd398ef",
+    "15a9393cfc1bcf7e5bfba3853fb3b80c6ef3c7ac8af567ba9be92fc14b564fb2",
     "18f5d9440b5dc767fcd738b30fdbd60573e46f95178d6ecb4ed69605ec8385d0",
+    "217dc3a2638a172dcf8094eb38f53b8f91f7839775bd9f89233dd1f7572630bb",
+    "3957b76cb8d141e531a211dc88a57625747a460e743c05a47ddaae80262d7191",
+    "3c71285981d8b10afd417ba83a17b4a43ecdb8706580ac42fc88b3728ca9eabc",
+    "3dae9808c47940497c8143a2c39b6a9cfe812c9038b95e697e68d1a20444ee15",
+    "46baac51c14c77229dcffd91c6de20c9d60b7d0b6419293a8537cb6496fd80bc",
     "48a3ef6c2e2399bf4a6e9bf827eae6b8730ea572ced1f7350345d860dc9d51b6",
+    "491ec0f3931f5ae1792e242a6ef69aea4f71ca714701a60fbf029ab4fa5ff12e",
+    "49f63af83893caa23c367d5c8c9a5d21e085810b35d210087cacc503576def84",
+    "4d4aff7b0f54d273a91a0c9812e007503c0b6b82040e86af1eb6f5a72921361e",
+    "6d217cacd51707f9cdc01faea4678b716436ec42ea13919ae0f559806368c6f4",
+    "730d3bb7afb7d779658c7a6373561e05238f689e467368fdf9eb915386a0e922",
+    "751b1a23a297ecdad2c1b58621bab97f7fcf077a1b28aa087e0440952e8dd2be",
+    "758f9158faaf88a959587dfd8437827d976653db7b8d74e30e31e2a59798d1ff",
+    "7886793caf3f602216fe3c28808ec83735545ccfb2e567e82ccdd69fd621a741",
+    "88342445f5c18d07c56ffee4ad8284ab4e165ab5eb756aefd8b59f738c5a0267",
     "910e2b2c614e61aa6622cf5b65b0737fb8e928f6c8629619a3f1965f851c38aa",
+    "9538a0f3c2bceea4576fdaa580b13f1b4829739017167b93efab4134054e9ddc",
+    "a3de7a47b204812a81c806895dad98f39aca54dd04d9d1b874198d4ff23348d6",
+    "a4f381cf560dcea05d584f402b732d019b6606692092f838cd0725e5dc04ecc0",
+    "a7669587887efeb274edf556d5dc2a821529ee4f13f660b2301c2dc621824503",
     "acec9f7a2dac3aab28cb9d9f69a22dc76426bc7f77c290d628490d8f36f9af62",
+    "ada79e2c22b7f898b4c0cb72073ca4b73e98e5df0de33ea5eb602c6ea5da7e6f",
+    "ae18784ef7785dcbb6db36f1939e6c74c8cd372a52e59bfd2646baa8f0b7890f",
+    "b45eb7ea912154f77344367e8e52b1019276fa58893249551e3f2fab807d020a",
     "c0fb598ed00a69c53710886905d64d83cf84bee1f0f2923a89a909cb53625a83",
     "c3200049973cee1482e08a05131e2150a8c38e3825989ee028b009be53747a9d",
-    "d6c09f32922baffe11ea7471eb6f3ea69ae2dd435ff669380309ba28954caf74"
+    "c9a077c14401b49e6aaab01bff0805bc5b2034609b2aabb4858493bd1fca989b",
+    "d0a3b27bdf2a5a76f370162879376aee9028eed9f9ef3a5452fb699c6f13191a",
+    "d6c09f32922baffe11ea7471eb6f3ea69ae2dd435ff669380309ba28954caf74",
+    "daa4138d285330ea4857a1b1d52196c0b9463bd14356788584dd49ba6fd35a1b",
+    "e64ff8a5a3b625ffcd9cca946cf659cf72288fbd9621f413f16bfe371b9efefc",
+    "eb491d52f2670555cde162a3982bf3eaf1c085c06c6cc224a4ea8f6309284d65"
   ],
   "captures": [
-    {"edition":39,"paper":10,"number":1,"kind":"q","page":82,"box":[455,584,508,716],"mode":"float"},
-    {"edition":39,"paper":15,"number":2,"kind":"q","page":125,"box":[347,76,506,167],"mode":"float"},
-    {"edition":36,"paper":4,"number":4,"kind":"q","page":20,"box":[392,71,508,182],"mode":"float"},
-    {"edition":36,"paper":10,"number":6,"kind":"q","page":52,"box":[396,70,508,247],"mode":"float"},
-    {"edition":36,"paper":20,"number":7,"kind":"q","page":103,"box":[353,70,508,212],"mode":"float"},
-    {"edition":36,"paper":21,"number":3,"kind":"q","page":106,"box":[347,458,507,563],"mode":"float"},
-    {"edition":35,"paper":10,"number":5,"kind":"q","page":55,"box":[413,75,498,183],"mode":"float"},
-    {"edition":35,"paper":19,"number":1,"kind":"q","page":100,"box":[387,101,508,236],"mode":"float"},
-    {"edition":36,"paper":23,"number":6,"kind":"a","page":239,"box":[178,374,437,498],"mode":"band"}
+    {
+      "edition": 39,
+      "paper": 10,
+      "number": 1,
+      "kind": "q",
+      "page": 82,
+      "box": [
+        455,
+        584,
+        508,
+        716
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 39,
+      "paper": 15,
+      "number": 2,
+      "kind": "q",
+      "page": 125,
+      "box": [
+        347,
+        76,
+        506,
+        167
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 36,
+      "paper": 4,
+      "number": 4,
+      "kind": "q",
+      "page": 20,
+      "box": [
+        392,
+        71,
+        508,
+        182
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 36,
+      "paper": 10,
+      "number": 6,
+      "kind": "q",
+      "page": 52,
+      "box": [
+        396,
+        70,
+        508,
+        247
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 36,
+      "paper": 20,
+      "number": 7,
+      "kind": "q",
+      "page": 103,
+      "box": [
+        353,
+        70,
+        508,
+        212
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 36,
+      "paper": 21,
+      "number": 3,
+      "kind": "q",
+      "page": 106,
+      "box": [
+        347,
+        458,
+        507,
+        563
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 35,
+      "paper": 10,
+      "number": 5,
+      "kind": "q",
+      "page": 55,
+      "box": [
+        413,
+        75,
+        498,
+        183
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 35,
+      "paper": 19,
+      "number": 1,
+      "kind": "q",
+      "page": 100,
+      "box": [
+        387,
+        101,
+        508,
+        236
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 36,
+      "paper": 23,
+      "number": 6,
+      "kind": "a",
+      "page": 239,
+      "box": [
+        178,
+        374,
+        437,
+        498
+      ],
+      "mode": "band"
+    }
   ],
   "reviewNotes": "All listed boundary exceptions were reviewed against original page renders. Background hashes identify only verified pale watermark tiles; no chemistry diagram is redrawn. White fill-only rectangles behind heading text are not diagrams."
 }

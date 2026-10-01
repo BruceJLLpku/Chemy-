@@ -55,7 +55,7 @@ def scan(kind,path):
                 match=re.match(r'^第\s*(\d+)\s*题(.*)',r['text'])
                 if match and '分' in match[2] and '评判' not in match[2]:
                     pts=re.search(r'[（(]\s*([\d.]+)\s*分',match[2])
-                    if pts:
+                    if pts and not any((h['paper'],h['number'])==(paper,int(match[1])) for h in headings):
                         pct=re.search(r'占(?:比)?\s*([\d.]+)\s*[%％]',match[2])
                         title=re.sub(r'[（(]\s*[\d.]+\s*分.*?[）)]','',match[2]).strip()
                         headings.append({'paper':paper,'number':int(match[1]),'title':title,

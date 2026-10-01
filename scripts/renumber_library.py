@@ -221,20 +221,24 @@ def main():
                 for figure in spec['figures'][k]:
                     n=figure['page'];box=figure['box'];selected=[p for p in PATCHES[k,n] if p['id']==qid and p['box'][0]>=box[0]-.1 and p['box'][2]<=box[2]+.1 and p['box'][1]<box[3] and p['box'][3]>box[1]]
                     if not selected:continue
-                    png=OUT/f'{k}-{n:03}.png';pdf=patch_page(k,n);stamp=png.with_suffix('.sha256')
-                    signature=pdf.with_suffix('.sha256').read_text()
-                    if not png.exists() or not stamp.exists() or stamp.read_text()!=signature:
-                        subprocess.run(['pdftoppm','-singlefile','-r','252','-png',str(pdf),str(png.with_suffix(''))],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-                        stamp.write_text(signature)
-                    changed=Image.open(png).convert('RGB');original=Image.open(render_page(k,n)).convert('RGB');sc=original.width/load(k,n)['width']
+                    pdf=patch_page(k,n)
+                    original=Image.open(render_page(k,n)).convert('RGB');sc=original.width/load(k,n)['width']
                     newbox=[min([box[0]]+[p['drawBox'][0]-.5 for p in selected]),box[1],max([box[2]]+[p['drawBox'][2]+.5 for p in selected]),box[3]]
-                    pxbox=tuple(round(v*sc) for v in newbox);crop=original.crop(pxbox);overlay=changed.crop(pxbox)
+                    pxbox=tuple(round(v*sc) for v in newbox);crop=original.crop(pxbox)
+                    # Rasterize only the number regions; chemistry pixels always come from the original crop.
+                    roi=(max(0,int(min(min(p['box'][0],p['drawBox'][0])-.6 for p in selected)*sc)),max(0,int(min(p['box'][1]-.7 for p in selected)*sc)),min(original.width,int(max(max(p['box'][2],p['drawBox'][2])+.6 for p in selected)*sc)+2),min(original.height,int(max(p['box'][3]+.7 for p in selected)*sc)+2))
+                    sig=hashlib.sha256((pdf.with_suffix('.sha256').read_text()+str(roi)).encode()).hexdigest()
+                    png=OUT/f'roi-{sig[:20]}.png'
+                    if not png.exists():
+                        subprocess.run(['pdftoppm','-singlefile','-r','252','-x',str(roi[0]),'-y',str(roi[1]),'-W',str(roi[2]-roi[0]),'-H',str(roi[3]-roi[1]),'-png',str(pdf),str(png.with_suffix(''))],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                    changed=Image.open(png).convert('RGB')
                     masks=[]
                     # Reuse original pixels everywhere except the actual label glyph box.
                     for p in selected:
                         x0=min(p['box'][0],p['drawBox'][0])-.4;y0=p['box'][1]-.5;x1=max(p['box'][2],p['drawBox'][2])+.4;y1=p['box'][3]+.5
                         rect=(max(0,round(x0*sc)-pxbox[0]),max(0,round(y0*sc)-pxbox[1]),min(crop.width,round(x1*sc)-pxbox[0]),min(crop.height,round(y1*sc)-pxbox[1]))
-                        crop.paste(overlay.crop(rect),rect[:2]);masks.append(list(rect))
+                        src_rect=(rect[0]+pxbox[0]-roi[0],rect[1]+pxbox[1]-roi[1],rect[2]+pxbox[0]-roi[0],rect[3]+pxbox[1]-roi[1])
+                        crop.paste(changed.crop(src_rect),rect[:2]);masks.append(list(rect))
                     buf=BytesIO();crop.save(buf,format='WEBP',lossless=True,method=4);raw=buf.getvalue();sha=hashlib.sha256(raw).hexdigest();name=f'numbered-{qid}-{k}-{len(assets):04}-{sha[:12]}.webp';(ROOT/'dist/assets'/name).write_bytes(raw)
                     entry[field]=entry[field].replace('assets/'+figure['asset'],'assets/'+name)
                     # The wider label hangs in the margin; keep source graphics at their original scale.
@@ -252,8 +256,7 @@ def main():
     (OUT/'presentation.json').write_text(json.dumps(display,ensure_ascii=False,separators=(',',':')),encoding='utf8')
     (ROOT/'data'/f'numbering-assets-{EDITION}.json').write_text(json.dumps(assets,ensure_ascii=False,indent=2),encoding='utf8')
     # Materialize vector source pages for the print builder, including pages without website captures.
-    for k,n in PATCHES:
-        patch_page(k,n)
+    # Print templates clip source labels once; only website crops need a rendered replacement page.
     print('READY',EDITION,len(display),len(assets),flush=True)
 
 if __name__=='__main__':main()

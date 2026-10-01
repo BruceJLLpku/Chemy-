@@ -30,6 +30,7 @@ def committed_assets(paths,revision):
 def api(path,headers):
     with urllib.request.urlopen(urllib.request.Request('https://api.github.com/repos/'+REPO+path,headers=headers),timeout=45) as r:return json.load(r)
 def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=False,push_existing=False,numbered_only=False):
+    while (ROOT/'tmp/pause-publishing').exists():time.sleep(2)
     assert not(prepare_only and (verify_only or push_existing))
     if push_existing:verify_only=True
     bank=json.loads(committed('dist/questions.json')) if verify_only else json.loads((ROOT/'dist/questions.json').read_text(encoding='utf8'))
@@ -73,6 +74,10 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
     asset_paths={name for html in selected_html for name in re.findall(r'src="(assets/[^\"]+)"',html)}
     if numbered_only:
         asset_paths={name for html in all_html for name in re.findall(r'src="(assets/numbered-[^\"]+)"',html)}
+    # New immutable image filenames are also verified when later topic numbers shift.
+    changed_assets=set(git('diff','--name-only','HEAD^','HEAD','--','dist/assets').splitlines())
+    referenced={name for html in all_html for name in re.findall(r'src="(assets/[^\"]+)"',html)}
+    asset_paths.update(name for name in referenced if 'dist/'+name in changed_assets)
     tracked=set(git('ls-files','dist/assets').splitlines())
     all_paths={name for html in all_html for name in re.findall(r'src="(assets/[^\"]+)"',html)}
     assert all('dist/'+name in tracked for name in all_paths),'Referenced image missing from Git commit'

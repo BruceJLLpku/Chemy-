@@ -14,7 +14,7 @@ def render(job):
 if __name__=='__main__':
     jobs=[(slug,kind,1,f'{slug}-{kind}-first') for slug in SLUGS.values() for kind in ['questions','answers']]
     index=json.loads((ROOT/'data/print_index.json').read_text(encoding='utf8'))
-    jobs.extend(('organic',kind,index[f'organic-{kind}'][-1]['firstPage'],f'organic-{kind}-242') for kind in ['questions','answers'])
+    jobs.extend(('organic',kind,index[f'organic-{kind}'][-1]['firstPage'],f'organic-{kind}-last') for kind in ['questions','answers'])
     with ThreadPoolExecutor(max_workers=4) as pool:list(pool.map(render,jobs))
     slugs=list(SLUGS.values())
     for group in range(3):
@@ -25,4 +25,4 @@ if __name__=='__main__':
                     source.thumbnail((600,850));sheet.paste(source,(col*600,row*885+30))
                 ImageDraw.Draw(sheet).text((col*600+8,row*885+6),slug+' / '+kind,font=font,fill='#182c24')
         sheet.save(OUT/f'book-samples-{group+1}.png')
-    print('Rendered 18 booklet pages and 2 pages with question 242',flush=True)
+    print('Rendered 18 booklet pages and 2 pages with the last topic question',flush=True)

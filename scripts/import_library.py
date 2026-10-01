@@ -55,7 +55,7 @@ def spans(k,paper,number,heading=False):
     ranges=[]
     for n in range(h['page'],end['page']+1):
         lo=(h['top']-2 if heading else h['bottom']+.5) if n==h['page'] else 70
-        hi=end['top']-3 if n==end['page'] else 770
+        hi=end['top']-3 if n==end['page'] else min(770,load(k,n)['height']-70)
         if hi>lo+2:ranges.append([n,lo,hi])
     return ranges
 def render_page(k,n):
@@ -188,7 +188,7 @@ def import_paper(paper,topics):
     for n in range(begin,first['page']+1):
         lo=95 if n==begin else 70;hi=first['top']-3 if n==first['page'] else 766
         if hi>lo+15:common_ranges.append([n,lo,hi])
-    instructions,cf,ca=section('q',common_ranges,paper,0,'原卷提示') if common_ranges else ('',[],[])
+    instructions,cf,ca='',[],[]  # Paper-wide notes stay in the archived original; omitted from the public library.
     # Cheap ingest guard: original-byte provenance and usable files, without visual review.
     refs={name for html in [instructions]+[q[field] for q in items for field in ('body','answer')]
           for name in re.findall(r'src="assets/([^\"]+)"',html)}

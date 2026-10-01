@@ -48,6 +48,38 @@
           "bytes": 11607713
         }
       ]
+    },
+    "38": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "第38届Chemy题目合集.pdf",
+          "sha256": "f6446d67a39d5b49a192360322e936ee1949b74a8125e48259cd18eeefe6b9cd",
+          "bytes": 9737783
+        },
+        {
+          "kind": "a",
+          "filename": "第38届Chemy题目合集 答案.pdf",
+          "sha256": "8207190d3270557e487cdafe8d60d3b2a76257e7dd111822a5144ceebacb0487",
+          "bytes": 13863369
+        }
+      ]
+    },
+    "37": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "第37届Chemy题目合集.pdf",
+          "sha256": "8da099a31533e4311586e1a08098641658becef6f466ce6661d267890e9c36d9",
+          "bytes": 9882318
+        },
+        {
+          "kind": "a",
+          "filename": "第37届Chemy题目合集 答案.pdf",
+          "sha256": "c27543d71718e5caadf670fa47ad4c942c09e86cae395c6f0d757a747fe48f77",
+          "bytes": 13921075
+        }
+      ]
     }
   }
 }
