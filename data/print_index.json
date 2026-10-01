@@ -4427,6 +4427,33 @@
       "firstPage": 567,
       "lastPage": 567,
       "number": 492
+    },
+    {
+      "id": "chemy33-9-8",
+      "sourceNumber": 8,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 568,
+      "lastPage": 568,
+      "number": 493
+    },
+    {
+      "id": "chemy33-9-9",
+      "sourceNumber": 9,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 568,
+      "lastPage": 568,
+      "number": 494
+    },
+    {
+      "id": "chemy33-9-10",
+      "sourceNumber": 10,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 569,
+      "lastPage": 569,
+      "number": 495
     }
   ],
   "organic-answers": [
@@ -8857,6 +8884,33 @@
       "firstPage": 660,
       "lastPage": 660,
       "number": 492
+    },
+    {
+      "id": "chemy33-9-8",
+      "sourceNumber": 8,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 661,
+      "lastPage": 661,
+      "number": 493
+    },
+    {
+      "id": "chemy33-9-9",
+      "sourceNumber": 9,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 661,
+      "lastPage": 662,
+      "number": 494
+    },
+    {
+      "id": "chemy33-9-10",
+      "sourceNumber": 10,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 662,
+      "lastPage": 663,
+      "number": 495
     }
   ],
   "polymer-questions": [
@@ -9255,6 +9309,15 @@
       "firstPage": 53,
       "lastPage": 53,
       "number": 44
+    },
+    {
+      "id": "chemy33-9-7",
+      "sourceNumber": 7,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 54,
+      "lastPage": 54,
+      "number": 45
     }
   ],
   "polymer-answers": [
@@ -9653,6 +9716,15 @@
       "firstPage": 69,
       "lastPage": 69,
       "number": 44
+    },
+    {
+      "id": "chemy33-9-7",
+      "sourceNumber": 7,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 70,
+      "lastPage": 70,
+      "number": 45
     }
   ],
   "crystal-questions": [
@@ -10807,6 +10879,15 @@
       "firstPage": 131,
       "lastPage": 131,
       "number": 128
+    },
+    {
+      "id": "chemy33-9-4",
+      "sourceNumber": 4,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 132,
+      "lastPage": 132,
+      "number": 129
     }
   ],
   "crystal-answers": [
@@ -11961,6 +12042,15 @@
       "firstPage": 164,
       "lastPage": 164,
       "number": 128
+    },
+    {
+      "id": "chemy33-9-4",
+      "sourceNumber": 4,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 165,
+      "lastPage": 165,
+      "number": 129
     }
   ],
   "inference-questions": [
@@ -15743,6 +15833,33 @@
       "firstPage": 321,
       "lastPage": 321,
       "number": 420
+    },
+    {
+      "id": "chemy33-9-2",
+      "sourceNumber": 2,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 322,
+      "lastPage": 322,
+      "number": 421
+    },
+    {
+      "id": "chemy33-9-3",
+      "sourceNumber": 3,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 322,
+      "lastPage": 322,
+      "number": 422
+    },
+    {
+      "id": "chemy33-9-5",
+      "sourceNumber": 5,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 323,
+      "lastPage": 323,
+      "number": 423
     }
   ],
   "inference-answers": [
@@ -19525,6 +19642,33 @@
       "firstPage": 481,
       "lastPage": 482,
       "number": 420
+    },
+    {
+      "id": "chemy33-9-2",
+      "sourceNumber": 2,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 483,
+      "lastPage": 484,
+      "number": 421
+    },
+    {
+      "id": "chemy33-9-3",
+      "sourceNumber": 3,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 484,
+      "lastPage": 485,
+      "number": 422
+    },
+    {
+      "id": "chemy33-9-5",
+      "sourceNumber": 5,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 485,
+      "lastPage": 485,
+      "number": 423
     }
   ],
   "elements-questions": [
@@ -20886,6 +21030,15 @@
       "firstPage": 123,
       "lastPage": 123,
       "number": 151
+    },
+    {
+      "id": "chemy33-9-1",
+      "sourceNumber": 1,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 124,
+      "lastPage": 124,
+      "number": 152
     }
   ],
   "elements-answers": [
@@ -22247,6 +22400,15 @@
       "firstPage": 143,
       "lastPage": 143,
       "number": 151
+    },
+    {
+      "id": "chemy33-9-1",
+      "sourceNumber": 1,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 144,
+      "lastPage": 144,
+      "number": 152
     }
   ],
   "equilibrium-questions": [
@@ -25753,6 +25915,15 @@
       "firstPage": 62,
       "lastPage": 62,
       "number": 60
+    },
+    {
+      "id": "chemy33-9-6",
+      "sourceNumber": 6,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 63,
+      "lastPage": 63,
+      "number": 61
     }
   ],
   "analysis-answers": [
@@ -26295,6 +26466,15 @@
       "firstPage": 78,
       "lastPage": 78,
       "number": 60
+    },
+    {
+      "id": "chemy33-9-6",
+      "sourceNumber": 6,
+      "sourceEdition": 33,
+      "sourcePaper": 9,
+      "firstPage": 79,
+      "lastPage": 79,
+      "number": 61
     }
   ]
 }
