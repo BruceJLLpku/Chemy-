@@ -54,7 +54,7 @@ def stamp_template(template,overlay,dest):
     with pikepdf.open(template) as pdf,pikepdf.open(BytesIO(overlay)) as numbers:
         assert len(pdf.pages)==len(numbers.pages)
         for page,extra in zip(pdf.pages,numbers.pages):page.add_overlay(extra)
-        share_streams(pdf)
+        # The source template already shares its resources. Deduplicate once when merging the final booklet.
         pdf.save(dest,compress_streams=True,object_stream_mode=pikepdf.ObjectStreamMode.generate,deterministic_id=True)
 
 def merge_parts(paths,records,dest,metadata):
