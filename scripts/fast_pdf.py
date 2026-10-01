@@ -9,6 +9,16 @@ import pikepdf
 def page_count(path):
     with pikepdf.open(path) as pdf:return len(pdf.pages)
 
+def clip_stamp(source,holes,overlay,dest):
+    """Keep source operators intact and mask only the replaced label glyphs."""
+    with pikepdf.open(source) as pdf,pikepdf.open(BytesIO(overlay)) as extra:
+        page=pdf.pages[0];w=float(page.mediabox[2]);h=float(page.mediabox[3])
+        contents=page.obj['/Contents']
+        raw=b'\n'.join(stream.read_bytes() for stream in contents) if isinstance(contents,pikepdf.Array) else contents.read_bytes()
+        page.obj['/Contents']=pdf.make_stream(('q\n'+f'0 0 {w} {h} re\n'+''.join(holes)+'W* n\n').encode()+raw+b'\nQ\n')
+        page.add_overlay(extra.pages[0])
+        pdf.save(dest,compress_streams=True,object_stream_mode=pikepdf.ObjectStreamMode.generate,deterministic_id=True)
+
 def share_streams(pdf):
     """Share only byte-identical streams whose complete rendering dictionaries agree."""
     memo={};visiting=set()

@@ -21,6 +21,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from import_library import ROOT,CACHE,DATA,load,render_page,colored,SOURCES
 from paper1_manifest import PAPER,FIGURES
 from display_numbering import write_numbering,renumber_attributes
+from fast_pdf import clip_stamp
 
 EDITION=_args.edition;OUT=CACHE/'numbered';OUT.mkdir(exist_ok=True)
 pdfmetrics.registerFont(TTFont('LabelRegular','C:/Windows/Fonts/times.ttf'))
@@ -167,19 +168,21 @@ def patch_page(k,n):
     path=OUT/f'{k}-{n:03}.pdf';patches=PATCHES[k,n];render_page(k,n)
     signature=hashlib.sha256(('label-v2'+json.dumps(patches,sort_keys=True)).encode()).hexdigest();stamp=path.with_suffix('.sha256')
     if path.exists() and stamp.exists() and stamp.read_text()==signature:return path
-    source=CACHE/k/f'{n:03}-clean.pdf';reader=PdfReader(source);p=copy.copy(reader.pages[0]);d=load(k,n);h=d['height'];w=d['width']
+    source=CACHE/k/f'{n:03}-clean.pdf';d=load(k,n);h=d['height'];w=d['width'];temporary=path.with_suffix('.writing.pdf')
     if patches:
         # Even-odd clipping removes only the appearance of old label glyphs.
         holes=[]
         for patch in patches:
             x0,y0,x1,y1=patch['box'];holes.append(f'{x0-.06:.5f} {h-y1-.12:.5f} {x1-x0+.12:.5f} {y1-y0+.24:.5f} re\n')
-        stream=DecodedStreamObject();stream.set_data(('q\n'+f'0 0 {w} {h} re\n'+''.join(holes)+'W* n\n').encode()+p.get_contents().get_data()+b'\nQ\n');p[NameObject('/Contents')]=stream
         buf=BytesIO();c=canvas.Canvas(buf,pagesize=(w,h))
         for patch in patches:
             c.saveState();color=patch['color'];c.setFillColorRGB(*color[:3]) if isinstance(color,list) else c.setFillGray(color or 0)
             c.translate(patch['x'],patch['baseline']);c.scale(patch['horizontalScale'],1);c.setFont(patch['font'],patch['size']);c.drawString(0,0,patch['new']);c.restoreState()
-        c.save();p.merge_page(PdfReader(buf).pages[0])
-    writer=PdfWriter();writer.add_page(p);temporary=path.with_suffix('.writing.pdf');writer.write(temporary);os.replace(temporary,path);stamp.write_text(signature);return path
+        c.save();clip_stamp(source,holes,buf.getvalue(),temporary)
+    else:
+        import shutil
+        shutil.copyfile(source,temporary)
+    os.replace(temporary,path);stamp.write_text(signature);return path
 
 def text_html(html,old,new,paper,kind):
     chunks=re.split(r'(<[^>]+>)',html);tags=[]
