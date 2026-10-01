@@ -4,7 +4,7 @@
     "kind": "q",
     "page": 5,
     "originalAsset": "e36-p01-q06-01-f0ffd93fdf92.webp",
-    "asset": "numbered-chemy36-1-6-q-0000-e8effb3d4093.webp",
+    "asset": "numbered-chemy36-1-6-q-0000-1e8aa9735dc4.webp",
     "sourceBox": [
       84,
       337.75806975,
@@ -25,11 +25,11 @@
         431
       ]
     ],
-    "sha256": "e8effb3d409342fc5a806805e1353380a102a24ab961df6b09b0d4c981610417",
+    "sha256": "1e8aa9735dc4a61220d812ec6d37f06182b0af2ae1f6bf20c209d0eb8f175cd1",
     "labels": [
       {
         "old": "6-1",
-        "new": "136-1"
+        "new": "141-1"
       }
     ]
   },
@@ -38,7 +38,7 @@
     "kind": "a",
     "page": 5,
     "originalAsset": "e36-p01-a06-01-07038e7f4293.webp",
-    "asset": "numbered-chemy36-1-6-a-0001-85348e5e951d.webp",
+    "asset": "numbered-chemy36-1-6-a-0001-07cfe1712659.webp",
     "sourceBox": [
       84,
       166.15807874999996,
@@ -65,15 +65,15 @@
         486
       ]
     ],
-    "sha256": "85348e5e951dd987c5b04d35868a5f439ac2bbf9b7d2d4cebab35bbc39400537",
+    "sha256": "07cfe17126596ac659e14899a6e76769b088725123fdf227d6e2509e1972a641",
     "labels": [
       {
         "old": "6-1",
-        "new": "136-1"
+        "new": "141-1"
       },
       {
         "old": "6-1",
-        "new": "136-1"
+        "new": "141-1"
       }
     ]
   },
@@ -82,7 +82,7 @@
     "kind": "a",
     "page": 5,
     "originalAsset": "e36-p01-a06-02-25955553a1bf.webp",
-    "asset": "numbered-chemy36-1-6-a-0002-a5391f826ad5.webp",
+    "asset": "numbered-chemy36-1-6-a-0002-9de4d9dab3d1.webp",
     "sourceBox": [
       84,
       541.3606770000001,
@@ -103,11 +103,11 @@
         46
       ]
     ],
-    "sha256": "a5391f826ad590917afd7c7ec98ea73f67aaa0714d2320ae9448b6b64e4b7803",
+    "sha256": "9de4d9dab3d1a45ff3fe84714695375f72759d3d6bd1dc9074ce73e1211ab2c1",
     "labels": [
       {
         "old": "6-4",
-        "new": "136-4"
+        "new": "141-4"
       }
     ]
   },
@@ -116,7 +116,7 @@
     "kind": "q",
     "page": 8,
     "originalAsset": "e36-p02-q03-01-c684f5844774.webp",
-    "asset": "numbered-chemy36-2-3-q-0003-62d12dacf0b9.webp",
+    "asset": "numbered-chemy36-2-3-q-0003-3fddf01cd842.webp",
     "sourceBox": [
       84,
       587.35806075,
@@ -143,15 +143,15 @@
         346
       ]
     ],
-    "sha256": "62d12dacf0b947e51d3ce2f7e1aa5693a1e80d2d00adee79ef66628478d1dab8",
+    "sha256": "3fddf01cd8426fba03c7e7db914fb139a0990c64bcc8a3cdb877c14a3db4f602",
     "labels": [
       {
         "old": "3-1",
-        "new": "34-1"
+        "new": "35-1"
       },
       {
         "old": "3-2",
-        "new": "34-2"
+        "new": "35-2"
       }
     ]
   },
@@ -160,7 +160,7 @@
     "kind": "a",
     "page": 12,
     "originalAsset": "e36-p02-a03-01-be9ef75cd376.webp",
-    "asset": "numbered-chemy36-2-3-a-0004-47e4f4215c32.webp",
+    "asset": "numbered-chemy36-2-3-a-0004-de64ff69b65f.webp",
     "sourceBox": [
       84,
       452.15983175,
@@ -181,11 +181,11 @@
         47
       ]
     ],
-    "sha256": "47e4f4215c326ff8f70484564ad96877e3156bfde0da23eced03683200d70954",
+    "sha256": "de64ff69b65f2691821936c12d831fb093b4d0895e8f4640642614a0e13d70a6",
     "labels": [
       {
         "old": "3-1",
-        "new": "34-1"
+        "new": "35-1"
       }
     ]
   },
@@ -194,7 +194,7 @@
     "kind": "a",
     "page": 12,
     "originalAsset": "e36-p02-a03-03-bf14d51c11ff.webp",
-    "asset": "numbered-chemy36-2-3-a-0005-dd773c2665c2.webp",
+    "asset": "numbered-chemy36-2-3-a-0005-579fe25a1b7a.webp",
     "sourceBox": [
       84,
       644.6397972500001,
@@ -215,11 +215,11 @@
         68
       ]
     ],
-    "sha256": "dd773c2665c291bcf6d8813beb1a4c5b178a6f768adda9078fbb77351c14d0d9",
+    "sha256": "579fe25a1b7aafc644152ecefe11640ae18a4fd17df16e893c2658d59b9a8292",
     "labels": [
       {
         "old": "3-4",
-        "new": "34-4"
+        "new": "35-4"
       }
     ]
   },
@@ -228,7 +228,7 @@
     "kind": "q",
     "page": 9,
     "originalAsset": "e36-p02-q04-01-ef8010dce64e.webp",
-    "asset": "numbered-chemy36-2-4-q-0006-2eeffc806c9e.webp",
+    "asset": "numbered-chemy36-2-4-q-0006-b65c8813e992.webp",
     "sourceBox": [
       84,
       86.42103474999999,
@@ -249,11 +249,11 @@
         54
       ]
     ],
-    "sha256": "2eeffc806c9ea88f0b4a1df028a27e41702158194b5f48bd43c633b9ec9f76ee",
+    "sha256": "b65c8813e992d5544121be2ce29c4d7a4c51ae2c5f383d6b37ff51e6ea3da5e2",
     "labels": [
       {
         "old": "4-1",
-        "new": "139-1"
+        "new": "144-1"
       }
     ]
   },
@@ -262,7 +262,7 @@
     "kind": "q",
     "page": 9,
     "originalAsset": "e36-p02-q04-02-2d11a898f09f.webp",
-    "asset": "numbered-chemy36-2-4-q-0007-e086cfaf7d66.webp",
+    "asset": "numbered-chemy36-2-4-q-0007-56a8bb60bf69.webp",
     "sourceBox": [
       84,
       141.60000274999993,
@@ -283,11 +283,11 @@
         353
       ]
     ],
-    "sha256": "e086cfaf7d66b6e24da30cce264bfb2792dc6e314fc6d83dadb1ae83ec5e1cd6",
+    "sha256": "56a8bb60bf69ba54b4beb05ce9b4fdf4c42d5333e3af28b9bf61590cbe5ba803",
     "labels": [
       {
         "old": "4-2",
-        "new": "139-2"
+        "new": "144-2"
       }
     ]
   },
@@ -296,7 +296,7 @@
     "kind": "a",
     "page": 17,
     "originalAsset": "e36-p02-a07-02-4a5003291a5d.webp",
-    "asset": "numbered-chemy36-2-7-a-0008-3606472022e8.webp",
+    "asset": "numbered-chemy36-2-7-a-0008-1339d4d767c4.webp",
     "sourceBox": [
       84,
       387.03105825,
@@ -317,11 +317,11 @@
         43
       ]
     ],
-    "sha256": "3606472022e8a003725684dfc7153f87a62ceafef09fe7e6f232c1c8b41863fb",
+    "sha256": "1339d4d767c4db1c9a8926e386a38a81211b8caa92733c29b5327d8af14242bf",
     "labels": [
       {
         "old": "7-2",
-        "new": "140-2"
+        "new": "145-2"
       }
     ]
   },
@@ -364,7 +364,7 @@
     "kind": "a",
     "page": 34,
     "originalAsset": "e36-p04-a03-01-f2bdcb18e4ce.webp",
-    "asset": "numbered-chemy36-4-3-a-0010-b90faf125d9c.webp",
+    "asset": "numbered-chemy36-4-3-a-0010-4427365a7edb.webp",
     "sourceBox": [
       84,
       343.120671,
@@ -385,11 +385,11 @@
         46
       ]
     ],
-    "sha256": "b90faf125d9c753786390a7e4134b15f3984f76ad947e785f2aa0256a1ed2294",
+    "sha256": "4427365a7edb561ca965a82be479267f30dd81147fe03ada4c043ecdf5493a8d",
     "labels": [
       {
         "old": "3-1",
-        "new": "144-1"
+        "new": "149-1"
       }
     ]
   },
@@ -398,7 +398,7 @@
     "kind": "a",
     "page": 34,
     "originalAsset": "e36-p04-a03-02-52a352f5fbbd.webp",
-    "asset": "numbered-chemy36-4-3-a-0011-fe5523f64ab3.webp",
+    "asset": "numbered-chemy36-4-3-a-0011-d68a33bffd60.webp",
     "sourceBox": [
       84,
       423.16064925,
@@ -419,11 +419,11 @@
         46
       ]
     ],
-    "sha256": "fe5523f64ab3c0796865f622cc9ee045cdd63d48ccce0bcf2b060f37d854a10c",
+    "sha256": "d68a33bffd609240fb672ff45e3de5793723eedf6fe21c2b74bcd8d33e3fe82c",
     "labels": [
       {
         "old": "3-2",
-        "new": "144-2"
+        "new": "149-2"
       }
     ]
   },
@@ -432,7 +432,7 @@
     "kind": "a",
     "page": 34,
     "originalAsset": "e36-p04-a03-03-92bcef875464.webp",
-    "asset": "numbered-chemy36-4-3-a-0012-874c413eb9a5.webp",
+    "asset": "numbered-chemy36-4-3-a-0012-894ecb595295.webp",
     "sourceBox": [
       84,
       584.320653,
@@ -453,11 +453,11 @@
         46
       ]
     ],
-    "sha256": "874c413eb9a5a09ae7e83135416e386e6876093bb88e0b5bb32c87a2c044665c",
+    "sha256": "894ecb5952959d0ec3ac0a9c521ca68d9b98319d17ee1c6f0aa3ec22453ff641",
     "labels": [
       {
         "old": "3-3",
-        "new": "144-3"
+        "new": "149-3"
       }
     ]
   },
@@ -466,7 +466,7 @@
     "kind": "a",
     "page": 35,
     "originalAsset": "e36-p04-a04-01-b38a5960088b.webp",
-    "asset": "numbered-chemy36-4-4-a-0013-8966dc917bcb.webp",
+    "asset": "numbered-chemy36-4-4-a-0013-bc925af08b5f.webp",
     "sourceBox": [
       84,
       86.42103474999999,
@@ -505,23 +505,23 @@
         382
       ]
     ],
-    "sha256": "8966dc917bcb9add56ffce3a8355c43f10e389f330f7232a596a01ffa05a4a80",
+    "sha256": "bc925af08b5f366b2c67436f2fa97625cc17a881fdc8f5649cc605a959b86ab8",
     "labels": [
       {
         "old": "4-1",
-        "new": "43-1"
+        "new": "46-1"
       },
       {
         "old": "4-1-1",
-        "new": "43-1-1"
+        "new": "46-1-1"
       },
       {
         "old": "4-1-2",
-        "new": "43-1-2"
+        "new": "46-1-2"
       },
       {
         "old": "4-1-3",
-        "new": "43-1-3"
+        "new": "46-1-3"
       }
     ]
   },
@@ -530,7 +530,7 @@
     "kind": "a",
     "page": 36,
     "originalAsset": "e36-p04-a04-02-a17354428cce.webp",
-    "asset": "numbered-chemy36-4-4-a-0014-904e702b7dac.webp",
+    "asset": "numbered-chemy36-4-4-a-0014-1b5d4ac1970b.webp",
     "sourceBox": [
       84,
       73.84066500000006,
@@ -551,11 +551,11 @@
         46
       ]
     ],
-    "sha256": "904e702b7dac859030827ac78406b0593d1ca249c02f7052bf18e94017077556",
+    "sha256": "1b5d4ac1970b5e0a89cf2c56c2f0360e9d88ffb7c309348eebba8545820f116a",
     "labels": [
       {
         "old": "4-2-1",
-        "new": "43-2-1"
+        "new": "46-2-1"
       }
     ]
   },
@@ -564,7 +564,7 @@
     "kind": "a",
     "page": 36,
     "originalAsset": "e36-p04-a04-03-7cdc853ebd64.webp",
-    "asset": "numbered-chemy36-4-4-a-0015-0992874cd471.webp",
+    "asset": "numbered-chemy36-4-4-a-0015-cbdba68026a5.webp",
     "sourceBox": [
       84,
       221.44065525000008,
@@ -585,11 +585,11 @@
         46
       ]
     ],
-    "sha256": "0992874cd4714554c34a72e86647bf563f4d492196841cd0eb0a681c6dce6d65",
+    "sha256": "cbdba68026a522ae7bb4cb57cdfb2fa96677539a0566d4c8142ef43799ab0d0c",
     "labels": [
       {
         "old": "4-2-3",
-        "new": "43-2-3"
+        "new": "46-2-3"
       }
     ]
   },
@@ -598,7 +598,7 @@
     "kind": "a",
     "page": 36,
     "originalAsset": "e36-p04-a04-04-efa822bc3891.webp",
-    "asset": "numbered-chemy36-4-4-a-0016-9e98f140aafc.webp",
+    "asset": "numbered-chemy36-4-4-a-0016-652f202e97c5.webp",
     "sourceBox": [
       84,
       349.840665,
@@ -619,11 +619,11 @@
         45
       ]
     ],
-    "sha256": "9e98f140aafc633907d0846f90e0b3b26119f6d79f8ab466c0e0faa76b8d3dca",
+    "sha256": "652f202e97c5c848c1ec8c745822e43529b78b517c3a02a090d53f87f8fd9e5d",
     "labels": [
       {
         "old": "4-3",
-        "new": "43-3"
+        "new": "46-3"
       }
     ]
   },
@@ -632,7 +632,7 @@
     "kind": "a",
     "page": 38,
     "originalAsset": "e36-p04-a07-01-b8cf96a470f2.webp",
-    "asset": "numbered-chemy36-4-7-a-0017-23f5551c134f.webp",
+    "asset": "numbered-chemy36-4-7-a-0017-f6ac452c25aa.webp",
     "sourceBox": [
       84,
       355.120671,
@@ -653,11 +653,11 @@
         46
       ]
     ],
-    "sha256": "23f5551c134fe18b92f15dc1824e9e82a52b17db25aec9bd691d24d17a43e1e6",
+    "sha256": "f6ac452c25aacfed5ac0be9dc6ff1cdfc44977178037668aedab0a2e29167b8a",
     "labels": [
       {
         "old": "7-2",
-        "new": "146-2"
+        "new": "151-2"
       }
     ]
   },
@@ -802,7 +802,7 @@
     "kind": "q",
     "page": 29,
     "originalAsset": "e36-p06-q01-01-cddaa558c35c.webp",
-    "asset": "numbered-chemy36-6-1-q-0022-80852f23d375.webp",
+    "asset": "numbered-chemy36-6-1-q-0022-3e3b54fee6e0.webp",
     "sourceBox": [
       84,
       167.39998175000005,
@@ -829,15 +829,15 @@
         317
       ]
     ],
-    "sha256": "80852f23d375906863c9c2414ad889d51d5ae2b004b7dac49fcda9af8558739d",
+    "sha256": "3e3b54fee6e05e058c545c22a39b1c2179537cf0573d196da9ecee0bd88eab94",
     "labels": [
       {
         "old": "1-1",
-        "new": "150-1"
+        "new": "155-1"
       },
       {
         "old": "1-2",
-        "new": "150-2"
+        "new": "155-2"
       }
     ]
   },
@@ -846,7 +846,7 @@
     "kind": "q",
     "page": 31,
     "originalAsset": "e36-p06-q06-01-7b21d0341030.webp",
-    "asset": "numbered-chemy36-6-6-q-0023-eb477ecd50f1.webp",
+    "asset": "numbered-chemy36-6-6-q-0023-949df0172a5c.webp",
     "sourceBox": [
       84,
       119.35807199999999,
@@ -867,11 +867,11 @@
         571
       ]
     ],
-    "sha256": "eb477ecd50f129ef47d4ceb59b00aa50060a385f76ed6d14659865dd537580d6",
+    "sha256": "949df0172a5c2259c2fc064bd321457aad5e701fffd41592407aba9db2be616b",
     "labels": [
       {
         "old": "6-1",
-        "new": "45-1"
+        "new": "48-1"
       }
     ]
   },
@@ -880,7 +880,7 @@
     "kind": "q",
     "page": 35,
     "originalAsset": "e36-p07-q05-01-56710bf10162.webp",
-    "asset": "numbered-chemy36-7-5-q-0024-d2583bda8885.webp",
+    "asset": "numbered-chemy36-7-5-q-0024-6375defb9465.webp",
     "sourceBox": [
       84,
       322.15807874999996,
@@ -901,11 +901,11 @@
         499
       ]
     ],
-    "sha256": "d2583bda88853936114604404707f61be270012363719177614ed7ef374747e1",
+    "sha256": "6375defb94653421701ab8aa448845ff05ada7d8b45cf3ef959334d1a63222c1",
     "labels": [
       {
         "old": "5-1",
-        "new": "153-1"
+        "new": "158-1"
       }
     ]
   },
@@ -914,7 +914,7 @@
     "kind": "q",
     "page": 40,
     "originalAsset": "e36-p08-q02-01-a901010ac920.webp",
-    "asset": "numbered-chemy36-8-2-q-0025-e191c21b91d3.webp",
+    "asset": "numbered-chemy36-8-2-q-0025-c67a64dc7952.webp",
     "sourceBox": [
       84,
       368.95807425,
@@ -941,15 +941,15 @@
         867
       ]
     ],
-    "sha256": "e191c21b91d3dfdc88cf4a91f3f5f87341d7e1cebd4d34286fd904923a787006",
+    "sha256": "c67a64dc795208d2f577d5f6f4f4045b8dfa8dd3cde50d0f93725ee50b83ee0d",
     "labels": [
       {
         "old": "2-1",
-        "new": "38-1"
+        "new": "39-1"
       },
       {
         "old": "2-2",
-        "new": "38-2"
+        "new": "39-2"
       }
     ]
   },
@@ -958,7 +958,7 @@
     "kind": "a",
     "page": 73,
     "originalAsset": "e36-p08-a02-02-2ac90044aa9a.webp",
-    "asset": "numbered-chemy36-8-2-a-0026-bfa0ddd0c6e0.webp",
+    "asset": "numbered-chemy36-8-2-a-0026-91b067c269f2.webp",
     "sourceBox": [
       84,
       107.49580174999994,
@@ -979,11 +979,11 @@
         51
       ]
     ],
-    "sha256": "bfa0ddd0c6e02469a6b715980ac171dfb943fb3f4f16a8376ebc24994e133e7d",
+    "sha256": "91b067c269f20e10bc22e3fc512710a699d25694e0124456e2e7b897174c6a72",
     "labels": [
       {
         "old": "2-2",
-        "new": "38-2"
+        "new": "39-2"
       }
     ]
   },
@@ -992,7 +992,7 @@
     "kind": "q",
     "page": 41,
     "originalAsset": "e36-p08-q03-01-9032df33a381.webp",
-    "asset": "numbered-chemy36-8-3-q-0027-f1c447122304.webp",
+    "asset": "numbered-chemy36-8-3-q-0027-b0389668a792.webp",
     "sourceBox": [
       84,
       103.75806975,
@@ -1013,11 +1013,11 @@
         49
       ]
     ],
-    "sha256": "f1c4471223044b87aac6089253aa6abd62d7c1c25b32b7c3837c89c673cc4258",
+    "sha256": "b0389668a7926f3fab9e6a8601c0eb29e5e88589fffaadb685d7b779eaa06a3f",
     "labels": [
       {
         "old": "3-1",
-        "new": "155-1"
+        "new": "160-1"
       }
     ]
   },
@@ -1026,7 +1026,7 @@
     "kind": "q",
     "page": 43,
     "originalAsset": "e36-p08-q06-01-34ff4e730873.webp",
-    "asset": "numbered-chemy36-8-6-q-0028-16df0c2a06c5.webp",
+    "asset": "numbered-chemy36-8-6-q-0028-30e5d5b3972f.webp",
     "sourceBox": [
       84,
       86.42103474999999,
@@ -1059,19 +1059,19 @@
         928
       ]
     ],
-    "sha256": "16df0c2a06c5d13ffa90d570aa5fe0bcee0da8b4c5429fbdacb81e3a5fde730d",
+    "sha256": "30e5d5b3972f98b5c29ba6b888a4ec0779591c87d7259b6e8b4b6341ea17efd0",
     "labels": [
       {
         "old": "6-1",
-        "new": "49-1"
+        "new": "52-1"
       },
       {
         "old": "6-2",
-        "new": "49-2"
+        "new": "52-2"
       },
       {
         "old": "6-3",
-        "new": "49-3"
+        "new": "52-3"
       }
     ]
   },
@@ -1080,7 +1080,7 @@
     "kind": "a",
     "page": 79,
     "originalAsset": "e36-p08-a06-03-ab03a3e64ea1.webp",
-    "asset": "numbered-chemy36-8-6-a-0029-280e4634ea48.webp",
+    "asset": "numbered-chemy36-8-6-a-0029-31c376c7695f.webp",
     "sourceBox": [
       84,
       696.24000125,
@@ -1101,11 +1101,11 @@
         65
       ]
     ],
-    "sha256": "280e4634ea485bbeec6f8c53fe2a074f64eee036dc78d190da86941fe91e3082",
+    "sha256": "31c376c7695f5ee75c6116ebd6a2aee7ea8654f7eef04148b793496b086c799a",
     "labels": [
       {
         "old": "6-3",
-        "new": "49-3"
+        "new": "52-3"
       }
     ]
   },
@@ -1188,7 +1188,7 @@
     "kind": "q",
     "page": 46,
     "originalAsset": "e36-p09-q02-01-377694a4d866.webp",
-    "asset": "numbered-chemy36-9-2-q-0031-e46e3fb6c733.webp",
+    "asset": "numbered-chemy36-9-2-q-0031-8736b8ebedd4.webp",
     "sourceBox": [
       84,
       226.82103774999996,
@@ -1233,27 +1233,27 @@
         546
       ]
     ],
-    "sha256": "e46e3fb6c733d7d0896eca74e7189dd1746af2c1c9e0f01d3b2730643fa4dae9",
+    "sha256": "8736b8ebedd49cc641a474ef7f98bc1566409033cd6c6dfc3fbc8448aa4ad431",
     "labels": [
       {
         "old": "2-1",
-        "new": "159-1"
+        "new": "164-1"
       },
       {
         "old": "2-2",
-        "new": "159-2"
+        "new": "164-2"
       },
       {
         "old": "2-3",
-        "new": "159-3"
+        "new": "164-3"
       },
       {
         "old": "2-4",
-        "new": "159-4"
+        "new": "164-4"
       },
       {
         "old": "2-5",
-        "new": "159-5"
+        "new": "164-5"
       }
     ]
   },
@@ -1262,7 +1262,7 @@
     "kind": "q",
     "page": 46,
     "originalAsset": "e36-p09-q03-03-49a0ed4fc567.webp",
-    "asset": "numbered-chemy36-9-3-q-0032-a5092dde3b67.webp",
+    "asset": "numbered-chemy36-9-3-q-0032-dc3466549478.webp",
     "sourceBox": [
       84,
       587.35806075,
@@ -1283,11 +1283,11 @@
         49
       ]
     ],
-    "sha256": "a5092dde3b674405de818d89734d96d67ba760f5222214cc4ea08d6d40aa81b9",
+    "sha256": "dc3466549478d4a2a1de8d7aa9bcbe26d06eb077d53ea0551aed3cf4138a019d",
     "labels": [
       {
         "old": "3-3",
-        "new": "160-3"
+        "new": "165-3"
       }
     ]
   },
@@ -1296,7 +1296,7 @@
     "kind": "q",
     "page": 48,
     "originalAsset": "e36-p09-q06-01-9c6019de3523.webp",
-    "asset": "numbered-chemy36-9-6-q-0033-363102cecb9e.webp",
+    "asset": "numbered-chemy36-9-6-q-0033-52255cc4703d.webp",
     "sourceBox": [
       84,
       86.42103474999999,
@@ -1335,23 +1335,23 @@
         436
       ]
     ],
-    "sha256": "363102cecb9ee48630631eca43ea5bcf5f4e1344a6d74fdb0c51759360e07adb",
+    "sha256": "52255cc4703df4e6269aa4545dcd743e27030ca86217981d67f9d971913b2362",
     "labels": [
       {
         "old": "6-1",
-        "new": "50-1"
+        "new": "53-1"
       },
       {
         "old": "6-2",
-        "new": "50-2"
+        "new": "53-2"
       },
       {
         "old": "6-3",
-        "new": "50-3"
+        "new": "53-3"
       },
       {
         "old": "6-4",
-        "new": "50-4"
+        "new": "53-4"
       }
     ]
   },
@@ -1394,7 +1394,7 @@
     "kind": "q",
     "page": 50,
     "originalAsset": "e36-p10-q01-01-6766a6991a04.webp",
-    "asset": "numbered-chemy36-10-1-q-0035-512d3a5ffcba.webp",
+    "asset": "numbered-chemy36-10-1-q-0035-e01c743d0be8.webp",
     "sourceBox": [
       84,
       322.15807874999996,
@@ -1415,11 +1415,11 @@
         48
       ]
     ],
-    "sha256": "512d3a5ffcbab207148b98d3611dec0f041f466476bf78860fd3e4731d5865ce",
+    "sha256": "e01c743d0be81570fdeddcda1ae5b6b8ac05fc727584394df1d54874119fab2d",
     "labels": [
       {
         "old": "1-4-1",
-        "new": "63-4-1"
+        "new": "65-4-1"
       }
     ]
   },
@@ -1428,7 +1428,7 @@
     "kind": "q",
     "page": 50,
     "originalAsset": "e36-p10-q02-01-519555aab5dd.webp",
-    "asset": "numbered-chemy36-10-2-q-0036-a96e1f3ec034.webp",
+    "asset": "numbered-chemy36-10-2-q-0036-1ac27b33cd78.webp",
     "sourceBox": [
       84,
       667.39808475,
@@ -1449,11 +1449,11 @@
         49
       ]
     ],
-    "sha256": "a96e1f3ec034a2ef766f762bfe42d9e67fa83f2ebe5b54522db357d28b9bede3",
+    "sha256": "1ac27b33cd787f4176ec95bc610700a66eb2681558d9f392eba1fb500da50f00",
     "labels": [
       {
         "old": "2-5",
-        "new": "163-5"
+        "new": "168-5"
       }
     ]
   },
@@ -1496,7 +1496,7 @@
     "kind": "a",
     "page": 109,
     "originalAsset": "e36-p11-a05-01-18b674e209a5.webp",
-    "asset": "numbered-chemy36-11-5-a-0038-c599567fea75.webp",
+    "asset": "numbered-chemy36-11-5-a-0038-958c17d07cb6.webp",
     "sourceBox": [
       84,
       373.0799975,
@@ -1517,11 +1517,11 @@
         50
       ]
     ],
-    "sha256": "c599567fea75663c878b741a963692819e06c98f0c8cfcbb2ff0e68c8dd2a984",
+    "sha256": "958c17d07cb64bd23d37afa34693d91522cf54f3aa81eb039994a30727f75bc7",
     "labels": [
       {
         "old": "5-5",
-        "new": "52-5"
+        "new": "55-5"
       }
     ]
   },
@@ -1530,7 +1530,7 @@
     "kind": "q",
     "page": 66,
     "originalAsset": "e36-p13-q06-01-a9d32bf8b401.webp",
-    "asset": "numbered-chemy36-13-6-q-0039-af5b3d5d1e4e.webp",
+    "asset": "numbered-chemy36-13-6-q-0039-436a5c375975.webp",
     "sourceBox": [
       84,
       87.35999824999999,
@@ -1575,27 +1575,27 @@
         1143
       ]
     ],
-    "sha256": "af5b3d5d1e4ed89cb930e7afd7161a5028c7e56da876d43db711c05ed42ead2e",
+    "sha256": "436a5c37597566890c7abf34c7a34d1abe0b8795cd790cd80a98156939e55579",
     "labels": [
       {
         "old": "6-1",
-        "new": "54-1"
+        "new": "57-1"
       },
       {
         "old": "6-2",
-        "new": "54-2"
+        "new": "57-2"
       },
       {
         "old": "6-3",
-        "new": "54-3"
+        "new": "57-3"
       },
       {
         "old": "6-3-1",
-        "new": "54-3-1"
+        "new": "57-3-1"
       },
       {
         "old": "6-3-2",
-        "new": "54-3-2"
+        "new": "57-3-2"
       }
     ]
   },
@@ -1638,7 +1638,7 @@
     "kind": "a",
     "page": 138,
     "originalAsset": "e36-p14-a07-01-6d95bb13eb50.webp",
-    "asset": "numbered-chemy36-14-7-a-0041-2f7cba6807d3.webp",
+    "asset": "numbered-chemy36-14-7-a-0041-d85f2c54e9e3.webp",
     "sourceBox": [
       84,
       167.44066725000005,
@@ -1659,11 +1659,11 @@
         46
       ]
     ],
-    "sha256": "2f7cba6807d3a50848fbdb07d69a7a36cab7a27e310f19374089ba1ad0082d52",
+    "sha256": "d85f2c54e9e3175717950959e204073cfd0057845ccd4a55445aec57ee3fa3ef",
     "labels": [
       {
         "old": "7-1",
-        "new": "181-1"
+        "new": "186-1"
       }
     ]
   },
@@ -1750,7 +1750,7 @@
     "kind": "q",
     "page": 81,
     "originalAsset": "e36-p16-q05-01-c5cdcfca226a.webp",
-    "asset": "numbered-chemy36-16-5-q-0044-2cc5cc0876f2.webp",
+    "asset": "numbered-chemy36-16-5-q-0044-a94cd19ac716.webp",
     "sourceBox": [
       84,
       353.35808325,
@@ -1777,15 +1777,15 @@
         103
       ]
     ],
-    "sha256": "2cc5cc0876f29fbf045a57d7b0104081124d220d62c23b9dd78c3c39932dfd3d",
+    "sha256": "a94cd19ac7162deb2c6d9c67be53e9264ce88f1a4a128725e2e9c6242f8c5386",
     "labels": [
       {
         "old": "5-1-1",
-        "new": "41-1-1"
+        "new": "42-1-1"
       },
       {
         "old": "5-1-2",
-        "new": "41-1-2"
+        "new": "42-1-2"
       }
     ]
   },
@@ -1794,7 +1794,7 @@
     "kind": "q",
     "page": 85,
     "originalAsset": "e36-p17-q01-01-a6a3df0e91a0.webp",
-    "asset": "numbered-chemy36-17-1-q-0045-e5e75cfa1287.webp",
+    "asset": "numbered-chemy36-17-1-q-0045-de048ea72365.webp",
     "sourceBox": [
       84,
       228.55806525000003,
@@ -1845,31 +1845,31 @@
         322
       ]
     ],
-    "sha256": "e5e75cfa1287c98a62cea768894a7e53a5c7d2dade19a1678b6501a967ad57e4",
+    "sha256": "de048ea723653e525283a7a5b469801e062cf9bbec42f3737f98f750aa03c3e9",
     "labels": [
       {
         "old": "1-2-1",
-        "new": "188-2-1"
+        "new": "193-2-1"
       },
       {
         "old": "1-2-2",
-        "new": "188-2-2"
+        "new": "193-2-2"
       },
       {
         "old": "1-2-3",
-        "new": "188-2-3"
+        "new": "193-2-3"
       },
       {
         "old": "1-2-4",
-        "new": "188-2-4"
+        "new": "193-2-4"
       },
       {
         "old": "1-2-5",
-        "new": "188-2-5"
+        "new": "193-2-5"
       },
       {
         "old": "1-3",
-        "new": "188-3"
+        "new": "193-3"
       }
     ]
   },
@@ -1878,7 +1878,7 @@
     "kind": "q",
     "page": 86,
     "originalAsset": "e36-p17-q05-01-ca3b8c671eed.webp",
-    "asset": "numbered-chemy36-17-5-q-0046-590daa16351e.webp",
+    "asset": "numbered-chemy36-17-5-q-0046-1f3aae105dea.webp",
     "sourceBox": [
       84,
       321.48000724999997,
@@ -1941,39 +1941,39 @@
         1198
       ]
     ],
-    "sha256": "590daa16351e17c23e8461d31e2ced10ace7e011ffe516388e776f587eb36f01",
+    "sha256": "1f3aae105deabc3a86b15f9a1baf2c5ccc0d009b86ada9c95fe2af09746771fd",
     "labels": [
       {
         "old": "5-1-1",
-        "new": "57-1-1"
+        "new": "60-1-1"
       },
       {
         "old": "5-1-2",
-        "new": "57-1-2"
+        "new": "60-1-2"
       },
       {
         "old": "5-2",
-        "new": "57-2"
+        "new": "60-2"
       },
       {
         "old": "5-2-1",
-        "new": "57-2-1"
+        "new": "60-2-1"
       },
       {
         "old": "5-2-2",
-        "new": "57-2-2"
+        "new": "60-2-2"
       },
       {
         "old": "5-2-3",
-        "new": "57-2-3"
+        "new": "60-2-3"
       },
       {
         "old": "5-2-4",
-        "new": "57-2-4"
+        "new": "60-2-4"
       },
       {
         "old": "5-2-5",
-        "new": "57-2-5"
+        "new": "60-2-5"
       }
     ]
   },
@@ -1982,7 +1982,7 @@
     "kind": "a",
     "page": 167,
     "originalAsset": "e36-p17-a05-01-d1a9278cfd65.webp",
-    "asset": "numbered-chemy36-17-5-a-0047-8c211056f41e.webp",
+    "asset": "numbered-chemy36-17-5-a-0047-ffe83e4ca3e4.webp",
     "sourceBox": [
       84,
       305.40001625,
@@ -2027,27 +2027,27 @@
         602
       ]
     ],
-    "sha256": "8c211056f41e4400e6018e720063d8b69c8ae491d95d46b9fa6d7acd36ae94d3",
+    "sha256": "ffe83e4ca3e4baa08844fbf71edcbc41ab4eaab71c3405929940838ee7a638cc",
     "labels": [
       {
         "old": "5-2",
-        "new": "57-2"
+        "new": "60-2"
       },
       {
         "old": "5-2-1",
-        "new": "57-2-1"
+        "new": "60-2-1"
       },
       {
         "old": "5-2-2",
-        "new": "57-2-2"
+        "new": "60-2-2"
       },
       {
         "old": "5-2-3",
-        "new": "57-2-3"
+        "new": "60-2-3"
       },
       {
         "old": "5-2-4",
-        "new": "57-2-4"
+        "new": "60-2-4"
       }
     ]
   },
@@ -2056,7 +2056,7 @@
     "kind": "q",
     "page": 87,
     "originalAsset": "e36-p17-q07-03-aebbd069a19f.webp",
-    "asset": "numbered-chemy36-17-7-q-0048-8d852497a417.webp",
+    "asset": "numbered-chemy36-17-7-q-0048-77321add9871.webp",
     "sourceBox": [
       84,
       634.15807875,
@@ -2077,11 +2077,11 @@
         48
       ]
     ],
-    "sha256": "8d852497a417683d3f5297795793cf5c162c347dabbe98c53c6d555f882948dd",
+    "sha256": "77321add9871aa967d6ca25ec8f33b86d1d4738d6653f3b7f820b601ecf99bab",
     "labels": [
       {
         "old": "7-2",
-        "new": "10-2"
+        "new": "11-2"
       }
     ]
   },
@@ -2090,7 +2090,7 @@
     "kind": "a",
     "page": 169,
     "originalAsset": "e36-p17-a07-01-b13546846ab7.webp",
-    "asset": "numbered-chemy36-17-7-a-0049-bd7061418553.webp",
+    "asset": "numbered-chemy36-17-7-a-0049-26bdc2c7047c.webp",
     "sourceBox": [
       84,
       354.7980705,
@@ -2111,11 +2111,11 @@
         49
       ]
     ],
-    "sha256": "bd706141855311369abc72a37901611b8b232cc41c7d40c61bec4a283b9b6bb6",
+    "sha256": "26bdc2c7047ca2c370a01818d803ddd27fe811e143d741ea2e15e13c40768e62",
     "labels": [
       {
         "old": "7-2",
-        "new": "10-2"
+        "new": "11-2"
       }
     ]
   },
@@ -2124,7 +2124,7 @@
     "kind": "a",
     "page": 175,
     "originalAsset": "e36-p18-a02-02-07a7896d7eef.webp",
-    "asset": "numbered-chemy36-18-2-a-0050-e9e7f5d22bbe.webp",
+    "asset": "numbered-chemy36-18-2-a-0050-1bc83e19fb64.webp",
     "sourceBox": [
       84,
       432.16064925,
@@ -2145,11 +2145,11 @@
         46
       ]
     ],
-    "sha256": "e9e7f5d22bbe898a3e94133dcb8bb031fd085b0b8f9099ccfb5b71ae3ccfbbbf",
+    "sha256": "1bc83e19fb64d5bd2c44044871706c9afde3618f42e01da597d25cfa06515ab3",
     "labels": [
       {
         "old": "2-3-1",
-        "new": "190-3-1"
+        "new": "195-3-1"
       }
     ]
   },
@@ -2158,7 +2158,7 @@
     "kind": "q",
     "page": 92,
     "originalAsset": "e36-p18-q04-01-021a0bf01ca4.webp",
-    "asset": "numbered-chemy36-18-4-q-0051-97fc037c3ee8.webp",
+    "asset": "numbered-chemy36-18-4-q-0051-a1d74d9e51b5.webp",
     "sourceBox": [
       84,
       103.75806975,
@@ -2179,11 +2179,11 @@
         274
       ]
     ],
-    "sha256": "97fc037c3ee80128b33a99f36d5d0b772b53185f7a34d9992b2f09f33ae4f2cc",
+    "sha256": "a1d74d9e51b5f91e744c764cc034e59bae0cf7410cf71cf72bd18baea0b2afc7",
     "labels": [
       {
         "old": "4-1-1",
-        "new": "42-1-1"
+        "new": "43-1-1"
       }
     ]
   },
@@ -2192,7 +2192,7 @@
     "kind": "q",
     "page": 92,
     "originalAsset": "e36-p18-q05-01-5226544837dd.webp",
-    "asset": "numbered-chemy36-18-5-q-0052-8ba97969e6a3.webp",
+    "asset": "numbered-chemy36-18-5-q-0052-33e82028590d.webp",
     "sourceBox": [
       84,
       499.27805849999993,
@@ -2213,11 +2213,11 @@
         859
       ]
     ],
-    "sha256": "8ba97969e6a3a184badad2c6fc8a32eab068ffcc35af8b0ac3f0baaad68aec55",
+    "sha256": "33e82028590dc21dc7bf56e5be0c43bfa8c64caa66a391f7d39d6b14bdd0abf9",
     "labels": [
       {
         "old": "5-1",
-        "new": "58-1"
+        "new": "61-1"
       }
     ]
   },
@@ -2226,7 +2226,7 @@
     "kind": "a",
     "page": 178,
     "originalAsset": "e36-p18-a05-01-04329cd16717.webp",
-    "asset": "numbered-chemy36-18-5-a-0053-4d5d4ad29880.webp",
+    "asset": "numbered-chemy36-18-5-a-0053-4ebe7544f9ab.webp",
     "sourceBox": [
       84,
       526.33579197,
@@ -2247,11 +2247,11 @@
         67
       ]
     ],
-    "sha256": "4d5d4ad29880e39266605a6bcc602716d94f197a1bc823342b6213ccc55df7af",
+    "sha256": "4ebe7544f9ab9e3ea8253818515cbdc940b2364d96835b5595cbcf8bc7900d24",
     "labels": [
       {
         "old": "5-4",
-        "new": "58-4"
+        "new": "61-4"
       }
     ]
   },
@@ -2260,7 +2260,7 @@
     "kind": "q",
     "page": 96,
     "originalAsset": "e36-p19-q04-01-7b90d7a9a817.webp",
-    "asset": "numbered-chemy36-19-4-q-0054-c9f747be5bc6.webp",
+    "asset": "numbered-chemy36-19-4-q-0054-6e7e55cae3a6.webp",
     "sourceBox": [
       84,
       538.8210152500001,
@@ -2287,15 +2287,15 @@
         273
       ]
     ],
-    "sha256": "c9f747be5bc6a4a376899056169521afe9d78b114745bc6b632ed732610e575d",
+    "sha256": "6e7e55cae3a67ab7e80c19128994a8b07a2b5599495cf2bdb69f4b26750ad2a6",
     "labels": [
       {
         "old": "4-1",
-        "new": "59-1"
+        "new": "62-1"
       },
       {
         "old": "4-2",
-        "new": "59-2"
+        "new": "62-2"
       }
     ]
   },
@@ -2304,7 +2304,7 @@
     "kind": "a",
     "page": 197,
     "originalAsset": "e36-p20-a06-01-19c164bea57b.webp",
-    "asset": "numbered-chemy36-20-6-a-0055-3052cc453afd.webp",
+    "asset": "numbered-chemy36-20-6-a-0055-8ea6e9913153.webp",
     "sourceBox": [
       84,
       421.80001400000003,
@@ -2325,11 +2325,11 @@
         50
       ]
     ],
-    "sha256": "3052cc453afdb78b8ff8905b03819d3f6a605366cc808c4a5de6e85ce24f3a34",
+    "sha256": "8ea6e99131537ce218330b1b0a066c791b4048773090549f55d89fd1c3027f5e",
     "labels": [
       {
         "old": "6-3-2",
-        "new": "62-3-2"
+        "new": "65-3-2"
       }
     ]
   },
@@ -2338,7 +2338,7 @@
     "kind": "q",
     "page": 106,
     "originalAsset": "e36-p21-q02-01-c214ec5143dc.webp",
-    "asset": "numbered-chemy36-21-2-q-0056-a7198a523256.webp",
+    "asset": "numbered-chemy36-21-2-q-0056-e631fe2e7be0.webp",
     "sourceBox": [
       84,
       72.55807125000001,
@@ -2365,15 +2365,15 @@
         467
       ]
     ],
-    "sha256": "a7198a5232567d823b028d689fd1ee6c6865fdb354f70b9b129cc879962b552a",
+    "sha256": "e631fe2e7be0046a2d7bce4d3d533f7fa0ea5b6b5ac24db91b707c456f757bbb",
     "labels": [
       {
         "old": "2-2",
-        "new": "44-2"
+        "new": "45-2"
       },
       {
         "old": "2-2-1",
-        "new": "44-2-1"
+        "new": "45-2-1"
       }
     ]
   },
@@ -2382,7 +2382,7 @@
     "kind": "a",
     "page": 207,
     "originalAsset": "e36-p21-a03-03-8391327c4cf2.webp",
-    "asset": "numbered-chemy36-21-3-a-0057-346b4b950f75.webp",
+    "asset": "numbered-chemy36-21-3-a-0057-c5b70cedc3b4.webp",
     "sourceBox": [
       84,
       463.67998850000004,
@@ -2403,11 +2403,11 @@
         50
       ]
     ],
-    "sha256": "346b4b950f7518dc2e194d69701e1242c0d281722e59441add93f5366c3d69ab",
+    "sha256": "c5b70cedc3b4abe93317e744d43b7033d19c00be3d12930d4efee3cc1ee63349",
     "labels": [
       {
         "old": "3-2",
-        "new": "63-2"
+        "new": "66-2"
       }
     ]
   },
@@ -2494,7 +2494,7 @@
     "kind": "q",
     "page": 110,
     "originalAsset": "e36-p22-q01-01-98923ab53e39.webp",
-    "asset": "numbered-chemy36-22-1-q-0060-39ae1273623b.webp",
+    "asset": "numbered-chemy36-22-1-q-0060-47e898816614.webp",
     "sourceBox": [
       84,
       212.95807424999998,
@@ -2515,11 +2515,11 @@
         49
       ]
     ],
-    "sha256": "39ae1273623be3d2945e6a65f72bc40e3bc73908f9218e2e696debf199dc60d7",
+    "sha256": "47e898816614c090b7b8484488dfa26a9b18be61a0b9f908c478e6732133e7db",
     "labels": [
       {
         "old": "1-1-2",
-        "new": "196-1-2"
+        "new": "201-1-2"
       }
     ]
   },
@@ -2528,7 +2528,7 @@
     "kind": "q",
     "page": 112,
     "originalAsset": "e36-p22-q04-01-bc7975876ae9.webp",
-    "asset": "numbered-chemy36-22-4-q-0061-1f7a931facda.webp",
+    "asset": "numbered-chemy36-22-4-q-0061-59e7e5991dc4.webp",
     "sourceBox": [
       84,
       415.75806975,
@@ -2549,11 +2549,11 @@
         387
       ]
     ],
-    "sha256": "1f7a931facda6ce6ee853438554843679aa710963ff309a65ad0f3af3aa2f730",
+    "sha256": "59e7e5991dc4e2b891b16efcefe5585b42906ef379bbda573fec3de03a13a849",
     "labels": [
       {
         "old": "4-1",
-        "new": "46-1"
+        "new": "47-1"
       }
     ]
   },
@@ -2562,7 +2562,7 @@
     "kind": "q",
     "page": 119,
     "originalAsset": "e36-p23-q03-01-21e56645b817.webp",
-    "asset": "numbered-chemy36-23-3-q-0062-bfb56c4c4479.webp",
+    "asset": "numbered-chemy36-23-3-q-0062-486688be32b6.webp",
     "sourceBox": [
       84,
       199.44000574999995,
@@ -2583,11 +2583,11 @@
         260
       ]
     ],
-    "sha256": "bfb56c4c4479fab76c533e8797abedb8719bf563d226893da8f86033381a23f9",
+    "sha256": "486688be32b6c7706a6077f603474f497d20300de311780e80fa433fd0a1a080",
     "labels": [
       {
         "old": "3-1",
-        "new": "200-1"
+        "new": "205-1"
       }
     ]
   },
@@ -2596,7 +2596,7 @@
     "kind": "q",
     "page": 119,
     "originalAsset": "e36-p23-q03-02-3578283f202a.webp",
-    "asset": "numbered-chemy36-23-3-q-0063-3305dfada56d.webp",
+    "asset": "numbered-chemy36-23-3-q-0063-92b775734b2f.webp",
     "sourceBox": [
       84,
       531.67806825,
@@ -2617,11 +2617,11 @@
         218
       ]
     ],
-    "sha256": "3305dfada56d542825683ae1edffe73ecb00b290c3bf69121b34e965d3f826dc",
+    "sha256": "92b775734b2ff7468bd086edd3eb77bff042d218dc0b70d001e1123e8e98717d",
     "labels": [
       {
         "old": "3-4",
-        "new": "200-4"
+        "new": "205-4"
       }
     ]
   },
@@ -2630,7 +2630,7 @@
     "kind": "a",
     "page": 236,
     "originalAsset": "e36-p23-a04-02-f82b3cfeafd7.webp",
-    "asset": "numbered-chemy36-23-4-a-0064-02a1412c1e31.webp",
+    "asset": "numbered-chemy36-23-4-a-0064-fc495919d6cb.webp",
     "sourceBox": [
       84,
       355.39808475,
@@ -2651,11 +2651,11 @@
         49
       ]
     ],
-    "sha256": "02a1412c1e311e41b1e453584aff1a0f48a0f262b49e13ae5812a952d877c69d",
+    "sha256": "fc495919d6cb52b6ff7039144170fc07ffcbd90115395bec7aede777b84fbe70",
     "labels": [
       {
         "old": "4-2",
-        "new": "64-2"
+        "new": "67-2"
       }
     ]
   },
@@ -2664,7 +2664,7 @@
     "kind": "q",
     "page": 121,
     "originalAsset": "e36-p23-q06-01-568288bd84dd.webp",
-    "asset": "numbered-chemy36-23-6-q-0065-60f34e80197b.webp",
+    "asset": "numbered-chemy36-23-6-q-0065-b06ffd019710.webp",
     "sourceBox": [
       84,
       134.95807424999998,
@@ -2685,11 +2685,11 @@
         500
       ]
     ],
-    "sha256": "60f34e80197b7e2855e0abebded26a90655e7bf18b4aafa0bf712508c5ac0d75",
+    "sha256": "b06ffd019710e81dc2d7cd8fa0b8c107b98ec22bd9330cee10f7394ee62f6a99",
     "labels": [
       {
         "old": "6-1",
-        "new": "47-1"
+        "new": "48-1"
       }
     ]
   },
@@ -2698,7 +2698,7 @@
     "kind": "q",
     "page": 121,
     "originalAsset": "e36-p23-q07-01-9cd51b522249.webp",
-    "asset": "numbered-chemy36-23-7-q-0066-e87d06877e54.webp",
+    "asset": "numbered-chemy36-23-7-q-0066-7784f8d354ef.webp",
     "sourceBox": [
       84,
       435.3180825,
@@ -2725,15 +2725,15 @@
         431
       ]
     ],
-    "sha256": "e87d06877e54b236a9f123a90b7391173cc51eab743c502877624551f0619993",
+    "sha256": "7784f8d354efe62c4765f9ed712dcf441372211ad184afbe6bb8282d022920c9",
     "labels": [
       {
         "old": "7-1",
-        "new": "202-1"
+        "new": "207-1"
       },
       {
         "old": "7-2",
-        "new": "202-2"
+        "new": "207-2"
       }
     ]
   },
@@ -2742,7 +2742,7 @@
     "kind": "a",
     "page": 248,
     "originalAsset": "e36-p24-a05-03-fe8d52dac678.webp",
-    "asset": "numbered-chemy36-24-5-a-0067-b80e30bf6c34.webp",
+    "asset": "numbered-chemy36-24-5-a-0067-5028acd22e1d.webp",
     "sourceBox": [
       84,
       373.91999450000003,
@@ -2763,11 +2763,11 @@
         62
       ]
     ],
-    "sha256": "b80e30bf6c346c70682c93b2680f352639e18daf94539bfceccf601838a3b2cc",
+    "sha256": "5028acd22e1da89689f4b19c95078c6805f092a1f846f7151890c2687dd4bc40",
     "labels": [
       {
         "old": "5-2-2",
-        "new": "65-2-2"
+        "new": "68-2-2"
       }
     ]
   },
@@ -2776,7 +2776,7 @@
     "kind": "q",
     "page": 126,
     "originalAsset": "e36-p24-q06-01-0bc331485395.webp",
-    "asset": "numbered-chemy36-24-6-q-0068-7517265010e8.webp",
+    "asset": "numbered-chemy36-24-6-q-0068-06cc16f27415.webp",
     "sourceBox": [
       84,
       86.42103474999999,
@@ -2809,19 +2809,19 @@
         436
       ]
     ],
-    "sha256": "7517265010e839cdb17068778569e72bb082a8799d5e64ed9a21b704aadd1afa",
+    "sha256": "06cc16f2741513db4948d8d56e1fb325d5bac362e91ff83035a556725550b50b",
     "labels": [
       {
         "old": "6-1",
-        "new": "19-1"
+        "new": "20-1"
       },
       {
         "old": "6-2",
-        "new": "19-2"
+        "new": "20-2"
       },
       {
         "old": "6-2-1",
-        "new": "19-2-1"
+        "new": "20-2-1"
       }
     ]
   },
@@ -2864,7 +2864,7 @@
     "kind": "a",
     "page": 257,
     "originalAsset": "e36-p24-a14-01-af3df38c427f.webp",
-    "asset": "numbered-chemy36-24-14-a-0070-44b6536ee6a1.webp",
+    "asset": "numbered-chemy36-24-14-a-0070-5ee0a69e27c8.webp",
     "sourceBox": [
       84,
       242.74490969,
@@ -2885,11 +2885,11 @@
         52
       ]
     ],
-    "sha256": "44b6536ee6a107e4eddeadeb79a4b8867d280064684fbe6573614b8e4146ad64",
+    "sha256": "5ee0a69e27c8c2b18a37c3912b978e651b6d8beee89d051dff23d22a19f452af",
     "labels": [
       {
         "old": "14-1",
-        "new": "42-1"
+        "new": "43-1"
       }
     ]
   },
@@ -2898,7 +2898,7 @@
     "kind": "a",
     "page": 260,
     "originalAsset": "e36-p25-a02-01-8a760efedd6e.webp",
-    "asset": "numbered-chemy36-25-2-a-0071-17ce13efa996.webp",
+    "asset": "numbered-chemy36-25-2-a-0071-a0871344d049.webp",
     "sourceBox": [
       84,
       229.3606537500001,
@@ -2919,11 +2919,11 @@
         46
       ]
     ],
-    "sha256": "17ce13efa99696d4c8ad71e20ade997e05fa62a0a833199e5bb34cf856eb5bf8",
+    "sha256": "a0871344d04944ba36d84876106e5bf788961a7bdd9841bb94bafda4042059f6",
     "labels": [
       {
         "old": "2-2",
-        "new": "205-2"
+        "new": "210-2"
       }
     ]
   },
@@ -2966,7 +2966,7 @@
     "kind": "a",
     "page": 263,
     "originalAsset": "e36-p25-a06-01-ee3453ff4f19.webp",
-    "asset": "numbered-chemy36-25-6-a-0073-4cdffb39d0b4.webp",
+    "asset": "numbered-chemy36-25-6-a-0073-7d6213b87384.webp",
     "sourceBox": [
       84,
       337.75806975,
@@ -2987,11 +2987,11 @@
         49
       ]
     ],
-    "sha256": "4cdffb39d0b49c532fe9312ba21f855b8205dee2e8f53e3b4832cbd71e22bf1c",
+    "sha256": "7d6213b87384743afcf141fd3335fe6e13f5774d440b24bfc0adea7a5f76f444",
     "labels": [
       {
         "old": "6-2-6",
-        "new": "66-2-6"
+        "new": "69-2-6"
       }
     ]
   }
