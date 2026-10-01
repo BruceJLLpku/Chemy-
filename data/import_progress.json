@@ -41,6 +41,12 @@
       "paper": 7,
       "sha": "a86405689d0e3957576cf743498688d25d99525b",
       "seconds": 576
+    },
+    {
+      "edition": 38,
+      "paper": 8,
+      "sha": null,
+      "recovery": "duplicate PDF resources shared without changing rendering"
     }
   ]
 }
