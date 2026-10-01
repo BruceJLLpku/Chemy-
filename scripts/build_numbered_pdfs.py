@@ -167,7 +167,16 @@ def merge_book(job):
     expected=[q['id'] for q in BANK if q['topic']==topic];assert [r['id'] for r in records]==expected,(topic,kind)
     assert [r['number'] for r in records]==list(range(1,len(expected)+1))
     metadata={'/Title':f'Chemy {topic}专题'+('题目册' if k=='q' else '答案册'),'/Author':'Chemy 化学奥林匹克团队（原题与答案）','/Subject':'专题连续编号，题目与小问统一编号；来源单独标注'}
-    dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf';pages=merge_parts(paths,records,dest,metadata);assert pages==offset
+    dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf'
+    cache=ROOT/'tmp/library/books'/f'merge-{slug}-{kind}.json'
+    engine=hashlib.sha256((ROOT/'scripts/fast_pdf.py').read_bytes()+(ROOT/'scripts/build_numbered_pdfs.py').read_bytes()).hexdigest()
+    fingerprint=hashlib.sha256(json.dumps({'profile':'book-cache-v1','engine':engine,'parts':[hashlib.sha256(p.read_bytes()).hexdigest() for p in paths],'records':records,'metadata':metadata},sort_keys=True).encode()).hexdigest()
+    if cache.exists() and dest.exists():
+        previous=json.loads(cache.read_text(encoding='utf8'))
+        if previous['fingerprint']==fingerprint and previous['pages']==offset and previous['sha256']==hashlib.sha256(dest.read_bytes()).hexdigest():
+            return f'{slug}-{kind}',records,offset
+    pages=merge_parts(paths,records,dest,metadata);assert pages==offset
+    cache.write_text(json.dumps({'fingerprint':fingerprint,'pages':pages,'sha256':hashlib.sha256(dest.read_bytes()).hexdigest()}),encoding='utf8')
     return f'{slug}-{kind}',records,pages
 
 def merge_all():
