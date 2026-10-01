@@ -33,3 +33,10 @@
 仅生成指定专题PDF：`python scripts/make_pdfs.py --topics elements inference`。不传`--topics`时生成所有有题目的专题。
 
 新卷需要先建立相应边界清单，再复用上述流程；现有脚本的页码及例外规则目前仅适用于模拟试题1。
+
+
+## 第39届全套增量导入
+
+`data/import_plan.json` 保存完整大题的单一主专题。`scripts/scan_library.py` 一次缓存两份原卷的原生文字、图形坐标和题号，`scripts/import_library.py N` 增量录入第N套，`scripts/build_library_pdfs.py N` 更新累计专题PDF，`scripts/publish_library.py N` 提交GitHub并等待Pages部署完成。第1套样例正文、答案及图形保持不变。第一套旧脚本仅用于重建样例，不可直接运行覆盖全套数据。
+
+按用户2026-09-30的要求，先逐套录入和发布，全部录完后统一检查图文完整性及题目与答案对应关系；录入中的 `reviewed: false` 如实保留，不能提前标为复核完成。缓存和临时文件不上传。

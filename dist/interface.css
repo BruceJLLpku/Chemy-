@@ -84,3 +84,5 @@
   .overlay.open{background:#082c2647;backdrop-filter:blur(3px)}
   .question{scroll-margin-top:84px}
 }
+
+.paper-filter{display:flex;align-items:center;gap:12px;margin:0 0 24px;color:#667b74;font-size:13px}.paper-filter select{min-width:200px;padding:9px 36px 9px 12px;border:1px solid #d8e3de;border-radius:8px;background:#fff;color:#23463c;font:inherit}.paper-filter select:focus-visible{outline:2px solid #688f81;outline-offset:3px}
