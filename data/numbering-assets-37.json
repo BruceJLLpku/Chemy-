@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "id": "chemy37-2-3",
+    "kind": "q",
+    "page": 11,
+    "originalAsset": "e37-p02-q03-02-8ea26fffe077.webp",
+    "asset": "numbered-chemy37-2-3-q-0000-b427e1b72ec0.webp",
+    "sourceBox": [
+      84,
+      121.31999300000007,
+      514,
+      277.161034
+    ],
+    "displayBox": [
+      84,
+      121.31999300000007,
+      514,
+      277.161034
+    ],
+    "masks": [
+      [
+        1,
+        274,
+        72,
+        314
+      ]
+    ],
+    "sha256": "b427e1b72ec09c3705bf330f58b324cba520ff142ad7d0b79558dcfadd70ad18",
+    "labels": [
+      {
+        "old": "3-4",
+        "new": "35-4"
+      }
+    ]
+  }
+]
