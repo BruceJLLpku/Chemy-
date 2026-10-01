@@ -14,20 +14,20 @@ if not SOURCE_DIR.exists():
 Q_SOURCE = SOURCE_DIR / '第39届Chemy化学奥林匹克竞赛模拟试题题目合集.pdf'
 A_SOURCE = SOURCE_DIR / '第39届Chemy化学奥林匹克竞赛模拟试题参考答案合集.pdf'
 SLUGS = {'有机化学':'organic','高分子化学':'polymer','晶体化学':'crystal',
-         '结构推断':'inference','元素化学':'elements','热力学与化学平衡':'equilibrium',
+         '结构推断':'inference','方程式与元素化学':'elements','热力学与化学平衡':'equilibrium',
          '电化学':'electrochemistry','动力学':'kinetics','分析化学':'analysis'}
 
 PAPER = [
- dict(number=1, title='元素化学', topic='元素化学', points=22, percent=12,
+ dict(number=1, title='元素化学', topic='方程式与元素化学', points=22, percent=12,
       question=[(4,319,600)], printQuestion=[(4,302,600)],
       answer=[(3,523,597),(3,696,714),(4,72,164),(4,216,259),(4,373,466)]),
- dict(number=2, title='氟代试剂', topic='元素化学', points=7, percent=4,
+ dict(number=2, title='氟代试剂', topic='方程式与元素化学', points=7, percent=4,
       question=[(4,631,708)], printQuestion=[(4,614,708)],
       answer=[(4,561,604),(4,625,734)]),
  dict(number=3, title='有趣的锗和锡化合物', topic='结构推断', points=16, percent=8,
       question=[(5,90,387)], printQuestion=[(5,73,387)],
       answer=[(5,382,733)]),
- dict(number=4, title='钼配合物及其转化', topic='元素化学', points=28, percent=13,
+ dict(number=4, title='钼配合物及其转化', topic='方程式与元素化学', points=28, percent=13,
       question=[(5,417,714)], printQuestion=[(5,401,714)],
       answer=[(6,309,367),(6,388,462),(6,482,573),(6,592,678),(6,703,717),(6,735,765)]),
  dict(number=5, title='未知配合物的测定', topic='分析化学', points=12, percent=6,
