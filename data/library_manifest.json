@@ -184258,6 +184258,758 @@
         "coverage": []
       },
       "reviewed": false
+    },
+    "33-14": {
+      "edition": 33,
+      "paper": 14,
+      "questions": [
+        {
+          "number": 1,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              57,
+              118.80367999999987,
+              383.56896
+            ]
+          ],
+          "printQuestion": [
+            [
+              57,
+              103.76895999999988,
+              383.56896
+            ]
+          ],
+          "answer": [
+            [
+              105,
+              117.62103324999998,
+              770
+            ],
+            [
+              106,
+              70,
+              291.998075
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": [
+              {
+                "page": 105,
+                "box": [
+                  84,
+                  580.91997575,
+                  514,
+                  664.31995775
+                ],
+                "asset": "e33-p14-a01-01-a2f45289fed4.webp",
+                "mode": "band",
+                "sha256": "a2f45289fed4269dc913c0104849e8813a3e8aa7bf725319ea50efc6a4d424c9"
+              },
+              {
+                "page": 106,
+                "box": [
+                  84,
+                  158.99999750000006,
+                  514,
+                  269.9610295
+                ],
+                "asset": "e33-p14-a01-02-b93a9c3f5344.webp",
+                "mode": "band",
+                "sha256": "b93a9c3f534444510901913285db117361db84339787d7a1493f3fc83f617134"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 57,
+                "range": [
+                  118.80367999999987,
+                  383.56896
+                ],
+                "selectedCharacters": 560,
+                "nativeCharacters": 560,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 105,
+                "range": [
+                  117.62103324999998,
+                  770
+                ],
+                "selectedCharacters": 644,
+                "nativeCharacters": 644,
+                "figures": 1
+              },
+              {
+                "page": 106,
+                "range": [
+                  70,
+                  291.998075
+                ],
+                "selectedCharacters": 128,
+                "nativeCharacters": 124,
+                "figures": 1
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 2,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              57,
+              399.60368,
+              714.16896
+            ]
+          ],
+          "printQuestion": [
+            [
+              57,
+              384.56896,
+              714.16896
+            ]
+          ],
+          "answer": [
+            [
+              106,
+              306.86103849999995,
+              770
+            ],
+            [
+              107,
+              70,
+              402.15807875
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 57,
+                "box": [
+                  84,
+                  400.16608,
+                  514,
+                  463.27903999999995
+                ],
+                "asset": "e33-p14-q02-01-0d7b4166b7d3.webp",
+                "mode": "band",
+                "sha256": "0d7b4166b7d3df2de31d0265d2e86328be76b55e6087df2d6a85323e4b88c823"
+              },
+              {
+                "page": 57,
+                "box": [
+                  84,
+                  478.16032,
+                  514,
+                  542.72192
+                ],
+                "asset": "e33-p14-q02-02-a1f13decda83.webp",
+                "mode": "band",
+                "sha256": "a1f13decda83bbe718c3ece8e49a02a43206514376a0d2b3a0fa4e9ff434cb26"
+              },
+              {
+                "page": 57,
+                "box": [
+                  84,
+                  557.60608,
+                  514,
+                  623.0105599999999
+                ],
+                "asset": "e33-p14-q02-03-25e775437da4.webp",
+                "mode": "band",
+                "sha256": "25e775437da4ecd2859ecdb996fe19a4afe888cbb1d5aa2f7f18312da7e86e2b"
+              }
+            ],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 57,
+                "range": [
+                  399.60368,
+                  714.16896
+                ],
+                "selectedCharacters": 532,
+                "nativeCharacters": 235,
+                "figures": 3
+              }
+            ],
+            "a": [
+              {
+                "page": 106,
+                "range": [
+                  306.86103849999995,
+                  770
+                ],
+                "selectedCharacters": 515,
+                "nativeCharacters": 515,
+                "figures": 0
+              },
+              {
+                "page": 107,
+                "range": [
+                  70,
+                  402.15807875
+                ],
+                "selectedCharacters": 234,
+                "nativeCharacters": 234,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 3,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              57,
+              730.20368,
+              770
+            ],
+            [
+              58,
+              70,
+              445.96896
+            ]
+          ],
+          "printQuestion": [
+            [
+              57,
+              715.16896,
+              770
+            ],
+            [
+              58,
+              70,
+              445.96896
+            ]
+          ],
+          "answer": [
+            [
+              107,
+              417.02104225000005,
+              770
+            ],
+            [
+              108,
+              70,
+              528.998075
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 58,
+                "box": [
+                  84,
+                  231.57295409999995,
+                  514,
+                  349.22295069999996
+                ],
+                "asset": "e33-p14-q03-01-a918f8c2a355.webp",
+                "mode": "band",
+                "sha256": "a918f8c2a3559bcca8cc53ec3a1b1b84fbf3c1e4a83feaa0eedccb75c797f566"
+              }
+            ],
+            "a": [
+              {
+                "page": 108,
+                "box": [
+                  84,
+                  218.04000874999997,
+                  514,
+                  335.640011
+                ],
+                "asset": "e33-p14-a03-01-5ba23e47c9f6.webp",
+                "mode": "band",
+                "sha256": "5ba23e47c9f69563869aedb40d8b84284588f051f6f4822ab46d9e1c6d295203"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 57,
+                "range": [
+                  730.20368,
+                  770
+                ],
+                "selectedCharacters": 87,
+                "nativeCharacters": 87,
+                "figures": 0
+              },
+              {
+                "page": 58,
+                "range": [
+                  70,
+                  445.96896
+                ],
+                "selectedCharacters": 503,
+                "nativeCharacters": 503,
+                "figures": 1
+              }
+            ],
+            "a": [
+              {
+                "page": 107,
+                "range": [
+                  417.02104225000005,
+                  770
+                ],
+                "selectedCharacters": 487,
+                "nativeCharacters": 487,
+                "figures": 0
+              },
+              {
+                "page": 108,
+                "range": [
+                  70,
+                  528.998075
+                ],
+                "selectedCharacters": 384,
+                "nativeCharacters": 384,
+                "figures": 1
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 4,
+          "topic": "晶体化学",
+          "question": [
+            [
+              58,
+              462.00368,
+              648.7689599999999
+            ]
+          ],
+          "printQuestion": [
+            [
+              58,
+              446.96896,
+              648.7689599999999
+            ]
+          ],
+          "answer": [
+            [
+              108,
+              543.8610385,
+              770
+            ],
+            [
+              109,
+              70,
+              198.39808474999995
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 58,
+                "range": [
+                  462.00368,
+                  648.7689599999999
+                ],
+                "selectedCharacters": 328,
+                "nativeCharacters": 328,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 108,
+                "range": [
+                  543.8610385,
+                  770
+                ],
+                "selectedCharacters": 134,
+                "nativeCharacters": 134,
+                "figures": 0
+              },
+              {
+                "page": 109,
+                "range": [
+                  70,
+                  198.39808474999995
+                ],
+                "selectedCharacters": 164,
+                "nativeCharacters": 164,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 5,
+          "topic": "分析化学",
+          "question": [
+            [
+              58,
+              664.80368,
+              770
+            ],
+            [
+              59,
+              70,
+              336.76896
+            ]
+          ],
+          "printQuestion": [
+            [
+              58,
+              649.7689599999999,
+              770
+            ],
+            [
+              59,
+              70,
+              336.76896
+            ]
+          ],
+          "answer": [
+            [
+              109,
+              213.26104824999993,
+              770
+            ],
+            [
+              110,
+              70,
+              119.31807125
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 58,
+                "range": [
+                  664.80368,
+                  770
+                ],
+                "selectedCharacters": 231,
+                "nativeCharacters": 231,
+                "figures": 0
+              },
+              {
+                "page": 59,
+                "range": [
+                  70,
+                  336.76896
+                ],
+                "selectedCharacters": 614,
+                "nativeCharacters": 614,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 109,
+                "range": [
+                  213.26104824999993,
+                  770
+                ],
+                "selectedCharacters": 382,
+                "nativeCharacters": 382,
+                "figures": 0
+              },
+              {
+                "page": 110,
+                "range": [
+                  70,
+                  119.31807125
+                ],
+                "selectedCharacters": 59,
+                "nativeCharacters": 59,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 6,
+          "topic": "晶体化学",
+          "question": [
+            [
+              59,
+              352.80368,
+              665.80896
+            ]
+          ],
+          "printQuestion": [
+            [
+              59,
+              337.76896,
+              665.80896
+            ]
+          ],
+          "answer": [
+            [
+              110,
+              134.18103474999998,
+              770
+            ],
+            [
+              111,
+              70,
+              368.9180735
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 59,
+                "box": [
+                  82.36,
+                  509.3632,
+                  514,
+                  574.6505599999999
+                ],
+                "asset": "e33-p14-q06-01-ef7e4497d1a2.webp",
+                "mode": "band",
+                "sha256": "ef7e4497d1a2e9f164f805114e862b82eef9299618618adceeeb254e7868f753"
+              }
+            ],
+            "a": [
+              {
+                "page": 110,
+                "box": [
+                  84,
+                  407.27999074999997,
+                  514,
+                  431.84104975
+                ],
+                "asset": "e33-p14-a06-01-44ee90d3cdf4.webp",
+                "mode": "band",
+                "sha256": "44ee90d3cdf430b9cf78bacf078a2ab989ca065b21403ee036cbe9c63dbaaaa8"
+              }
+            ]
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 59,
+                "range": [
+                  352.80368,
+                  665.80896
+                ],
+                "selectedCharacters": 604,
+                "nativeCharacters": 532,
+                "figures": 1
+              }
+            ],
+            "a": [
+              {
+                "page": 110,
+                "range": [
+                  134.18103474999998,
+                  770
+                ],
+                "selectedCharacters": 516,
+                "nativeCharacters": 512,
+                "figures": 1
+              },
+              {
+                "page": 111,
+                "range": [
+                  70,
+                  368.9180735
+                ],
+                "selectedCharacters": 14,
+                "nativeCharacters": 14,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 7,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              59,
+              681.84368,
+              770
+            ],
+            [
+              60,
+              70,
+              118.3689599999999
+            ]
+          ],
+          "printQuestion": [
+            [
+              59,
+              666.80896,
+              770
+            ],
+            [
+              60,
+              70,
+              118.3689599999999
+            ]
+          ],
+          "answer": [
+            [
+              111,
+              383.781037,
+              730.7180915
+            ]
+          ],
+          "figures": {
+            "q": [],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 59,
+                "range": [
+                  681.84368,
+                  770
+                ],
+                "selectedCharacters": 175,
+                "nativeCharacters": 175,
+                "figures": 0
+              },
+              {
+                "page": 60,
+                "range": [
+                  70,
+                  118.3689599999999
+                ],
+                "selectedCharacters": 65,
+                "nativeCharacters": 65,
+                "figures": 0
+              }
+            ],
+            "a": [
+              {
+                "page": 111,
+                "range": [
+                  383.781037,
+                  730.7180915
+                ],
+                "selectedCharacters": 335,
+                "nativeCharacters": 335,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        },
+        {
+          "number": 8,
+          "topic": "无机综合与结构推断",
+          "question": [
+            [
+              60,
+              134.4036799999999,
+              770
+            ]
+          ],
+          "printQuestion": [
+            [
+              60,
+              119.3689599999999,
+              770
+            ]
+          ],
+          "answer": [
+            [
+              111,
+              745.581055,
+              770
+            ],
+            [
+              112,
+              70,
+              770
+            ]
+          ],
+          "figures": {
+            "q": [
+              {
+                "page": 60,
+                "box": [
+                  84,
+                  155.15598920000002,
+                  514,
+                  301.2495142999999
+                ],
+                "asset": "e33-p14-q08-01-3bafd2aae2c6.webp",
+                "mode": "band",
+                "sha256": "3bafd2aae2c60864d3b3afc082f7bf2afc97b1020e2e0994a6dc0ca3ce688ebf"
+              }
+            ],
+            "a": []
+          },
+          "coverage": {
+            "q": [
+              {
+                "page": 60,
+                "range": [
+                  134.4036799999999,
+                  770
+                ],
+                "selectedCharacters": 239,
+                "nativeCharacters": 123,
+                "figures": 1
+              }
+            ],
+            "a": [
+              {
+                "page": 111,
+                "range": [
+                  745.581055,
+                  770
+                ],
+                "selectedCharacters": 0,
+                "nativeCharacters": 0,
+                "figures": 0
+              },
+              {
+                "page": 112,
+                "range": [
+                  70,
+                  770
+                ],
+                "selectedCharacters": 106,
+                "nativeCharacters": 106,
+                "figures": 0
+              }
+            ]
+          },
+          "reviewed": false
+        }
+      ],
+      "common": {
+        "question": [],
+        "figures": [],
+        "coverage": []
+      },
+      "reviewed": false
     }
   }
 }
