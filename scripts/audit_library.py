@@ -34,17 +34,17 @@ def chars_of(text):return Counter(c for c in text.replace('\uf044','Δ') if not 
 
 def audit(pixels=True,books=True):
     bank=read(ROOT/'dist/questions.json');manifest=read(ROOT/'data/library_manifest.json');notes=read(ROOT/'dist/papers.json')
-    expected={}
+    scope_expected={}
     for e in sorted({q.get('edition',39) for q in bank},reverse=True):
         index=source_index(e,'q')
-        expected[e]=(len(index['papers']),len({(h['paper'],h['number']) for h in index['questions']}))
+        scope_expected[e]=(len(index['papers']),len({(h['paper'],h['number']) for h in index['questions']}))
     issues=[];candidates=[];checks=Counter();bykey={(q.get('edition',39),q['paper'],q['number']):q for q in bank}
     def require(condition,code,context):
         if not condition:issues.append({'code':code,**context})
-    require(len(bykey)==len(bank)==sum(n for _,n in expected.values()),'total_or_duplicate',{'count':len(bank)})
+    require(len(bykey)==len(bank)==sum(n for _,n in scope_expected.values()),'total_or_duplicate',{'count':len(bank)})
     original=read(ROOT/'tmp/approved-paper1.json')
     require([q for q in bank if q.get('edition',39)==39 and q['paper']==1]==original,'approved_sample_changed',{})
-    for e,(papers,count) in expected.items():
+    for e,(papers,count) in scope_expected.items():
         qindex=source_index(e,'q');aindex=source_index(e,'a')
         sourcekeys={(e,h['paper'],h['number']) for h in qindex['questions']}
         require(sourcekeys=={(e,h['paper'],h['number']) for h in aindex['questions']},'source_pairing',{'edition':e})
@@ -83,11 +83,12 @@ def audit(pixels=True,books=True):
                 expected=Counter()
                 for n,lo,hi in ranges:
                     d=geometry(e,k,n);ff=[f['box'] for f in figures if f['page']==n]
+                    foreign=[f['box'] for f in EXCEPTIONS['captures'] if f['mode']=='float' and (f['edition'],f['paper'],f['kind'],f['page'])==(e,p,k,n) and f['number']!=record['number']]
                     for c in d['chars']:
                         center=(c['top']+c['bottom'])/2
-                        if lo-1<=c['top']<hi and 85<=c['x0']<514 and (k=='q' or colored(c['non_stroking_color'])) and not any(box[0]<=(c['x0']+c['x1'])/2<=box[2] and box[1]<=center<=box[3] for box in ff):expected.update(chars_of(c['text']))
+                        if lo-1<=c['top']<hi and 85<=c['x0']<514 and (k=='q' or colored(c['non_stroking_color'])) and not any(box[0]<=(c['x0']+c['x1'])/2<=box[2] and box[1]<=center<=box[3] for box in ff+foreign):expected.update(chars_of(c['text']))
                     def covered(obj):
-                        return any(box[0]-1<=obj['x0'] and obj['x1']<=box[2]+1 and box[1]-1<=obj['top'] and obj['bottom']<=box[3]+1 for box in ff)
+                        return any(box[0]-1<=obj['x0'] and obj['x1']<=box[2]+1 and box[1]-1<=obj['top'] and obj['bottom']<=box[3]+1 for box in ff+foreign)
                     for c in d['chars']:
                         if not c['text'].strip() or k=='a' and not colored(c['non_stroking_color']):continue
                         if lo<=c['top']<hi and 75<=c['x0']<590 and not 85<=c['x0']<514 and not covered(c):
@@ -116,6 +117,8 @@ def audit(pixels=True,books=True):
                 for f in figures:grouped[(e,k,f['page'])].append(f)
                 checks['paired_sections']+=1
         for f in chapter.get('common',{}).get('figures',[]):grouped[(e,'q',f['page'])].append(f)
+    print('SOURCE TEXT CHECK',checks['paired_sections'],'sections',len(issues),'issues',len(candidates),'boundary candidates',flush=True)
+    (ROOT/'tmp/audit-source-preliminary.json').write_text(json.dumps({'issues':issues,'reviewCandidates':candidates},ensure_ascii=False,indent=2),encoding='utf8')
     for (e,k,n),figures in sorted(grouped.items()):
         page=geometry(e,k,n);image=None
         if pixels:image=Image.open(cache_for(e)/k/f'{n:03}-clean.png').convert('RGB')
@@ -144,7 +147,7 @@ def audit(pixels=True,books=True):
                 require(offset==len(book.pages),'print_page_total',{'topic':topic,'kind':k,'pages':len(book.pages),'expected':offset})
                 checks['topic_pdfs']+=1;checks['print_pages']+=len(book.pages)
     candidates=list({json.dumps(c,sort_keys=True):c for c in candidates}.values())
-    report={'scope':{str(e):{'papers':p,'questions':n} for e,(p,n) in expected.items()},'methods':{'losslessSourcePixelComparison':pixels,'printChapterContentComparison':books,'nativeGlyphCoverage':True,'sourcePairingAndHashes':True},'checks':dict(checks),'issues':issues,'reviewCandidates':candidates,'automatedPassed':not issues,'visualReviewComplete':False}
+    report={'scope':{str(e):{'papers':p,'questions':n} for e,(p,n) in scope_expected.items()},'methods':{'losslessSourcePixelComparison':pixels,'printChapterContentComparison':books,'nativeGlyphCoverage':True,'sourcePairingAndHashes':True},'checks':dict(checks),'issues':issues,'reviewCandidates':candidates,'automatedPassed':not issues,'visualReviewComplete':False}
     REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8')
     print(json.dumps({'checks':dict(checks),'issues':len(issues),'reviewCandidates':len(candidates),'report':str(REPORT)},ensure_ascii=False),flush=True)
     for issue in issues[:12]:print(json.dumps(issue,ensure_ascii=False),flush=True)

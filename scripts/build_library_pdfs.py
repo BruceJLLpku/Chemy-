@@ -9,7 +9,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.pagesizes import A4
-from import_library import ROOT,CACHE,DATA,load,render_page,colored,merge,figure_bands
+from import_library import ROOT,CACHE,DATA,load,render_page,colored,merge,figure_bands,foreign_float_boxes,char_inside
 from paper1_manifest import SLUGS,PAPER
 from library_config import EDITION,paper_key
 
@@ -28,11 +28,12 @@ def frame(topic,kind,paper,index):
     c.setFillColorRGB(.3,.3,.3);c.setFont('SourceSong',7.5)
     c.drawString(62,35,'版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流，禁止商业用途。')
     c.drawRightString(W-62,35,str(index));c.save();return PdfReader(buf).pages[0]
-def bands(k,n,lo,hi,figures=()):
+def bands(k,n,lo,hi,figures=(),paper=None,number=None):
     d=load(k,n)
-    ff=[f['box'] for f in figures if f['page']==n];floats=[f['box'] for f in figures if f['page']==n and f.get('mode')=='float']
-    cc=[c for c in d['chars'] if c['text'].strip() and lo-1<=c['top']<hi and 85<c['x0']<514 and (k=='q' or colored(c['non_stroking_color']))]
-    bb=figure_bands(k,d,lo,hi,floats)+[[max(lo,c['top']-1),min(hi+8,c['bottom']+1)] for c in cc]+[[box[1],box[3]] for box in ff]
+    ff=[f['box'] for f in figures if f['page']==n and (f.get('mode')=='float' or f['box'][1]<hi and f['box'][3]>lo)];floats=[f['box'] for f in figures if f['page']==n and f.get('mode')=='float']
+    foreign=foreign_float_boxes(k,paper,number,n) if paper is not None else []
+    cc=[c for c in d['chars'] if c['text'].strip() and lo-1<=c['top']<hi and 85<c['x0']<514 and (k=='q' or colored(c['non_stroking_color'])) and not any(char_inside(c,b) for b in foreign)]
+    bb=figure_bands(k,d,lo,hi,floats+foreign)+[[max(lo,c['top']-1),min(hi+8,c['bottom']+1)] for c in cc]+[[box[1],box[3]] for box in ff]
     return merge(bb,4)
 def create(paper,topic,k,specs):
     writer=PdfWriter();target=None;cursor=0;idx=0

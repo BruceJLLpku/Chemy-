@@ -27,11 +27,13 @@ def edition(e):
     os.utime(cache,ns=(before.st_atime_ns,before.st_mtime_ns))
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--presentation-only',action='store_true');args=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('--presentation-only',action='store_true');ap.add_argument('--editions',nargs='+',type=int);args=ap.parse_args()
     bank=json.loads((ROOT/'dist/questions.json').read_text(encoding='utf8'))
     editions=sorted({q.get('edition',39) for q in bank},reverse=True)
+    workers=editions if args.editions is None else args.editions
+    assert set(workers)<=set(editions)
     if not args.presentation_only:
-        with ThreadPoolExecutor(max_workers=3) as pool:list(pool.map(edition,editions))
+        with ThreadPoolExecutor(max_workers=3) as pool:list(pool.map(edition,workers))
     display={}
     for e in editions:
         cache=ROOT/'tmp'/('library' if e==39 else f'library{e}')/'numbered/presentation.json'

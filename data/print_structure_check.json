@@ -1,100 +1,101 @@
 {
   "passed": true,
-  "pages": 3473,
-  "fullContentReviewComplete": false,
+  "pages": 4110,
+  "fullContentReviewComplete": true,
   "books": {
     "analysis-answers.pdf": {
-      "pages": 82,
-      "sha256": "94e6242c7160924b711128763f001681100f96a4c5b41ee2403f80a84575435b",
+      "pages": 101,
+      "sha256": "e8430efd5ef5799622160f485986ed2a841bef3e493e361680d90bacca70bd67",
       "sourceLinkAnnotationWarnings": []
     },
     "analysis-questions.pdf": {
-      "pages": 66,
-      "sha256": "c87a0b8e344eb6d9af60af4181eb47db8a1da21e43dfb62cd90348d8a366fa94",
+      "pages": 84,
+      "sha256": "64ed3def2fb08837a89118761af8ab54a9d141ce4d262fe571847a5ac783464d",
       "sourceLinkAnnotationWarnings": []
     },
     "crystal-answers.pdf": {
-      "pages": 180,
-      "sha256": "faa1ca9a474fc6a86b72f7acb023340f72b3ad29ef5f8cef1202ed46b38fb5a5",
+      "pages": 220,
+      "sha256": "5343b4d43e2ec052d5fdca1902aef8c9481afaed166ed7120b7ea1f3c105c2c4",
       "sourceLinkAnnotationWarnings": []
     },
     "crystal-questions.pdf": {
-      "pages": 143,
-      "sha256": "cb0fac6eef7718074eabde033caa855b95971ba795bd9899d7c525f0313495f0",
+      "pages": 176,
+      "sha256": "821ea08eed96e4712872490e7f0ee565eb6f4384b01bd8bfedfd90f0579576a6",
       "sourceLinkAnnotationWarnings": []
     },
     "electrochemistry-answers.pdf": {
-      "pages": 50,
-      "sha256": "71969dade2b9d9d2c10f325a73ad7a62057acdeca104a64cc9d0772f74b8e25a",
+      "pages": 66,
+      "sha256": "5cbb89efc1eb6daa66454c487db1bdb8a8e6b79d5ef5fa35c847be2a53d74440",
       "sourceLinkAnnotationWarnings": []
     },
     "electrochemistry-questions.pdf": {
-      "pages": 44,
-      "sha256": "f7dc50b54cbf1debf74800b603d01050eb5945f8620335e757d51ae07f9a0198",
+      "pages": 58,
+      "sha256": "bf5364172dff28c00ac54167696ea4a53acea7926f371fb0c79980acab812cd7",
       "sourceLinkAnnotationWarnings": []
     },
     "elements-answers.pdf": {
-      "pages": 149,
-      "sha256": "10319eaf68c6ab21f0505be2a3e6d8a109f75806dadaee14924c7973c06ea1bd",
+      "pages": 170,
+      "sha256": "03d3ff93747fa7af4eb6169d5eb96d9f3c20bfd743384d73e69f0e01089f13b0",
       "sourceLinkAnnotationWarnings": []
     },
     "elements-questions.pdf": {
-      "pages": 129,
-      "sha256": "243606808edb58b729b953a5ce99cc953c68463b0c9ddfd3d3edc7764fc93dc9",
+      "pages": 149,
+      "sha256": "0b5a796224f81db9854c1eefa2845f40f473d7df3a42e268532c89a8c568840d",
       "sourceLinkAnnotationWarnings": []
     },
     "equilibrium-answers.pdf": {
-      "pages": 129,
-      "sha256": "b5ba6c0f447188909805fc4ed2ceca45651cf71e8a07ab0089d54633c433ccaa",
+      "pages": 149,
+      "sha256": "150481587c01d59d13c606059df41a83b4334dcfc15f54a14876b373629c9556",
       "sourceLinkAnnotationWarnings": []
     },
     "equilibrium-questions.pdf": {
-      "pages": 104,
-      "sha256": "3fe715173eec4c537cb0649bffa3e81fd22b42a13dbb73564c58411186ccd621",
+      "pages": 121,
+      "sha256": "5ac02ddc3cfe8bc07b884c4822f20af1acb72ae64986eae49621365071986105",
       "sourceLinkAnnotationWarnings": []
     },
     "inference-answers.pdf": {
-      "pages": 514,
-      "sha256": "b80447d1d76b6c1e329299aa309f42b10b09b010c3b1df98b4cd395b9accf729",
+      "pages": 610,
+      "sha256": "8e4e705df0b4486af6439f05662e87c7942727750f4ac96563010ed389a2fbb6",
       "sourceLinkAnnotationWarnings": []
     },
     "inference-questions.pdf": {
-      "pages": 343,
-      "sha256": "06fcb0106f31bdf3ac3dc6bc89d981230e01d169bd58ba028bc609a202a2d8e4",
+      "pages": 401,
+      "sha256": "253d22fdb34e36c84410d070158534de13a0ec42cb361fe26aa559c0c66624f9",
       "sourceLinkAnnotationWarnings": [
-        "WARNING: C:\\Users\\Prettibruce\\Documents\\ChatGPT\\chemy竞赛题目分类汇总\\chemy-site\\dist\\downloads\\inference-questions.pdf object stream 6263, object 6316 0 at offset 20312: kid 319 (from 0) Annots has duplicate entry for annotation 6317 0",
-        "WARNING: C:\\Users\\Prettibruce\\Documents\\ChatGPT\\chemy竞赛题目分类汇总\\chemy-site\\dist\\downloads\\inference-questions.pdf object stream 6263, object 6316 0 at offset 20312: kid 319 (from 0) Annots has duplicate entry for annotation 6319 0"
+        "WARNING: C:\\Users\\Prettibruce\\Documents\\ChatGPT\\chemy竞赛题目分类汇总\\chemy-site\\dist\\downloads\\inference-questions.pdf object stream 6263, object 6329 0 at offset 25759: kid 319 (from 0) Annots has duplicate entry for annotation 6330 0",
+        "WARNING: C:\\Users\\Prettibruce\\Documents\\ChatGPT\\chemy竞赛题目分类汇总\\chemy-site\\dist\\downloads\\inference-questions.pdf object stream 6263, object 6329 0 at offset 25759: kid 319 (from 0) Annots has duplicate entry for annotation 6332 0"
       ]
     },
     "kinetics-answers.pdf": {
-      "pages": 56,
-      "sha256": "bdcee42cb6df653b95744b4dfe1d881108624b05a530b99e81f83956bf804a8a",
+      "pages": 75,
+      "sha256": "50aeae49c45551a64ca24501439ab7c44fc401e027596673e393192515528021",
       "sourceLinkAnnotationWarnings": []
     },
     "kinetics-questions.pdf": {
-      "pages": 47,
-      "sha256": "4e5c32c17be1c75ad5885185cdf80211b54649e37c3347042477fdfc83836343",
+      "pages": 65,
+      "sha256": "09c27d8a2fa332ee2d834df71aeac333c56e49546f6c819535f2c7ad6444ed73",
       "sourceLinkAnnotationWarnings": []
     },
     "organic-answers.pdf": {
-      "pages": 708,
-      "sha256": "de2fb30e1d51cb80561985f22113e307b165bc719f173f9a11dc9765641a92bc",
+      "pages": 828,
+      "sha256": "ff44d64a60ddc4d9ea1d5c1f39086b2fa6bd73f2bf6ed81e302794991c8ddd9e",
       "sourceLinkAnnotationWarnings": []
     },
     "organic-questions.pdf": {
-      "pages": 603,
-      "sha256": "c19001d8e6823fd777a59da4faa60ee8290b26650fe41b98e5a3f83f734e333f",
+      "pages": 691,
+      "sha256": "2bb4fcb5f4b560a463a8c350171b86b7c0595d4cea993ffa0142ef2541b77e13",
       "sourceLinkAnnotationWarnings": []
     },
     "polymer-answers.pdf": {
-      "pages": 71,
-      "sha256": "ba7a7915bc137357b1e2123007d797b5630aaa9ad1460f9de7888067df50beb0",
+      "pages": 83,
+      "sha256": "4254bd104c96fb8e963a267302a4c671d5a69ee2cb18ff8cf699e9bf232fae2d",
       "sourceLinkAnnotationWarnings": []
     },
     "polymer-questions.pdf": {
-      "pages": 55,
-      "sha256": "84fee2068043b0bfe490d01793e029743ab3e11894cd515f6a1a01eef91600dc",
+      "pages": 63,
+      "sha256": "2e840b7d6e6e90a9c6f8b60dde02d5bf42dd7f719043f8e072785f788dca27f6",
       "sourceLinkAnnotationWarnings": []
     }
-  }
+  },
+  "reviewMethod": "Automatic source pairing, native glyph coverage, original crop pixel comparison and full print drawing resource comparison; visual inspection of flagged source boundaries, all topic booklet samples, edition transitions and official errata samples. Not a manual rereading of every printed page."
 }

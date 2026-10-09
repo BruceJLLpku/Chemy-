@@ -1,0 +1,37 @@
+{
+  "complete": true,
+  "questions": 1933,
+  "collections": 196,
+  "topicBooks": 18,
+  "printPages": 4110,
+  "method": "Automatic source pairing, native glyph coverage, original crop pixel comparison and full print drawing resource comparison; visual inspection of flagged source boundaries, all topic booklet samples, edition transitions and official errata samples. Not a manual rereading of every printed page.",
+  "visuallyInspectedBoundaryPages": 22,
+  "questionWholeDiagramFixes": 20,
+  "answerWholeDiagramFixes": 1,
+  "bookletFirstPagesInspected": 18,
+  "additionalSamplePagesRendered": 58,
+  "officialErrataSourcePagesInspected": 6,
+  "chemicalRedrawing": false,
+  "resolved": [
+    "Cross-question floating original diagrams",
+    "Footer-cut original answer diagram",
+    "Greek-letter expressions mistaken for subquestion numbers",
+    "Three-digit number spacing",
+    "Small-font answer subquestion labels",
+    "Chemical diagram glyphs mistaken for a question title",
+    "Original practice 5-4 label referring to its own fourth subquestion",
+    "Trailing general abbreviation tables"
+  ],
+  "official32Corrections": [
+    "1-8",
+    "12-13",
+    "12-20",
+    "12-4",
+    "2-6",
+    "2-8",
+    "2-9",
+    "3-6",
+    "4-1",
+    "5-2"
+  ]
+}

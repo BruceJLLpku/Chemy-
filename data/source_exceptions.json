@@ -181,6 +181,301 @@
         498
       ],
       "mode": "band"
+    },
+    {
+      "edition": 38,
+      "paper": 6,
+      "number": 6,
+      "kind": "q",
+      "page": 40,
+      "box": [
+        190,
+        596,
+        422,
+        727
+      ],
+      "mode": "band"
+    },
+    {
+      "edition": 38,
+      "paper": 16,
+      "number": 6,
+      "kind": "q",
+      "page": 115,
+      "box": [
+        419,
+        71,
+        519,
+        272
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 38,
+      "paper": 18,
+      "number": 4,
+      "kind": "q",
+      "page": 126,
+      "box": [
+        370,
+        69,
+        498,
+        141
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 37,
+      "paper": 6,
+      "number": 10,
+      "kind": "q",
+      "page": 37,
+      "box": [
+        400,
+        70,
+        509,
+        327
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 37,
+      "paper": 10,
+      "number": 7,
+      "kind": "q",
+      "page": 61,
+      "box": [
+        448,
+        78,
+        490,
+        134
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 37,
+      "paper": 13,
+      "number": 5,
+      "kind": "q",
+      "page": 78,
+      "box": [
+        390,
+        349,
+        508,
+        493
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 37,
+      "paper": 18,
+      "number": 2,
+      "kind": "q",
+      "page": 102,
+      "box": [
+        447,
+        77,
+        505,
+        133
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 34,
+      "paper": 1,
+      "number": 6,
+      "kind": "q",
+      "page": 6,
+      "box": [
+        384,
+        538,
+        509,
+        663
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 34,
+      "paper": 4,
+      "number": 4,
+      "kind": "q",
+      "page": 19,
+      "box": [
+        386,
+        71,
+        508,
+        188
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 34,
+      "paper": 7,
+      "number": 7,
+      "kind": "q",
+      "page": 34,
+      "box": [
+        363,
+        70,
+        509,
+        211
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 34,
+      "paper": 7,
+      "number": 8,
+      "kind": "q",
+      "page": 34,
+      "box": [
+        397,
+        320,
+        509,
+        426
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 34,
+      "paper": 15,
+      "number": 2,
+      "kind": "q",
+      "page": 72,
+      "box": [
+        450,
+        390,
+        506,
+        447
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 33,
+      "paper": 8,
+      "number": 5,
+      "kind": "q",
+      "page": 33,
+      "box": [
+        359,
+        268,
+        509,
+        379
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 33,
+      "paper": 11,
+      "number": 6,
+      "kind": "q",
+      "page": 47,
+      "box": [
+        402,
+        414,
+        506,
+        494
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 33,
+      "paper": 12,
+      "number": 9,
+      "kind": "q",
+      "page": 52,
+      "box": [
+        418,
+        72,
+        507,
+        279
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 32,
+      "paper": 1,
+      "number": 4,
+      "kind": "q",
+      "page": 3,
+      "box": [
+        349,
+        135,
+        509,
+        299
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 32,
+      "paper": 3,
+      "number": 6,
+      "kind": "q",
+      "page": 11,
+      "box": [
+        409,
+        276,
+        509,
+        374
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 0,
+      "paper": 13,
+      "number": 7,
+      "kind": "q",
+      "page": 59,
+      "box": [
+        373,
+        70,
+        509,
+        268
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 0,
+      "paper": 15,
+      "number": 8,
+      "kind": "q",
+      "page": 69,
+      "box": [
+        397,
+        239,
+        509,
+        334
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 0,
+      "paper": 19,
+      "number": 12,
+      "kind": "q",
+      "page": 90,
+      "box": [
+        397,
+        377,
+        509,
+        498
+      ],
+      "mode": "float"
+    },
+    {
+      "edition": 32,
+      "paper": 2,
+      "number": 9,
+      "kind": "a",
+      "page": 14,
+      "box": [
+        84,
+        717.198057,
+        514,
+        794
+      ],
+      "mode": "band",
+      "rangeTop": 717.198057
     }
   ],
   "reviewNotes": "All listed boundary exceptions were reviewed against original page renders. Background hashes identify only verified pale watermark tiles; no chemistry diagram is redrawn. White fill-only rectangles behind heading text are not diagrams.",
@@ -521,5 +816,31 @@
       ],
       "reason": "Repeated broad pale source watermark; black chemistry content excluded by pixel minimum."
     }
-  ]
+  ],
+  "omittedGeneralNotes": [
+    {
+      "edition": 38,
+      "paper": 17,
+      "number": 6,
+      "kind": "q",
+      "page": 121,
+      "reason": "Generic organic abbreviations table, not question content"
+    },
+    {
+      "edition": 38,
+      "paper": 11,
+      "number": 7,
+      "kind": "q",
+      "page": 80,
+      "afterTop": 403.8,
+      "reason": "Generic organic abbreviations, not crystal question content"
+    }
+  ],
+  "finalBoundaryReview": {
+    "originalCandidates": 33,
+    "sourcePagesInspected": 20,
+    "wholeDiagramFixes": 20,
+    "chemicalRedrawing": false,
+    "answerWholeDiagramFixes": 1
+  }
 }

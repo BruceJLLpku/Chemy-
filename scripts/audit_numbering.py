@@ -20,7 +20,7 @@ def canonical(s,root,original,exceptions=()):
         for old,new in exceptions:
             if m.group()==old:return new
         return m.group()
-    s=re.sub(r'(?<![\dA-Za-z,，])(\d+)-(\d+(?:-\d+)*)(?![\d.])',replace,s)
+    s=re.sub(r'(?<![\dA-Za-z,，])(\d+)-(\d+(?:-\d+)*)(?![\d.A-Za-z\u0370-\u03ff])',replace,s)
     return re.sub(r'\s+','',s)
 
 def main(web_only=False):
@@ -34,17 +34,28 @@ def main(web_only=False):
             assert [t for t,a in before.tags]==[t for t,a in after.tags],(q['id'],'HTML structure changed')
             assert len(before.nodes)==len(after.nodes),(q['id'],'text nodes changed')
             for a,b in zip(before.nodes,after.nodes):
+                if a==b:continue
                 if '原答案册将本问编号' in a:assert a==b;continue
                 original_exceptions=[];display_exceptions=[]
                 if q['id']=='chemy39-8-2':
                     target=numbers['numberById']['chemy39-8-1'];original_exceptions=[('1-2-2','cross-2-2')];display_exceptions=[(f'{target}-2-2','cross-2-2')]
                 if q['id']=='chemy36-25-4' and field=='answer':original_exceptions=[('9-4','#-4')]
+                if q['id']=='chemy32-12-22' and field=='body':original_exceptions=[('5-4','#-4')]
                 assert canonical(a,q['number'],True,original_exceptions)==canonical(b,n,False,display_exceptions),(q['id'],field,a[:110],b[:110])
                 if 'eq.' in a:
                     assert re.findall(r'\([\d .-]+eq\.\)',a)==re.findall(r'\([\d .-]+eq\.\)',b),(q['id'],'reagent quantities changed')
             report['nativeSections']+=1
     assert dict(counts)==numbers['countsByTopic']
     assert '提示、常数与评分说明' not in (ROOT/'dist/app.js').read_text(encoding='utf8')
+    # Source answer labels are 9.35pt in this regression page: all five must change.
+    # The previous 9.5pt scanner cutoff left the visible original labels in place.
+    plan=json.loads((ROOT/'tmp/library38/numbered/labels.json').read_text(encoding='utf8'))
+    small=[p for p in plan['patches']['a-3'] if p['id']=='chemy38-1-1' and p['size']<9.5]
+    target=numbers['numberById']['chemy38-1-1']
+    assert {(p['old'],p['new']) for p in small}=={(f'1-{i}',f'{target}-{i}') for i in range(1,6)},'Small-font answer labels missed'
+    assert all(abs(p['drawBox'][2]-p['box'][2])<.01 for p in small),'Answer number consumed formula spacing'
+    report['smallFontAnswerLabelsVerified']=len(small)
+    report['smallFontLabelFormulaGapPreserved']=True
     for e in sorted({q.get('edition',39) for q in bank},reverse=True):
         cache=ROOT/'tmp'/('library' if e==39 else f'library{e}')
         assets=json.loads((ROOT/'data'/f'numbering-assets-{e}.json').read_text(encoding='utf8'))

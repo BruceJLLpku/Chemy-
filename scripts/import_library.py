@@ -29,6 +29,8 @@ def char_inside(c,box):
     return box[0]<=(c['x0']+c['x1'])/2<=box[2] and box[1]<=(c['top']+c['bottom'])/2<=box[3]
 def exceptions(k,paper,number,n):
     return [f for f in EXCEPTIONS['captures'] if (f['edition'],f['paper'],f['number'],f['kind'],f['page'])==(EDITION,paper,number,k,n)]
+def foreign_float_boxes(k,paper,number,n):
+    return [f['box'] for f in EXCEPTIONS['captures'] if f['mode']=='float' and (f['edition'],f['paper'],f['kind'],f['page'])==(EDITION,paper,k,n) and f['number']!=number]
 @lru_cache(maxsize=24)
 def load(k,n):
     d=json.loads((CACHE/k/f'{n:03}.json').read_text(encoding='utf8'))
@@ -42,7 +44,8 @@ def colored(c):
 
 def heading_title(h):
     center=(h['top']+h['bottom'])/2
-    chars=[c for c in load('q',h['page'])['chars'] if 85<=c['x0']<550 and abs((c['top']+c['bottom'])/2-center)<8]
+    floated=[f['box'] for f in EXCEPTIONS['captures'] if f['mode']=='float' and (f['edition'],f['paper'],f['kind'],f['page'])==(EDITION,h['paper'],'q',h['page'])]
+    chars=[c for c in load('q',h['page'])['chars'] if 85<=c['x0']<550 and abs((c['top']+c['bottom'])/2-center)<8 and not any(char_inside(c,box) for box in floated)]
     rows=native_blocks(chars)
     html=' '.join(row[1] for row in rows)
     html=re.sub(r'^第\s*\d+\s*题\s*','',html)
@@ -58,8 +61,11 @@ def spans(k,paper,number,heading=False):
     end=hs[i+1] if i+1<len(hs) and hs[i+1]['paper']==paper else {'page':int(INDEX[k]['papers'].get(str(paper+1),(config.get('aContentPages',len(INDEX[k]['pages'])) if k=='a' else len(INDEX[k]['pages']))+1)),'top':70}
     ranges=[]
     for n in range(h['page'],end['page']+1):
+        omitted=next((f for f in EXCEPTIONS.get('omittedGeneralNotes',[]) if (f['edition'],f['paper'],f['number'],f['kind'],f['page'])==(EDITION,paper,number,k,n)),None)
+        if omitted and 'afterTop' not in omitted:continue
         lo=(h['top']-2 if heading else h['bottom']+.5) if n==h['page'] else 70
         hi=end['top']-3 if n==end['page'] else min(770,load(k,n)['height']-70)
+        if omitted:hi=min(hi,omitted['afterTop'])
         if hi>lo+2:ranges.append([n,lo,hi])
     return ranges
 def render_page(k,n):
@@ -120,9 +126,9 @@ def figure_bands(k,d,lo,hi,exclude=()):
 def section(k,ranges,paper,number,label):
     parts=[];captures=[];audit=[];count=0
     for n,lo,hi in ranges:
-        d=load(k,n);special=exceptions(k,paper,number,n);floats=[f['box'] for f in special if f['mode']=='float'];bands=figure_bands(k,d,lo,hi,floats)
+        d=load(k,n);special=[f for f in exceptions(k,paper,number,n) if 'rangeTop' not in f or abs(f['rangeTop']-lo)<.01];floats=[f['box'] for f in special if f['mode']=='float'];foreign=foreign_float_boxes(k,paper,number,n);excluded=floats+foreign;bands=figure_bands(k,d,lo,hi,excluded)
         bands=merge(bands+[[f['box'][1],f['box'][3]] for f in special if f['mode']=='band'])
-        selected=[c for c in d['chars'] if lo-1<=c['top']<hi and 85<=c['x0']<514 and (k=='q' or colored(c['non_stroking_color']))]
+        selected=[c for c in d['chars'] if lo-1<=c['top']<hi and 85<=c['x0']<514 and (k=='q' or colored(c['non_stroking_color'])) and not any(char_inside(c,box) for box in foreign)]
         text=[c for c in selected if not any(a<=(c['top']+c['bottom'])/2<=b for a,b in bands) and not any(char_inside(c,box) for box in floats)]
         anchors=[c for c in text if c['text'].strip() and c['size']>=9.8]
         text=[c for c in text if c['text'].strip() or any(abs((c['top']+c['bottom']-a['top']-a['bottom'])/2)<2.3 for a in anchors)]
@@ -134,11 +140,11 @@ def section(k,ranges,paper,number,label):
         events=[(y,'text',html,x) for y,html,x in rows]
         boxes=[]
         for a,b in bands:
-            relevant=[o for o in d['shapes']+d['images']+d['chars'] if o['top']<b and o['bottom']>a and not('hash' in o and background(o,k)) and 75<o['x0']<550 and not any(inside(o,box) for box in floats)]
+            relevant=[o for o in d['shapes']+d['images']+d['chars'] if o['top']<b and o['bottom']>a and not('hash' in o and background(o,k)) and 75<o['x0']<550 and not any(inside(o,box) for box in excluded)]
             x0=min([84]+[o['x0']-2 for o in relevant]);x1=max([514]+[o['x1']+2 for o in relevant])
             for f in special:
                 if f['mode']=='band' and abs(a-f['box'][1])<.1 and abs(b-f['box'][3])<.1:x0,x1=f['box'][0],f['box'][2]
-            for box in floats:
+            for box in excluded:
                 if box[1]<b and box[3]>a and all(o['x1']<box[0] for o in relevant):x1=min(x1,box[0]-1)
             boxes.append(([x0,a,x1,b],'band'))
         boxes += [(box,'float') for box in floats]

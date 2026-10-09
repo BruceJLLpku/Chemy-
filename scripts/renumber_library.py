@@ -33,7 +33,7 @@ NUMBER=json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))['numb
 assert set(NUMBER)==set(QUESTIONS), 'Import must create the shared numbering table before parallel workers start'
 # Verified cross-question reference; ordinary reaction/spectrum ranges are not labels.
 CROSS_REFERENCES={('chemy39-8-2','1-2-2'):'chemy39-8-1'}
-LABEL_CORRECTIONS={('chemy39-1-6','a','6-5'):'6-4',('chemy36-25-4','a','9-4'):'4-4'}
+LABEL_CORRECTIONS={('chemy39-1-6','a','6-5'):'6-4',('chemy36-25-4','a','9-4'):'4-4',('chemy32-12-22','q','5-4'):'22-4'}
 
 def first_specs():
     result=[]
@@ -57,7 +57,7 @@ def runs(chars):
     """Keep one text baseline/font and only contiguous numeric characters."""
     rows=defaultdict(list)
     for c in chars:
-        if c['text'].strip() and c['size']>=9.5:
+        if c['text'].strip() and c['size']>=8:
             rows[(round(c['bottom'],1),c['fontname'],round(c['size'],2),str(c['non_stroking_color']))].append(c)
     out=[]
     for cs in rows.values():
@@ -72,7 +72,8 @@ def runs(chars):
 
 def neighbors(chars,group):
     ids={id(c) for c in group};c=group[0]
-    row=[x for x in chars if id(x) not in ids and x['text'].strip() and abs(x['bottom']-c['bottom'])<1.5]
+    # Chinese and Latin fonts on the same baseline have different glyph bounds.
+    row=[x for x in chars if id(x) not in ids and x['text'].strip() and abs(x['bottom']-c['bottom'])<max(3,.3*c['size'])]
     left=[x for x in row if x['x1']<=c['x0']+.1]
     right=[x for x in row if x['x0']>=group[-1]['x1']-.1]
     return max(left,key=lambda x:x['x1'],default=None),min(right,key=lambda x:x['x0'],default=None)
@@ -85,6 +86,7 @@ def label_candidates(k,n,lo,hi,old):
         text=''.join(c['text'] for c in group)
         if not re.fullmatch(str(old)+r'-\d+(?:-\d+)*',text):continue
         before,after=neighbors(cs,group)
+        if after and (after['text']=='.' or after['text'].isalpha() and (after['text'].isascii() or '\u0370'<=after['text']<='\u03ff')) and after['x0']<group[-1]['x1']+2:continue
         lead=group[0]['x0']<122 and (before is None or before['text'] in ['（','('])
         # Source bold runs are question labels and explicit cross-references.
         bold=any('Bold' in c['fontname'] or re.search(r'\+F(?:7|6)$',c['fontname']) for c in group)
@@ -110,7 +112,10 @@ def make_patch(k,n,group,newtext,qid,lead=False,font=None):
         if shape['top']<oldbox[3] and shape['bottom']>oldbox[1] and shape['x0']>=oldbox[2]+.1:
             right_limit=min(right_limit,shape['x0']-.8)
     left_space=max(0,oldbox[0]-limit);right_space=max(0,right_limit-oldbox[2]);oldwidth=oldbox[2]-oldbox[0]
-    if width<=oldwidth+right_space:actual=width;x=oldbox[0]
+    if lead:
+        # Preserve the original gap after a leading subquestion number.
+        actual=min(width,oldwidth+left_space);x=oldbox[2]-actual
+    elif width<=oldwidth+right_space:actual=width;x=oldbox[0]
     elif width<=oldwidth+left_space:actual=width;x=oldbox[2]-width
     else:
         actual=min(width,oldwidth+left_space+right_space)
@@ -153,7 +158,7 @@ for paper,specs in sorted(SPECS.items()):
                     if source_number!=old and (qid,text) not in CROSS_REFERENCES and (qid,k,text) not in LABEL_CORRECTIONS:continue
                     before,after=neighbors(cs,group)
                     if before and before['text'] in ',，' and before['x1']>group[0]['x0']-1:continue
-                    if after and (after['text']=='.' or after['text'].isascii() and after['text'].isalpha()) and after['x0']<group[-1]['x1']+.3:continue
+                    if after and (after['text']=='.' or after['text'].isalpha() and (after['text'].isascii() or '\u0370'<=after['text']<='\u03ff')) and after['x0']<group[-1]['x1']+2:continue
                     labels.append((group,text,False))
                 for group,text,lead in labels:
                     text=LABEL_CORRECTIONS.get((qid,k,text),text)
@@ -206,7 +211,7 @@ def text_html(html,old,new,paper,kind):
             return str(NUMBER.get(target,new))+text[len(str(source)):]
         # Decimal subtraction and chemical locants never match this complete-token rule.
         if '原答案册将本问编号' not in part:
-            part=re.sub(r'(?<![\dA-Za-z,，])(\d+)-(\d+(?:-\d+)*)(?![\d.])',replace_label,part)
+            part=re.sub(r'(?<![\dA-Za-z,，])(\d+)-(\d+(?:-\d+)*)(?![\d.A-Za-z\u0370-\u03ff])',replace_label,part)
         part=re.sub(r'第\s*'+str(old)+r'\s*题',f'第 {new} 题',part)
         chunks[i]=part
     return renumber_attributes(''.join(chunks),old,new)
@@ -221,6 +226,7 @@ def main():
         for spec in specs:
             qid=f'chemy{EDITION}-{paper}-{spec["number"]}';q=QUESTIONS[qid];new=NUMBER[qid]
             entry={name:text_html(q[name],q['number'],new,paper,'q' if name=='body' else 'a') for name in ['body','answer']}
+            if qid=='chemy32-12-22':entry['titleHtml']=(q.get('titleHtml') or q['title']).replace('5-4',f'{new}-4')
             for k in ['q','a']:
                 field='body' if k=='q' else 'answer'
                 for figure in spec['figures'][k]:

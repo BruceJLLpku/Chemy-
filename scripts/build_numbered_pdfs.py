@@ -18,6 +18,7 @@ from paper1_manifest import PAPER,FIGURES
 from library_config import EDITION
 from fast_pdf import page_count,stamp_template,merge_parts
 from source_info import source_name,question_source,score_text,set_source_color
+from import_library import foreign_float_boxes
 
 pdfmetrics.registerFont(TTFont('LabelRegular','C:/Windows/Fonts/times.ttf'))
 pdfmetrics.registerFont(TTFont('LabelBold','C:/Windows/Fonts/timesbd.ttf'))
@@ -53,6 +54,7 @@ def frame(topic,k,paper,index):
 
 def draw_heading(c,q,cursor):
     n=NUMBERS[q['id']];title=reformat_title(q.get('titleHtml') or escape(q['title']))
+    if q['id']=='chemy32-12-22':title=title.replace('5-4',f'{n}-4')
     percent='' if q.get('percent') is None else f'，占 {q["percent"]}%'
     p=Paragraph(f'第 {n} 题　{title}{score_text(q)}',TITLE_STYLE);_,height=p.wrap(W-124,100)
     p.drawOn(c,62,cursor-height)
@@ -62,6 +64,7 @@ def draw_heading(c,q,cursor):
 
 def heading_height(q):
     title=reformat_title(q.get('titleHtml') or escape(q['title']));percent='' if q.get('percent') is None else f'，占 {q["percent"]}%'
+    if q['id']=='chemy32-12-22':title=title.replace('5-4',f'{NUMBERS[q["id"]]}-4')
     p=Paragraph(f'第 {NUMBERS[q["id"]]} 题　{title}{score_text(q)}',TITLE_STYLE)
     return p.wrap(W-124,100)[1]+25
 
@@ -99,6 +102,8 @@ def create(paper,topic,k,specs):
     static={page:[{key:p[key] for key in ['id','old','box','font','size','baseline','color']} for p in ps] for page,ps in owned.items()}
     heights={i:heading_height(QUESTIONS[i]) for i in ids}
     fingerprint=hashlib.sha256(json.dumps({'profile':'numberless-template-v2','specs':specs,'q':[{key:QUESTIONS[i].get(key) for key in ['id','title','titleHtml','points','percent']}|{key:QUESTIONS[i][key] for key in ['sourcePaperLabel','series','answerCorrectionPages'] if key in QUESTIONS[i]} for i in sorted(ids)],'heights':heights,'labels':static},sort_keys=True).encode()).hexdigest()
+    foreign={f'{s["number"]}-{n}':foreign_float_boxes(k,paper,s['number'],n) for s in specs for n,_,_ in s['question' if k=='q' else 'answer'] if foreign_float_boxes(k,paper,s['number'],n)}
+    if foreign:fingerprint=hashlib.sha256((fingerprint+json.dumps(foreign,sort_keys=True)).encode()).hexdigest()
     signature=hashlib.sha256(('indirect-form-contents-v2'+fingerprint+json.dumps({i:NUMBERS[i] for i in sorted(ids)})+json.dumps(owned,sort_keys=True)).encode()).hexdigest()
     if complete_pdf(dest) and dest.with_suffix('.json').exists() and stamp.exists() and stamp.read_text()==signature:return
     template=dest.with_suffix('.template.pdf');layout_path=dest.with_suffix('.layout.json');template_stamp=dest.with_suffix('.template.sha256')
@@ -116,7 +121,7 @@ def create(paper,topic,k,specs):
                         from make_pdfs import print_bounds,A
                         lo,hi=print_bounds(A,n,lo,hi)
                     bb=[[lo,hi]]
-                else:bb=bands(k,n,lo,hi,spec['figures'][k])
+                else:bb=bands(k,n,lo,hi,spec['figures'][k],paper,spec['number'])
                 chunks=[]
                 for a,b in bb:
                     if chunks and b-chunks[-1][0]<570:chunks[-1][1]=b
@@ -134,6 +139,10 @@ def create(paper,topic,k,specs):
                     if floats:
                         rects=[(left,ph-min(b,hi),right-left,max(0,min(b,hi)-max(a,lo)))]+[(f[0],ph-min(b,f[3]),f[2]-f[0],max(0,min(b,f[3])-max(a,f[1]))) for f in floats if f[1]<b and f[3]>a]
                         clip='q\n'+''.join(f'{x:.5f} {y:.5f} {w:.5f} {h:.5f} re\n' for x,y,w,h in rects if h>0)+'W n\n';stream=DecodedStreamObject();stream.set_data(clip.encode()+p.get_contents().get_data()+b'\nQ\n');p[NameObject('/Contents')]=stream
+                    foreign=foreign_float_boxes(k,paper,spec['number'],n)
+                    if foreign:
+                        holes=''.join(f'{x0:.5f} {ph-y1:.5f} {x1-x0:.5f} {y1-y0:.5f} re\n' for x0,y0,x1,y1 in foreign)
+                        stream=DecodedStreamObject();stream.set_data((f'q\n0 0 {float(p.mediabox.width)} {ph} re\n'+holes+'W* n\n').encode()+p.get_contents().get_data()+b'\nQ\n');p[NameObject('/Contents')]=stream
                     tx=62-84*scale;ty=cursor-(ph-a)*scale
                     target.merge_transformed_page(p,Transformation().scale(scale).translate(tx,ty),expand=False)
                     for pos,label in enumerate(LABELS.get(f'{k}-{n}',[])):

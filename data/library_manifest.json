@@ -88999,7 +88999,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-2": {
       "edition": 38,
@@ -90217,7 +90217,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-3": {
       "edition": 38,
@@ -91480,7 +91480,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-4": {
       "edition": 38,
@@ -92734,7 +92734,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-5": {
       "edition": 38,
@@ -94120,7 +94120,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-6": {
       "edition": 38,
@@ -94571,7 +94571,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 40,
+                "box": [
+                  190,
+                  596,
+                  422,
+                  727
+                ],
+                "asset": "e38-p06-q06-01-d573570abc5c.webp",
+                "mode": "band",
+                "sha256": "d573570abc5cc481645d585afa356ce155a8bf93e0309ea1a234b6aa2d87a656"
+              }
+            ],
             "a": [
               {
                 "page": 68,
@@ -94633,7 +94646,7 @@
                 ],
                 "selectedCharacters": 855,
                 "nativeCharacters": 855,
-                "figures": 0
+                "figures": 1
               }
             ],
             "a": [
@@ -95642,7 +95655,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-7": {
       "edition": 38,
@@ -96780,7 +96793,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-8": {
       "edition": 38,
@@ -98061,7 +98074,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-9": {
       "edition": 38,
@@ -100291,7 +100304,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-10": {
       "edition": 38,
@@ -101453,7 +101466,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-11": {
       "edition": 38,
@@ -102038,14 +102051,14 @@
             [
               80,
               81.24003845000004,
-              480.83947049999995
+              403.8
             ]
           ],
           "printQuestion": [
             [
               80,
               68.07948775,
-              480.83947049999995
+              403.8
             ]
           ],
           "answer": [
@@ -102070,10 +102083,10 @@
                 "page": 80,
                 "range": [
                   81.24003845000004,
-                  480.83947049999995
+                  403.8
                 ],
-                "selectedCharacters": 783,
-                "nativeCharacters": 783,
+                "selectedCharacters": 647,
+                "nativeCharacters": 647,
                 "figures": 0
               }
             ],
@@ -102658,7 +102671,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-12": {
       "edition": 38,
@@ -103903,7 +103916,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-13": {
       "edition": 38,
@@ -105312,7 +105325,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-14": {
       "edition": 38,
@@ -106711,7 +106724,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-15": {
       "edition": 38,
@@ -108101,7 +108114,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-16": {
       "edition": 38,
@@ -108782,6 +108795,18 @@
                 "asset": "e38-p16-q06-01-873e0e94c625.webp",
                 "mode": "band",
                 "sha256": "873e0e94c6256b2566803e45499b6fabb9ec4214054bf7891d94d78c82cd83f9"
+              },
+              {
+                "page": 115,
+                "box": [
+                  419,
+                  71,
+                  519,
+                  272
+                ],
+                "asset": "e38-p16-q06-02-c26b295a1234.webp",
+                "mode": "float",
+                "sha256": "c26b295a12344419d5a79d3693eeb416daefb8591a5fceda5f90fbc581ec6b6e"
               }
             ],
             "a": [
@@ -109412,7 +109437,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-17": {
       "edition": 38,
@@ -109845,11 +109870,6 @@
               120,
               315.9601733,
               722.0
-            ],
-            [
-              121,
-              70,
-              126.71949074999998
             ]
           ],
           "printQuestion": [
@@ -109857,11 +109877,6 @@
               120,
               302.77851261498284,
               722.0
-            ],
-            [
-              121,
-              70,
-              126.71949074999998
             ]
           ],
           "answer": [
@@ -109889,18 +109904,6 @@
                 "asset": "e38-p17-q06-01-c562fde7d3ae.webp",
                 "mode": "band",
                 "sha256": "c562fde7d3aec05f02179e478fe98cbc5563f8c394adf430f2ec64eaee1468ad"
-              },
-              {
-                "page": 121,
-                "box": [
-                  84,
-                  97.83948250000003,
-                  514,
-                  115.5600015
-                ],
-                "asset": "e38-p17-q06-02-bd1c9672d362.webp",
-                "mode": "band",
-                "sha256": "bd1c9672d362320ea205a5f6e3044e7b5dd7e2b9e6901ff346273c57804a74dd"
               }
             ],
             "a": []
@@ -109915,16 +109918,6 @@
                 ],
                 "selectedCharacters": 740,
                 "nativeCharacters": 387,
-                "figures": 1
-              },
-              {
-                "page": 121,
-                "range": [
-                  70,
-                  126.71949074999998
-                ],
-                "selectedCharacters": 103,
-                "nativeCharacters": 86,
                 "figures": 1
               }
             ],
@@ -110581,7 +110574,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-18": {
       "edition": 38,
@@ -110950,6 +110943,18 @@
                 "asset": "e38-p18-q04-04-005127a2fd42.webp",
                 "mode": "band",
                 "sha256": "005127a2fd42f7d183f8ed5e41ab4277be4d6f4b8872113713b5471e8a05a5ca"
+              },
+              {
+                "page": 126,
+                "box": [
+                  370,
+                  69,
+                  498,
+                  141
+                ],
+                "asset": "e38-p18-q04-05-d275811bc127.webp",
+                "mode": "float",
+                "sha256": "d275811bc12797d704248ce952a364101147d4e99185eeae4d686c4030166413"
               }
             ],
             "a": [
@@ -112031,7 +112036,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-19": {
       "edition": 38,
@@ -113533,7 +113538,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-20": {
       "edition": 38,
@@ -115426,7 +115431,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-21": {
       "edition": 38,
@@ -116987,7 +116992,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-22": {
       "edition": 38,
@@ -118122,7 +118127,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-23": {
       "edition": 38,
@@ -119326,7 +119331,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "38-24": {
       "edition": 38,
@@ -120683,7 +120688,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-1": {
       "edition": 37,
@@ -121934,7 +121939,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-2": {
       "edition": 37,
@@ -123166,7 +123171,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-3": {
       "edition": 37,
@@ -124288,7 +124293,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-4": {
       "edition": 37,
@@ -125461,7 +125466,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-5": {
       "edition": 37,
@@ -126457,7 +126462,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-6": {
       "edition": 37,
@@ -127213,7 +127218,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 37,
+                "box": [
+                  400,
+                  70,
+                  509,
+                  327
+                ],
+                "asset": "e37-p06-q10-01-13c9d6da5071.webp",
+                "mode": "float",
+                "sha256": "13c9d6da50714d45c4d82c0886a2de786c5ca6f1936845a6798e43446fff338c"
+              }
+            ],
             "a": []
           },
           "coverage": {
@@ -127670,7 +127688,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-7": {
       "edition": 37,
@@ -129262,7 +129280,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-8": {
       "edition": 37,
@@ -130290,7 +130308,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-9": {
       "edition": 37,
@@ -131622,7 +131640,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-10": {
       "edition": 37,
@@ -132141,13 +132159,25 @@
                 "page": 61,
                 "box": [
                   84,
-                  86.42103474999999,
+                  88.15807874999996,
                   514,
                   149.51844925
                 ],
-                "asset": "e37-p10-q07-01-a8069d66f204.webp",
+                "asset": "e37-p10-q07-01-449813ed7065.webp",
                 "mode": "band",
-                "sha256": "a8069d66f204bc0ce566e347441e3bfe687c6412d5aac97dbcaf45697e71262f"
+                "sha256": "449813ed70659f8d6c5296176cbfb011811b6ca30bd59ed66d08de4fa1db3de6"
+              },
+              {
+                "page": 61,
+                "box": [
+                  448,
+                  78,
+                  490,
+                  134
+                ],
+                "asset": "e37-p10-q07-02-a77e5d56a018.webp",
+                "mode": "float",
+                "sha256": "a77e5d56a018a1f9eaefc5d2078f4752a706ce9590ceb599fcdc3d527c46f44b"
               }
             ],
             "a": [
@@ -132747,7 +132777,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-11": {
       "edition": 37,
@@ -134025,7 +134055,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-12": {
       "edition": 37,
@@ -135119,7 +135149,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-13": {
       "edition": 37,
@@ -135476,6 +135506,18 @@
                 "asset": "e37-p13-q05-01-2a02fc76f6a3.webp",
                 "mode": "band",
                 "sha256": "2a02fc76f6a316057ecb85ee0112f2ec279e15ff5b667a49a1d67ecd6d41ce18"
+              },
+              {
+                "page": 78,
+                "box": [
+                  390,
+                  349,
+                  508,
+                  493
+                ],
+                "asset": "e37-p13-q05-02-05c1ac3646ce.webp",
+                "mode": "float",
+                "sha256": "05c1ac3646ced7c8c2a8d1e3aba0a05adf4cf586bd7eec6a258e840c43f52dd1"
               }
             ],
             "a": [
@@ -136200,7 +136242,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-14": {
       "edition": 37,
@@ -137108,7 +137150,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-15": {
       "edition": 37,
@@ -138136,7 +138178,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-16": {
       "edition": 37,
@@ -139025,7 +139067,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-17": {
       "edition": 37,
@@ -139908,7 +139950,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-18": {
       "edition": 37,
@@ -140161,23 +140203,11 @@
                 "page": 102,
                 "box": [
                   84,
-                  86.42103474999999,
-                  514,
-                  134.72103549999997
-                ],
-                "asset": "e37-p18-q02-01-b8bf6464f4d4.webp",
-                "mode": "band",
-                "sha256": "b8bf6464f4d44bf74a7e9d8bd1d4785211988893043c97716b32b0dd172dfd4c"
-              },
-              {
-                "page": 102,
-                "box": [
-                  84,
                   153.60000274999993,
                   514,
                   194.75999075000004
                 ],
-                "asset": "e37-p18-q02-02-8298c28b793a.webp",
+                "asset": "e37-p18-q02-01-8298c28b793a.webp",
                 "mode": "band",
                 "sha256": "8298c28b793a231e078048325afc6b79b74d54fdde9497007ab771b0e45b23f3"
               },
@@ -140189,7 +140219,7 @@
                   514,
                   300.36000425
                 ],
-                "asset": "e37-p18-q02-03-f91e36ecaf88.webp",
+                "asset": "e37-p18-q02-02-f91e36ecaf88.webp",
                 "mode": "band",
                 "sha256": "f91e36ecaf888e1b6556699dbe437d32bd8d87be48036af30ab33cba8b1e8dff"
               },
@@ -140201,9 +140231,21 @@
                   514,
                   410.75999075
                 ],
-                "asset": "e37-p18-q02-04-51787352569d.webp",
+                "asset": "e37-p18-q02-03-51787352569d.webp",
                 "mode": "band",
                 "sha256": "51787352569df502fcf23b53fcf3603c883f77b517b5238c4cbe1195c6da3833"
+              },
+              {
+                "page": 102,
+                "box": [
+                  447,
+                  77,
+                  505,
+                  133
+                ],
+                "asset": "e37-p18-q02-04-52be1d690ad2.webp",
+                "mode": "float",
+                "sha256": "52be1d690ad2a4eb25c804dea533b71f0b841c408abbc87ce515a406c9b9eca9"
               }
             ],
             "a": [
@@ -140278,8 +140320,8 @@
                   461.55808850000005
                 ],
                 "selectedCharacters": 357,
-                "nativeCharacters": 257,
-                "figures": 4
+                "nativeCharacters": 357,
+                "figures": 3
               }
             ],
             "a": [
@@ -141597,7 +141639,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-19": {
       "edition": 37,
@@ -142730,7 +142772,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-20": {
       "edition": 37,
@@ -143686,7 +143728,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-21": {
       "edition": 37,
@@ -144657,7 +144699,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-22": {
       "edition": 37,
@@ -145734,7 +145776,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-23": {
       "edition": 37,
@@ -146927,7 +146969,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-24": {
       "edition": 37,
@@ -148143,7 +148185,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-25": {
       "edition": 37,
@@ -149494,7 +149536,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-26": {
       "edition": 37,
@@ -150787,7 +150829,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-27": {
       "edition": 37,
@@ -152100,7 +152142,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "37-28": {
       "edition": 37,
@@ -153409,7 +153451,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-1": {
       "edition": 34,
@@ -153895,7 +153937,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 6,
+                "box": [
+                  384,
+                  538,
+                  509,
+                  663
+                ],
+                "asset": "e34-p01-q06-01-8731b349dea8.webp",
+                "mode": "float",
+                "sha256": "8731b349dea87e33ce945bcb0d9a248c25c626b808d495282dd7f093a07573af"
+              }
+            ],
             "a": []
           },
           "coverage": {
@@ -154324,7 +154379,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-2": {
       "edition": 34,
@@ -155270,7 +155325,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-3": {
       "edition": 34,
@@ -156177,7 +156232,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-4": {
       "edition": 34,
@@ -156467,7 +156522,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 19,
+                "box": [
+                  386,
+                  71,
+                  508,
+                  188
+                ],
+                "asset": "e34-p04-q04-01-562960a33093.webp",
+                "mode": "float",
+                "sha256": "562960a3309318bd7887907b2a841422083e34a7c43c17209dc2f561200edf85"
+              }
+            ],
             "a": [
               {
                 "page": 30,
@@ -157179,7 +157247,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-5": {
       "edition": 34,
@@ -158182,7 +158250,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-6": {
       "edition": 34,
@@ -159102,7 +159170,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-7": {
       "edition": 34,
@@ -159639,6 +159707,18 @@
                 "asset": "e34-p07-q07-01-5dacff4b286a.webp",
                 "mode": "band",
                 "sha256": "5dacff4b286afaf005889d37921ffac65aa6ccb6c9c74417900c17156af38312"
+              },
+              {
+                "page": 34,
+                "box": [
+                  363,
+                  70,
+                  509,
+                  211
+                ],
+                "asset": "e34-p07-q07-02-66bd71f50ec9.webp",
+                "mode": "float",
+                "sha256": "66bd71f50ec9f1ea13850060e49333339287ba99d748cb71f535ab5048de0abe"
               }
             ],
             "a": [
@@ -159736,6 +159816,18 @@
                 "asset": "e34-p07-q08-01-0de22c1fbbd2.webp",
                 "mode": "band",
                 "sha256": "0de22c1fbbd2f243751b3274ccfc4ccf9c5081b446190f4ed5cd3ef3bc46b6de"
+              },
+              {
+                "page": 34,
+                "box": [
+                  397,
+                  320,
+                  509,
+                  426
+                ],
+                "asset": "e34-p07-q08-02-25b32d3f7a53.webp",
+                "mode": "float",
+                "sha256": "25b32d3f7a530a23f19c804169239ce0bc06468ce55f0e753deb473a5c39d115"
               }
             ],
             "a": [
@@ -160208,7 +160300,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-8": {
       "edition": 34,
@@ -161160,7 +161252,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-9": {
       "edition": 34,
@@ -162174,7 +162266,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-10": {
       "edition": 34,
@@ -163173,7 +163265,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-11": {
       "edition": 34,
@@ -164388,7 +164480,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-12": {
       "edition": 34,
@@ -165181,7 +165273,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-13": {
       "edition": 34,
@@ -166538,7 +166630,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-14": {
       "edition": 34,
@@ -167597,7 +167689,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-15": {
       "edition": 34,
@@ -167715,25 +167807,25 @@
                 "page": 72,
                 "box": [
                   84,
-                  398.4210520000001,
-                  514,
-                  446.90342332
-                ],
-                "asset": "e34-p15-q02-01-79c09cec30a3.webp",
-                "mode": "band",
-                "sha256": "79c09cec30a35a5427eb89593018ab951d5f239436ebd769a055521f4548b9bd"
-              },
-              {
-                "page": 72,
-                "box": [
-                  84,
                   524.95805175,
                   514,
                   620.3610385
                 ],
-                "asset": "e34-p15-q02-02-bd50d8a384f9.webp",
+                "asset": "e34-p15-q02-01-bd50d8a384f9.webp",
                 "mode": "band",
                 "sha256": "bd50d8a384f9afe62ed637fcf82ec0010c871ee893c2e5fdcb04bb50adc15ff5"
+              },
+              {
+                "page": 72,
+                "box": [
+                  450,
+                  390,
+                  506,
+                  447
+                ],
+                "asset": "e34-p15-q02-02-916886cf595d.webp",
+                "mode": "float",
+                "sha256": "916886cf595de34657411002f4ce2519ccad2e841a3e534ac95b2decb26d035a"
               }
             ],
             "a": [
@@ -167760,8 +167852,8 @@
                   770
                 ],
                 "selectedCharacters": 963,
-                "nativeCharacters": 623,
-                "figures": 2
+                "nativeCharacters": 748,
+                "figures": 1
               }
             ],
             "a": [
@@ -168451,7 +168543,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-16": {
       "edition": 34,
@@ -169359,7 +169451,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "34-17": {
       "edition": 34,
@@ -170289,7 +170381,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-1": {
       "edition": 33,
@@ -171249,7 +171341,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-2": {
       "edition": 33,
@@ -172223,7 +172315,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-3": {
       "edition": 33,
@@ -173331,7 +173423,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-4": {
       "edition": 33,
@@ -174255,7 +174347,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-5": {
       "edition": 33,
@@ -175310,7 +175402,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-6": {
       "edition": 33,
@@ -176524,7 +176616,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-7": {
       "edition": 33,
@@ -177649,7 +177741,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-8": {
       "edition": 33,
@@ -178056,7 +178148,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 33,
+                "box": [
+                  359,
+                  268,
+                  509,
+                  379
+                ],
+                "asset": "e33-p08-q05-01-ccd74102c46f.webp",
+                "mode": "float",
+                "sha256": "ccd74102c46f295c690707b1414d6e4cc2b3a3ac2f2aa922c6a31a7e2111775a"
+              }
+            ],
             "a": [
               {
                 "page": 61,
@@ -178673,7 +178778,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-9": {
       "edition": 33,
@@ -179699,7 +179804,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-10": {
       "edition": 33,
@@ -181066,7 +181171,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-11": {
       "edition": 33,
@@ -181826,14 +181931,14 @@
               {
                 "page": 47,
                 "box": [
-                  84,
-                  431.0094914628,
-                  514,
-                  495.2048
+                  402,
+                  414,
+                  506,
+                  494
                 ],
-                "asset": "e33-p11-q06-01-b3956cbfab0b.webp",
-                "mode": "band",
-                "sha256": "b3956cbfab0ba0506dbcb2648e6b3e42a12c70301acef928204252d1e58d1b6e"
+                "asset": "e33-p11-q06-01-2655d85f7e7f.webp",
+                "mode": "float",
+                "sha256": "2655d85f7e7f85f5e70b327aab8541cc1f1a81ef9e8b6ce88705f91bd812e9ba"
               }
             ],
             "a": [
@@ -181872,8 +181977,8 @@
                   523.9689599999999
                 ],
                 "selectedCharacters": 156,
-                "nativeCharacters": 38,
-                "figures": 1
+                "nativeCharacters": 151,
+                "figures": 0
               }
             ],
             "a": [
@@ -182436,7 +182541,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-12": {
       "edition": 33,
@@ -183151,12 +183256,24 @@
                 "box": [
                   84,
                   197.3488000000001,
-                  514,
+                  417,
                   229.9769600000002
                 ],
-                "asset": "e33-p12-q09-01-dc305a404a8e.webp",
+                "asset": "e33-p12-q09-01-6d37f447546e.webp",
                 "mode": "band",
-                "sha256": "dc305a404a8e90c1f150f83f21533a113ada19386c2428c2c52085f1f647eef9"
+                "sha256": "6d37f447546e722d20e6266cacb2d51bc4ac69ead0f47613931c7b1db859856f"
+              },
+              {
+                "page": 52,
+                "box": [
+                  418,
+                  72,
+                  507,
+                  279
+                ],
+                "asset": "e33-p12-q09-02-bc1ac21b5575.webp",
+                "mode": "float",
+                "sha256": "bc1ac21b557575f378380774318830b4b498a07195b1d955d6da87289cd62062"
               }
             ],
             "a": []
@@ -183272,7 +183389,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-13": {
       "edition": 33,
@@ -184257,7 +184374,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-14": {
       "edition": 33,
@@ -185009,7 +185126,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-15": {
       "edition": 33,
@@ -186050,7 +186167,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-16": {
       "edition": 33,
@@ -187256,7 +187373,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-17": {
       "edition": 33,
@@ -188517,7 +188634,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "33-18": {
       "edition": 33,
@@ -190773,7 +190890,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-1": {
       "edition": 32,
@@ -191090,12 +191207,24 @@
                 "box": [
                   84,
                   183.7980705,
-                  514,
+                  348,
                   263.879993
                 ],
-                "asset": "e32-p01-q04-01-c6ca40f142ca.webp",
+                "asset": "e32-p01-q04-01-7d5ca4ac6edb.webp",
                 "mode": "band",
-                "sha256": "c6ca40f142ca42de422f63dcc293813fc99be81d7a077604a5d55665e52d6a25"
+                "sha256": "7d5ca4ac6edb7021be20b7749bca7fc56841e9e941c4f189e28e1c801f6b4a5a"
+              },
+              {
+                "page": 3,
+                "box": [
+                  349,
+                  135,
+                  509,
+                  299
+                ],
+                "asset": "e32-p01-q04-02-a70b0bdaf1ff.webp",
+                "mode": "float",
+                "sha256": "a70b0bdaf1ff8b04ac2d21303aff236893d111fd8eea2dec50808f606e502cf8"
               }
             ],
             "a": [
@@ -191907,7 +192036,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-2": {
       "edition": 32,
@@ -192725,7 +192854,7 @@
             [
               14,
               717.1980570000001,
-              770
+              794
             ],
             [
               15,
@@ -192786,6 +192915,18 @@
                 "sha256": "0dd8b022c42aa80fde390d004d7946912a8d694cd8ae1577c0373efc36dc0c85"
               },
               {
+                "page": 14,
+                "box": [
+                  84,
+                  717.198057,
+                  514,
+                  794
+                ],
+                "asset": "e32-p02-a09-03-d35e116a2a23.webp",
+                "mode": "band",
+                "sha256": "d35e116a2a2350f8e686eaba108318b83e5f41b1fcdf6bc4122f4ceada6e20e0"
+              },
+              {
                 "page": 15,
                 "box": [
                   82.36000225,
@@ -192793,7 +192934,7 @@
                   514,
                   135.0810325
                 ],
-                "asset": "e32-p02-a09-03-25df9d21991d.webp",
+                "asset": "e32-p02-a09-04-25df9d21991d.webp",
                 "mode": "band",
                 "sha256": "25df9d21991d60bfd9d5d0cbf1bd05b515e5b07f4cdaa69cc2827a227c733761"
               }
@@ -192857,11 +192998,11 @@
                 "page": 14,
                 "range": [
                   717.1980570000001,
-                  770
+                  794
                 ],
                 "selectedCharacters": 5,
-                "nativeCharacters": 5,
-                "figures": 0
+                "nativeCharacters": 0,
+                "figures": 1
               },
               {
                 "page": 15,
@@ -193116,7 +193257,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-3": {
       "edition": 32,
@@ -193500,7 +193641,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 11,
+                "box": [
+                  409,
+                  276,
+                  509,
+                  374
+                ],
+                "asset": "e32-p03-q06-01-fceec03e04e5.webp",
+                "mode": "float",
+                "sha256": "fceec03e04e5fb942757d44b92f1bcc8751575d600f27abe41f875758d597095"
+              }
+            ],
             "a": [
               {
                 "page": 115,
@@ -194083,7 +194237,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-4": {
       "edition": 32,
@@ -195110,7 +195264,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-5": {
       "edition": 32,
@@ -196312,7 +196466,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-6": {
       "edition": 32,
@@ -197427,7 +197581,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-7": {
       "edition": 32,
@@ -198404,7 +198558,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-8": {
       "edition": 32,
@@ -199546,7 +199700,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-9": {
       "edition": 32,
@@ -200601,7 +200755,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-10": {
       "edition": 32,
@@ -201978,7 +202132,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-11": {
       "edition": 32,
@@ -203146,7 +203300,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "32-12": {
       "edition": 32,
@@ -205579,7 +205733,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-1": {
       "edition": 0,
@@ -206439,7 +206593,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-2": {
       "edition": 0,
@@ -207462,7 +207616,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-3": {
       "edition": 0,
@@ -208507,7 +208661,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-4": {
       "edition": 0,
@@ -209452,7 +209606,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-5": {
       "edition": 0,
@@ -210382,7 +210536,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-6": {
       "edition": 0,
@@ -211407,7 +211561,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-7": {
       "edition": 0,
@@ -212350,7 +212504,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-8": {
       "edition": 0,
@@ -213087,7 +213241,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-9": {
       "edition": 0,
@@ -214018,7 +214172,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-10": {
       "edition": 0,
@@ -214881,7 +215035,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-11": {
       "edition": 0,
@@ -215844,7 +215998,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-12": {
       "edition": 0,
@@ -216671,7 +216825,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-13": {
       "edition": 0,
@@ -217207,7 +217361,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 59,
+                "box": [
+                  373,
+                  70,
+                  509,
+                  268
+                ],
+                "asset": "e0-p13-q07-01-eacf7d3a430c.webp",
+                "mode": "float",
+                "sha256": "eacf7d3a430c238f5c790211630db2abf5aaa443ac843e73ee6fa51cb45a81d0"
+              }
+            ],
             "a": []
           },
           "coverage": {
@@ -217610,7 +217777,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-14": {
       "edition": 0,
@@ -218564,7 +218731,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-15": {
       "edition": 0,
@@ -219216,7 +219383,20 @@
             ]
           ],
           "figures": {
-            "q": [],
+            "q": [
+              {
+                "page": 69,
+                "box": [
+                  397,
+                  239,
+                  509,
+                  334
+                ],
+                "asset": "e0-p15-q08-01-40c6d1efa4ac.webp",
+                "mode": "float",
+                "sha256": "40c6d1efa4ac8fe4f4015e43238a83aba77a0e8306c4a77d53c29f0c91558763"
+              }
+            ],
             "a": [
               {
                 "page": 129,
@@ -219992,7 +220172,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-16": {
       "edition": 0,
@@ -220985,7 +221165,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-17": {
       "edition": 0,
@@ -221998,7 +222178,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-18": {
       "edition": 0,
@@ -223405,7 +223585,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-19": {
       "edition": 0,
@@ -224307,13 +224487,37 @@
                 "page": 90,
                 "box": [
                   84,
-                  382.82103775,
+                  431.35806075,
+                  514,
+                  462.50341432
+                ],
+                "asset": "e0-p19-q12-01-42c862daf051.webp",
+                "mode": "band",
+                "sha256": "42c862daf051d1b2ac0b50e69a9b4db5a8cf7aaed952bbec7624b4bfbd036e2d"
+              },
+              {
+                "page": 90,
+                "box": [
+                  84,
+                  478.15807875,
                   514,
                   509.12103325000004
                 ],
-                "asset": "e0-p19-q12-01-1244e52083d1.webp",
+                "asset": "e0-p19-q12-02-5da53a698216.webp",
                 "mode": "band",
-                "sha256": "1244e52083d1e129eabf9977e184a2d9a348485436a87841035e4522f14846c2"
+                "sha256": "5da53a6982163b4504e49dd82fff05b22bbc2a54b8fc8408f0fd20f69bde17fd"
+              },
+              {
+                "page": 90,
+                "box": [
+                  397,
+                  377,
+                  509,
+                  498
+                ],
+                "asset": "e0-p19-q12-03-fe975e97eaaf.webp",
+                "mode": "float",
+                "sha256": "fe975e97eaafca44c2321d57ba48afb1589cd6c752696b300200113b817b19be"
               }
             ],
             "a": [
@@ -224352,8 +224556,8 @@
                   523.95805175
                 ],
                 "selectedCharacters": 223,
-                "nativeCharacters": 0,
-                "figures": 1
+                "nativeCharacters": 114,
+                "figures": 2
               }
             ],
             "a": [
@@ -224483,7 +224687,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-20": {
       "edition": 0,
@@ -225581,7 +225785,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-21": {
       "edition": 0,
@@ -226880,7 +227084,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-22": {
       "edition": 0,
@@ -228181,7 +228385,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-23": {
       "edition": 0,
@@ -229337,7 +229541,7 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     },
     "0-24": {
       "edition": 0,
@@ -230382,7 +230586,44 @@
         "figures": [],
         "coverage": []
       },
-      "reviewed": false
+      "reviewed": true
     }
+  },
+  "finalReview": {
+    "complete": true,
+    "questions": 1933,
+    "collections": 196,
+    "topicBooks": 18,
+    "printPages": 4110,
+    "method": "Automatic source pairing, native glyph coverage, original crop pixel comparison and full print drawing resource comparison; visual inspection of flagged source boundaries, all topic booklet samples, edition transitions and official errata samples. Not a manual rereading of every printed page.",
+    "visuallyInspectedBoundaryPages": 22,
+    "questionWholeDiagramFixes": 20,
+    "answerWholeDiagramFixes": 1,
+    "bookletFirstPagesInspected": 18,
+    "additionalSamplePagesRendered": 58,
+    "officialErrataSourcePagesInspected": 6,
+    "chemicalRedrawing": false,
+    "resolved": [
+      "Cross-question floating original diagrams",
+      "Footer-cut original answer diagram",
+      "Greek-letter expressions mistaken for subquestion numbers",
+      "Three-digit number spacing",
+      "Small-font answer subquestion labels",
+      "Chemical diagram glyphs mistaken for a question title",
+      "Original practice 5-4 label referring to its own fourth subquestion",
+      "Trailing general abbreviation tables"
+    ],
+    "official32Corrections": [
+      "1-8",
+      "12-13",
+      "12-20",
+      "12-4",
+      "2-6",
+      "2-8",
+      "2-9",
+      "3-6",
+      "4-1",
+      "5-2"
+    ]
   }
 }

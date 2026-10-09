@@ -1,108 +1,103 @@
 {
-  "questions": 713,
-  "nativeSections": 1426,
-  "numberedCaptures": 227,
+  "questions": 1933,
+  "nativeSections": 3866,
+  "numberedCaptures": 574,
   "preservedPixelsOutsideLabels": true,
   "pdfs": {
     "organic-questions.pdf": {
-      "pages": 294,
-      "sha256": "4edce7157ca6f4af856de94dea07cfb94da63a31d707aa5f16f44a7629559152",
-      "numberedQuestions": 242
+      "pages": 691,
+      "sha256": "2bb4fcb5f4b560a463a8c350171b86b7c0595d4cea993ffa0142ef2541b77e13",
+      "numberedQuestions": 656
     },
     "organic-answers.pdf": {
-      "pages": 333,
-      "sha256": "5ba913f2cecd568f0e98d840380cd041c0b559e0791a8d6682d5e13da442bf3a",
-      "numberedQuestions": 242
+      "pages": 828,
+      "sha256": "ff44d64a60ddc4d9ea1d5c1f39086b2fa6bd73f2bf6ed81e302794991c8ddd9e",
+      "numberedQuestions": 656
     },
     "polymer-questions.pdf": {
-      "pages": 28,
-      "sha256": "43c48733e6679ad9d7aaae0a425aaa16081e8482c05dc7cd16aba8311d51a3b6",
-      "numberedQuestions": 24
+      "pages": 63,
+      "sha256": "2e840b7d6e6e90a9c6f8b60dde02d5bf42dd7f719043f8e072785f788dca27f6",
+      "numberedQuestions": 55
     },
     "polymer-answers.pdf": {
-      "pages": 38,
-      "sha256": "e59bf247ae778ff22365175ffc331789546338d69cf015450013fd4d494144b6",
-      "numberedQuestions": 24
+      "pages": 83,
+      "sha256": "4254bd104c96fb8e963a267302a4c671d5a69ee2cb18ff8cf699e9bf232fae2d",
+      "numberedQuestions": 55
     },
     "crystal-questions.pdf": {
-      "pages": 73,
-      "sha256": "e01dd7b43c9671495dc06a5f70441527958c0adfc575324d6edde491c1e855f6",
-      "numberedQuestions": 66
+      "pages": 176,
+      "sha256": "821ea08eed96e4712872490e7f0ee565eb6f4384b01bd8bfedfd90f0579576a6",
+      "numberedQuestions": 177
     },
     "crystal-answers.pdf": {
-      "pages": 93,
-      "sha256": "a46d68c3356ec605b268c75f5dea9b5802ebcbb7b2d81904952d5e56e41ea87f",
-      "numberedQuestions": 66
+      "pages": 220,
+      "sha256": "5343b4d43e2ec052d5fdca1902aef8c9481afaed166ed7120b7ea1f3c105c2c4",
+      "numberedQuestions": 177
     },
     "inference-questions.pdf": {
-      "pages": 147,
-      "sha256": "47fbb0fa2bd3268d600c97e8dbf5306d77f4025826faa24a52e5bb35210dface",
-      "numberedQuestions": 193
+      "pages": 401,
+      "sha256": "253d22fdb34e36c84410d070158534de13a0ec42cb361fe26aa559c0c66624f9",
+      "numberedQuestions": 552
     },
     "inference-answers.pdf": {
-      "pages": 229,
-      "sha256": "c0ea6ff723b792c11b378083568b768866c32e985321df408d74fee853fcfeb4",
-      "numberedQuestions": 193
+      "pages": 610,
+      "sha256": "8e4e705df0b4486af6439f05662e87c7942727750f4ac96563010ed389a2fbb6",
+      "numberedQuestions": 552
     },
     "elements-questions.pdf": {
-      "pages": 63,
-      "sha256": "8bccb3ca731e8be16023dd640b67801192c24f5f7b74ba51a6ddf70cba69f9d2",
-      "numberedQuestions": 77
+      "pages": 149,
+      "sha256": "0b5a796224f81db9854c1eefa2845f40f473d7df3a42e268532c89a8c568840d",
+      "numberedQuestions": 181
     },
     "elements-answers.pdf": {
-      "pages": 73,
-      "sha256": "e4443bc1fc0e16d5a18a2e18403b0d11cb8591ac00ddc3e78090177786be63e9",
-      "numberedQuestions": 77
+      "pages": 170,
+      "sha256": "03d3ff93747fa7af4eb6169d5eb96d9f3c20bfd743384d73e69f0e01089f13b0",
+      "numberedQuestions": 181
     },
     "equilibrium-questions.pdf": {
-      "pages": 47,
-      "sha256": "f742ea378bd55b70845b1f1001e10a2cbf4460cef2dad3c36a9f7c5c681962e1",
-      "numberedQuestions": 50
+      "pages": 121,
+      "sha256": "5ac02ddc3cfe8bc07b884c4822f20af1acb72ae64986eae49621365071986105",
+      "numberedQuestions": 127
     },
     "equilibrium-answers.pdf": {
-      "pages": 61,
-      "sha256": "2434f6c5001c784b574ae54022cda748d26fe25075019840422cf39598f8d7cd",
-      "numberedQuestions": 50
+      "pages": 149,
+      "sha256": "150481587c01d59d13c606059df41a83b4334dcfc15f54a14876b373629c9556",
+      "numberedQuestions": 127
     },
     "electrochemistry-questions.pdf": {
-      "pages": 24,
-      "sha256": "f75636a9af62b31ca77b2034bd43d9487117397cc8bd136eb72f1971075e422e",
-      "numberedQuestions": 17
+      "pages": 58,
+      "sha256": "bf5364172dff28c00ac54167696ea4a53acea7926f371fb0c79980acab812cd7",
+      "numberedQuestions": 51
     },
     "electrochemistry-answers.pdf": {
-      "pages": 27,
-      "sha256": "6b3dcf5a0108e6487f3aeaf76ad1764f357108db9dc6f886b73dadad062daae7",
-      "numberedQuestions": 17
+      "pages": 66,
+      "sha256": "5cbb89efc1eb6daa66454c487db1bdb8a8e6b79d5ef5fa35c847be2a53d74440",
+      "numberedQuestions": 51
     },
     "kinetics-questions.pdf": {
-      "pages": 18,
-      "sha256": "2fe1c7f370e136ccf03bacceed00880b0f84bed0e92a53a1c27eaae988feb75c",
-      "numberedQuestions": 13
+      "pages": 65,
+      "sha256": "09c27d8a2fa332ee2d834df71aeac333c56e49546f6c819535f2c7ad6444ed73",
+      "numberedQuestions": 52
     },
     "kinetics-answers.pdf": {
-      "pages": 22,
-      "sha256": "bad7f11ea1a546d8a61527e0fa0d71ede346d46d2d034665d4f679af570c277b",
-      "numberedQuestions": 13
+      "pages": 75,
+      "sha256": "50aeae49c45551a64ca24501439ab7c44fc401e027596673e393192515528021",
+      "numberedQuestions": 52
     },
     "analysis-questions.pdf": {
-      "pages": 30,
-      "sha256": "4f90751e57c2b6806f5142b3f11f98cbcb3ef3fa3e323d372f9830c21bb9cdb6",
-      "numberedQuestions": 31
+      "pages": 84,
+      "sha256": "64ed3def2fb08837a89118761af8ab54a9d141ce4d262fe571847a5ac783464d",
+      "numberedQuestions": 82
     },
     "analysis-answers.pdf": {
-      "pages": 39,
-      "sha256": "e033a704c8f6a7a36e0d405dc97cd593d83e9a90e0cef12037d65dc64a63b396",
-      "numberedQuestions": 31
+      "pages": 101,
+      "sha256": "e8430efd5ef5799622160f485986ed2a841bef3e493e361680d90bacca70bd67",
+      "numberedQuestions": 82
     }
   },
   "issues": [],
+  "smallFontAnswerLabelsVerified": 5,
+  "smallFontLabelFormulaGapPreserved": true,
   "originalDatasetPreserved": true,
-  "passed": true,
-  "visualReviewComplete": true,
-  "visualReview": {
-    "bookletSamples": 18,
-    "longNumberSamples": 2,
-    "scope": "All booklet first pages plus organic question 242, including arrows, label placement and source attribution; not every printed page read manually."
-  },
-  "printPages": 1639
+  "passed": true
 }
