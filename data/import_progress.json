@@ -534,6 +534,12 @@
       "sha": "d5858ab2d0ca5ce30502108b5a2cf9bf0d413a25",
       "seconds": 439,
       "printRecovery": true
+    },
+    {
+      "edition": 32,
+      "paper": 3,
+      "sha": "51f19750f2c014372d56f1dadd16941f24e05503",
+      "publicationRecovery": true
     }
   ]
 }

@@ -11,6 +11,10 @@ from library_config import EDITION,edition_of
 GIT='C:/Users/Prettibruce/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd/git.exe'
 REPO='BruceJLLpku/Chemy-';BASE='https://brucejllpku.github.io/Chemy-/'
 env=os.environ.copy();env.update(GCM_INTERACTIVE='never',GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='3',GIT_CONFIG_KEY_0='safe.directory',GIT_CONFIG_VALUE_0=ROOT.as_posix(),GIT_CONFIG_KEY_1='gc.auto',GIT_CONFIG_VALUE_1='0',GIT_CONFIG_KEY_2='maintenance.auto',GIT_CONFIG_VALUE_2='false')
+# Use the same configured system proxy as the publication API requests.
+proxy=urllib.request.getproxies().get('https')
+if proxy:
+    env.update(GIT_CONFIG_COUNT='4',GIT_CONFIG_KEY_3='http.proxy',GIT_CONFIG_VALUE_3=proxy if '://' in proxy else 'http://'+proxy)
 def git(*args):
     return subprocess.run([GIT,*args],cwd=ROOT,env=env,text=True,capture_output=True,check=True,encoding='utf8').stdout.strip()
 
