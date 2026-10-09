@@ -739,5 +739,16 @@
       "sha": "c70e41ab4d013e23d29e37eb556d406e43974f63",
       "seconds": 282
     }
-  ]
+  ],
+  "finalReview": {
+    "status": "complete",
+    "publicationCommit": "8075b76ae32555dd4aa64ea07b98177ce09e296f",
+    "verifiedAtUtc": "2026-10-09T20:22:42.678446+00:00",
+    "questions": 1933,
+    "collections": 196,
+    "publicTopicPdfsVerified": 18,
+    "coreFilesVerified": 6,
+    "changedSourceImagesVerified": 484,
+    "sourceAndNumberingReviewComplete": true
+  }
 }
