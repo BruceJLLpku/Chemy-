@@ -3,42 +3,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#123b37">
+  <meta name="theme-color" content="#ffffff">
   <title>Chemy 化学竞赛专题题库</title>
-  <meta name="description" content="按有机化学、高分子化学、晶体化学等九个专题浏览 Chemy 化学竞赛题目，查看参考答案，下载打印专题 PDF。">
+  <meta name="description" content="按九个化学专题、届次和试卷查找 Chemy 竞赛题目，搜索题干关键词，查看原卷参考答案，下载专题 PDF。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="interface.css">
-  <script src="app.js?v=topic-numbering-v1" defer></script>
+  <link rel="stylesheet" href="interface.css?v=directory-search-v2">
+  <script src="app.js?v=directory-search-v2" defer></script>
 </head>
-<body>
+<body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
-  <aside class="sidebar" id="sidebar" aria-label="专题目录">
-    <div class="brand"><div class="brand-mark"><img src="favicon.svg" alt=""></div><div><strong>Chemy</strong><span>化学竞赛专题题库</span></div></div>
-    <div class="nav-label">按专题浏览<span aria-hidden="true">9</span></div>
+  <header class="site-header">
+    <a class="site-brand" href="#about" aria-label="Chemy 化学竞赛专题题库首页"><img src="assets/chemy-wordmark.png" alt="CHEMY" width="120" height="48"><span>化学竞赛专题题库</span></a>
+    <div class="header-tools">
+      <button class="search-launch" id="search-launch" aria-haspopup="dialog" aria-controls="search-dialog" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="search-placeholder">搜索题目标题或题干…</span><span class="search-short">查题</span><kbd>Ctrl K</kbd></button>
+      <a class="repository-link" href="https://github.com/BruceJLLpku/Chemy-" target="_blank" rel="noopener">源文件</a>
+    </div>
+  </header>
+  <aside class="sidebar" id="sidebar" aria-label="专题" tabindex="-1">
+    <a class="about-link" id="about-link" href="#about" aria-current="page">介绍与使用</a>
+    <div class="panel-heading"><h2>专题</h2><button class="panel-close" data-close-panel aria-label="关闭专题目录">×</button></div>
     <nav id="categories" aria-label="化学专题"></nav>
-    <div class="sidebar-bottom"><strong>Chemy · 模拟题</strong><br>正在加载题库<br>题目与答案保留原卷出处</div>
+    <div class="sidebar-bottom" id="library-status">正在加载题库…</div>
   </aside>
-  <div class="overlay" id="overlay"></div>
-  <main class="app-main">
-    <header class="topbar">
-      <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="sidebar" aria-label="打开专题目录"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="breadcrumb"><span>专题题库</span><svg viewBox="0 0 20 20" aria-hidden="true"><path fill="none" d="m7 4 6 6-6 6"/></svg><span id="breadcrumb-topic">有机化学</span></div>
-      <div class="topbar-tools">
-        <span class="edition"><span class="edition-dot" aria-hidden="true"></span><span id="edition-label">Chemy 模拟试题</span></span>
-        <a class="repository-link" href="https://github.com/BruceJLLpku/Chemy-" target="_blank" rel="noopener" aria-label="在 GitHub 查看题库源文件"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18c-4.5 1.4-4.5-2.4-6.3-2.9M15.4 21v-3.7c0-1 .3-1.7.8-2.2 2.7-.3 5.6-1.3 5.6-6a4.8 4.8 0 0 0-1.3-3.4 4.4 4.4 0 0 0-.1-3.4s-1-.3-3.5 1.3a12 12 0 0 0-6.4 0C8 2 7 2.3 7 2.3a4.4 4.4 0 0 0-.1 3.4 4.8 4.8 0 0 0-1.3 3.4c0 4.7 2.9 5.7 5.6 6-.5.5-.8 1.2-.8 2.2V21"/></svg><span>源文件</span></a>
-      </div>
-    </header>
-    <div class="reading" id="reading" tabindex="-1">
-      <div class="topic-head">
-        <div><h1 id="topic-title">有机化学</h1><p id="topic-summary">模拟试题 1</p></div>
-        <div class="topic-symbol" id="topic-symbol" aria-hidden="true"></div>
-        <div class="downloads" id="downloads"></div>
-      </div>
-      <div class="paper-filter" id="paper-filter"></div>
-      <div id="questions"></div>
-      <footer class="copyright">题目与参考答案来源：Chemy 化学奥林匹克团队，第32～39届试题合集与Chemy联赛。版权归原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
+  <aside class="directory-pane" id="directory-pane" aria-label="题目目录" tabindex="-1">
+    <div class="panel-heading"><h2>题目目录</h2><button class="panel-close" data-close-panel aria-label="关闭题目目录">×</button></div>
+    <form class="number-jump" id="number-jump"><label class="sr-only" for="question-number">当前专题题号</label><input id="question-number" type="text" inputmode="numeric" autocomplete="off" placeholder="输入专题题号" aria-describedby="number-status"><button type="submit" disabled>跳转</button></form>
+    <p id="number-status" class="field-status" role="status"></p>
+    <div class="directory-filters"><label class="sr-only" for="edition-select">筛选届次</label><select id="edition-select" disabled><option value="all">全部届次</option></select><label class="sr-only" for="paper-select">筛选试卷</label><select id="paper-select" disabled><option value="all">全部试卷</option></select></div>
+    <p class="directory-count" id="directory-count" role="status"></p>
+    <nav class="directory-tree" id="directory-tree" aria-label="按届次和试卷排列的题目"><p class="loading-note">正在加载目录…</p></nav>
+  </aside>
+  <div class="overlay" id="overlay" hidden></div>
+  <main class="app-main" id="main">
+    <div class="browse-tools"><button id="topic-toggle" aria-expanded="false" aria-controls="sidebar">专题</button><button id="directory-toggle" aria-expanded="false" aria-controls="directory-pane">题目目录</button><button id="return-search" hidden>返回搜索结果</button></div>
+    <section class="introduction" id="introduction" aria-labelledby="introduction-title" tabindex="-1">
+      <h1 id="introduction-title">写在前面</h1>
+      <p class="intro-lead">这个网站，起于备赛时的一个小小愿望。</p>
+      <p>Chemy 的题目逐年积累，许多题目设计精巧，既值得细细推敲，也有扎实的训练价值。然而，竞赛生的时间终究有限，能专门拿出三个小时、从头到尾完成的套卷，只能是其中一部分。我常想，能不能把这些好题按专题整理起来，让大家循着自己的薄弱之处，找到最需要的练习？</p>
+      <p>那时，我就曾尝试整理这样的专题卷：晶体掌握得不够扎实，就在一道道晶体题中厘清概念；结构推断尚不熟练，就沿着一条条线索磨炼思路。把散落在不同年份、不同试卷里的题目汇集起来，让更多好题有机会被认真做过，也让零散的解题经验，慢慢沉淀成自己的方法。</p>
+      <p>后来我发现，每年都有同学怀着同样的愿望。如今，借助Vibe Coding，当年的想法终于有了落地的机会，于是便有了这个网站。我想把整理好的专题题目开源分享出来，让大家少一些搜寻与翻找，多一些专注与思考。愿这些练习能帮你补齐短板，也愿你在反复推敲之后，收获豁然开朗的欣喜，渐渐看见化学严密而又生动的美。</p>
+      <p>我是广东 2023 届的鹈鹕。曾经，我在一所竞赛资源有限的学校学习化学竞赛。Chemy 上一套又一套的题目，陪伴我从弱校走进省队、拿到金牌，也为我后来走进北京大学化学与分子工程学院打下了基础。感谢 Chemy 将这些题目公开分享，让当年的我，在学校所能提供的资源之外，仍有继续向前的可能。如今整理这些专题，也是想把曾经收到的帮助，再递到后来同学的手中。愿你从这里出发，走出属于自己的竞赛之路。</p>
+      <section class="intro-usage" aria-labelledby="usage-title">
+        <h2 id="usage-title">题库与使用</h2>
+        <p>本题库汇总了 Chemy 第 32 届至第 39 届公开的全部模拟试题，并在此基础上对题库进行了整理与修改。</p>
+        <p>你可以直接在网站上做题，也可以下载 PDF。题目与答案分别成册，方便按需下载：例如，只下载题目部分，打印后练习，再对照答案复盘。若时间有限，也可以选择快速浏览感兴趣的专题，如有机化学，在阅读中积累反应、结构与解题素材。</p>
+        <p>Chemy 的模拟试题有很高的整套训练价值，建议提前规划，留出部分试卷用于完整的套题练习；对于来不及整套完成的试卷，则可以按专题选题，围绕自己的薄弱环节进行针对性训练。</p>
+        <p>题目整理在这里，如何使用，由你决定。愿你找到适合自己的节奏，让每一道认真读过、想过、做过的题，都成为学习中的一份积累。</p>
+      </section>
+      <a class="intro-browse" href="#organic">浏览专题题目</a>
+      <footer class="copyright">题目与参考答案版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
+    </section>
+    <div class="reading" id="reading" tabindex="-1" hidden>
+      <div class="topic-head"><div><h1 id="topic-title">化学竞赛专题题库</h1><p id="topic-summary" role="status">正在加载题库，请稍候…</p></div><div class="downloads" id="downloads"></div></div>
+      <div id="questions" aria-busy="true"><p class="loading-note">正在读取题目与编号…</p></div>
+      <footer class="copyright">题目与参考答案来源：Chemy 化学奥林匹克团队，第32～39届试题合集与 Chemy 联赛。版权归原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
     </div>
   </main>
+  <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-title">
+    <div class="search-heading"><h2 id="search-title">查找题目</h2><button id="search-close" class="dialog-close" aria-label="关闭搜索">×</button></div>
+    <form id="search-form" class="search-form"><label class="sr-only" for="search-input">题目关键词</label><input id="search-input" type="search" placeholder="输入关键词，如：铁 电势、LiFePO4" autocomplete="off"><button type="submit">搜索</button></form>
+    <div class="search-filters"><label>专题<select id="search-topic"><option value="all">全部专题</option></select></label><label>届次<select id="search-edition"><option value="all">全部届次</option></select></label><label>试卷<select id="search-paper"><option value="all">全部试卷</option></select></label><label class="answer-search"><input id="search-answers" type="checkbox">同时搜索答案</label></div>
+    <p class="search-help">多个关键词用空格分隔，结果需同时包含这些词。仅检索已有文字，图片内文字可能无法查到。</p>
+    <p id="search-status" class="search-status" role="status" aria-live="polite">输入关键词，搜索全部题目。</p>
+    <div class="search-results" id="search-results" tabindex="0" aria-label="搜索结果"></div>
+  </dialog>
 </body>
 </html>
