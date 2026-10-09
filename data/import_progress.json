@@ -527,6 +527,13 @@
       "paper": 1,
       "sha": "bb38f81bdbc8c2609e7c0a1a2f137b9ef6649b19",
       "seconds": 289
+    },
+    {
+      "edition": 32,
+      "paper": 2,
+      "sha": "d5858ab2d0ca5ce30502108b5a2cf9bf0d413a25",
+      "seconds": 439,
+      "printRecovery": true
     }
   ]
 }
