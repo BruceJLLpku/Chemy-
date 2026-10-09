@@ -65,7 +65,10 @@ def publish(paper,verify_only=False,check_all=False,message=None,prepare_only=Fa
         # Bound Git's temporary working set and pack existing objects before disk space runs low.
         import shutil
         if shutil.disk_usage(ROOT).free<3*1024**3:
-            git('repack','-d','-l','--window=5','--window-memory=64m','--threads=2','--depth=20')
+            git('repack','-d','-l','--window=5','--window-memory=192m','--threads=2','--depth=20')
+            git('-c','pack.windowMemory=192m','-c','pack.threads=2','multi-pack-index','write')
+            git('-c','pack.windowMemory=192m','-c','pack.threads=2','multi-pack-index','repack','--batch-size=1073741824')
+            git('multi-pack-index','expire')
             print('STORAGE Git history packed; all commits retained',flush=True)
         git('add','dist','scripts','data','docs','sources','README.md','WORK_STATE.md','.github/workflows/pages.yml')
         git('commit','-m',message or (f'Import Chemy league edition {paper} with cumulative topic PDFs' if EDITION==0 else f'Import Chemy {EDITION} collection {paper} with cumulative topic PDFs'))

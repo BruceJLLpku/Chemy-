@@ -1,5 +1,5 @@
 """Independent edition workers; merge only after every display and print part is ready."""
-import argparse,json,subprocess,sys,hashlib
+import argparse,json,subprocess,sys,hashlib,os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from display_numbering import renumber_attributes
@@ -18,6 +18,13 @@ def edition(e):
     for script in ['renumber_library.py','build_numbered_pdfs.py']:
         subprocess.run([sys.executable,'-X','utf8',str(ROOT/'scripts'/script),'--edition',str(e)],cwd=ROOT,check=True)
     stamp.write_text(signature)
+    # Release disposable renders as soon as this edition is done, before other editions finish.
+    before=cache.stat()
+    for path in cache.iterdir():
+        if path.is_file() and path.suffix.lower() in {'.pdf','.png'}:
+            assert path.resolve().parent==cache.resolve() and path.resolve().is_relative_to((ROOT/'tmp').resolve())
+            path.unlink()
+    os.utime(cache,ns=(before.st_atime_ns,before.st_mtime_ns))
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--presentation-only',action='store_true');args=ap.parse_args()

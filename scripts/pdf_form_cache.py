@@ -5,14 +5,22 @@ from pypdf.generic import NameObject,NumberObject,DictionaryObject,DecodedStream
 
 def wrap_template(path,fingerprint):
     stamp=path.with_suffix('.form.sha256')
-    if stamp.exists() and stamp.read_text()=='form-v1-'+fingerprint:return
+    if stamp.exists() and stamp.read_text()=='form-v2-'+fingerprint:return
     reader=PdfReader(path);writer=PdfWriter();writer.append(reader)
     for page in writer.pages:
+        contents=page.get_contents()
+        if contents.get_data().strip()==b'q /Static Do Q' and '/Static' in page['/Resources'].get('/XObject',{}):
+            page[NameObject('/Contents')]=writer._add_object(contents)
+            continue
         form=DecodedStreamObject();form.set_data(page.get_contents().get_data())
         form.update({NameObject('/Type'):NameObject('/XObject'),NameObject('/Subtype'):NameObject('/Form'),NameObject('/FormType'):NumberObject(1),NameObject('/BBox'):ArrayObject(page.mediabox),NameObject('/Resources'):page['/Resources']})
         if '/Group' in page:form[NameObject('/Group')]=page['/Group']
         ref=writer._add_object(form)
         page[NameObject('/Resources')]=DictionaryObject({NameObject('/XObject'):DictionaryObject({NameObject('/Static'):ref})})
-        stream=DecodedStreamObject();stream.set_data(b'q /Static Do Q\n');page[NameObject('/Contents')]=stream
+        stream=DecodedStreamObject();stream.set_data(b'q /Static Do Q\n');page[NameObject('/Contents')]=writer._add_object(stream)
     writer.compress_identical_objects(remove_duplicates=True,remove_unreferenced=True)
-    temporary=path.with_suffix('.form-writing.pdf');writer.write(temporary);os.replace(temporary,path);stamp.write_text('form-v1-'+fingerprint)
+    temporary=path.with_suffix('.form-writing.pdf');writer.write(temporary)
+    import pikepdf
+    with pikepdf.open(temporary,allow_overwriting_input=True) as pdf:
+        pdf.save(temporary,compress_streams=True,object_stream_mode=pikepdf.ObjectStreamMode.generate,deterministic_id=True)
+    os.replace(temporary,path);stamp.write_text('form-v2-'+fingerprint)
