@@ -20,7 +20,9 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 
 首页展示作者的建站缘起与题库使用建议。选择专题后，可按“届次 → 试卷 → 题目”展开目录，筛选来源或输入专题题号跳转。顶部查题窗口支持搜索题目标题与题干，可限定专题、届次、试卷，并按需纳入答案文字。多个关键词用空格分隔；英文大小写与化学式上下标兼容。搜索结果展示来源和关键词片段，点击定位原题，“返回搜索结果”保留搜索位置。多数原图内部文字未进行 OCR，不能直接检索。
 
-题目与答案 PDF 为整个专题的累计册，不随网页筛选缩小范围。界面、搜索与复核方法见 [docs/interface.md](docs/interface.md)。
+每题提供“下载本题 PDF”。勾选多题后可合并下载练习卷，选择跨专题、跨筛选保留，按专题与专题题号排列，只含题目。题与题连续排版，不强制逐题分页，长题仅在文字与图形之间的空白处换页。原字体、公式、图形、编号与出处保留。生成在浏览器本地完成，首次读取相关专题题册可能需要稍候；关闭下载窗口可取消，失败后可以重试。
+
+专题题目与答案 PDF 仍为整个专题的累计册，不随网页筛选缩小范围。界面、搜索与复核方法见 [docs/interface.md](docs/interface.md)。
 
 ## 内容维护
 
@@ -31,6 +33,7 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 - `scripts/rebuild_numbering.py` 批量更新编号、含题号的原图局部标签和 PDF。只复用或替换编号字形，化学结构、反应箭头与图表不重绘。缓存按编号计划复用。
 - `scripts/audit_numbering.py` 核对网站和打印编号，检查原数据未变、编号区域之外原图像素一致，以及 713 题的题答打印索引。
 - `data/print_index.json` 记录各题在累计打印册中的编号、来源和页码。
+- `dist/export-index/` 保存各题在题目册中的裁剪范围与安全换页边界。题目册重新生成后，运行 `scripts/build_export_index.py` 同步索引；依赖 pdfplumber、pypdfium2、numpy。浏览器使用本地打包的 pdf-lib 在 Worker 中拼接原矢量内容，无需额外服务或上传用户的选题。
 
 三届六份原始 PDF 完整保存在 `sources/`，原文件字节不改；归档的首套打印册保留在 `data/book_bases/`。原始完整图文复核见 `data/audit_report.json`；此次展示编号与打印册检查见 `data/numbering-audit.json`。
 

@@ -21,6 +21,81 @@ let searchMatches = [], searchTerms = [], shownResults = 0;
 let searchSignature = '';
 let showingIntroduction = true;
 const summaryById = new Map();
+const selectedQuestions = new Set();
+let exportItems = [], exportWorker = null, exportBusy = false;
+
+function updateSelection() {
+  $('selection-tools').classList.toggle('has-selection',selectedQuestions.size > 0);
+  $('selection-count').textContent = `已选 ${selectedQuestions.size} 题`;
+  $('download-selected').disabled = $('clear-selection').disabled = !selectedQuestions.size;
+  const visible = currentList();
+  $('select-visible').disabled = !visible.length;
+  $('select-visible').textContent = visible.length && visible.every(q => selectedQuestions.has(q.id)) ? '取消当前列表勾选' : '勾选当前列表';
+  document.documentElement.style.setProperty('--selection-height',selectedQuestions.size ? `${$('selection-tools').offsetHeight}px` : '0px');
+}
+function openExport(ids) {
+  exportItems = ids.map(id => byId.get(id)).filter(Boolean).sort((a,b) => topics.indexOf(a.topic)-topics.indexOf(b.topic) || numbers[a.id]-numbers[b.id]);
+  if (!exportItems.length) return;
+  closePanel(false);
+  $('export-title').textContent = exportItems.length === 1 ? '下载本题 PDF' : `下载 ${exportItems.length} 道题 PDF`;
+  $('export-list').innerHTML = exportItems.map(q => `<li><strong>${escapeHtml(q.topic)} · 第 ${numbers[q.id]} 题</strong><span>${escapeHtml(questionTitle(q))}</span><small>${escapeHtml(paperLabel(paperKey(q)))} · 原第 ${q.number} 题</small></li>`).join('');
+  $('export-status').textContent = '';
+  $('export-start').disabled = false; $('export-start').textContent = '生成并下载 PDF';
+  $('export-dialog').showModal();
+}
+function cancelExport() {
+  exportWorker?.terminate(); exportWorker = null; exportBusy = false;
+  $('export-start').disabled = false;
+}
+function startExport() {
+  if (exportBusy) return;
+  exportBusy = true; $('export-start').disabled = true;
+  $('export-status').textContent = '正在准备题目…';
+  try { exportWorker = new Worker('pdf-worker.js?v=1'); }
+  catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。'); return; }
+  exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。');
+  exportWorker.onmessage = ({data}) => {
+    if (data.status) $('export-status').textContent = data.status;
+    else if (data.error) exportFailed(data.error);
+    else if (data.bytes) {
+      const blob = new Blob([data.bytes],{type:'application/pdf'});
+      const url = URL.createObjectURL(blob), link = document.createElement('a');
+      const single = exportItems.length === 1 ? `${exportItems[0].topic}-第${numbers[exportItems[0].id]}题` : `选题-${exportItems.length}题`;
+      link.href = url; link.download = `Chemy-${single}.pdf`; document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url),60000);
+      $('export-status').textContent = 'PDF 已生成，下载已开始。';
+      cancelExport(); $('export-start').textContent = '再次下载 PDF';
+    }
+  };
+  exportWorker.postMessage({items:exportItems.map(q => ({id:q.id,slug:slugByTopic[q.topic]})),version:pdfVersion,title:`Chemy · ${exportItems.map(q => `${q.topic}第${numbers[q.id]}题`).join('、')}`});
+}
+function exportFailed(message) {
+  cancelExport(); $('export-status').textContent = message; $('export-start').textContent = '重试下载 PDF';
+}
+$('select-visible').addEventListener('click',() => {
+  const list = currentList(), remove = list.every(q => selectedQuestions.has(q.id));
+  for (const q of list) { if (remove) selectedQuestions.delete(q.id); else selectedQuestions.add(q.id); }
+  document.querySelectorAll('[data-select-question]').forEach(input => { input.checked = selectedQuestions.has(input.dataset.selectQuestion); });
+  updateSelection();
+});
+$('clear-selection').addEventListener('click',() => {
+  selectedQuestions.clear(); document.querySelectorAll('[data-select-question]').forEach(input => { input.checked = false; }); updateSelection();
+});
+$('download-selected').addEventListener('click',() => openExport([...selectedQuestions]));
+$('questions').addEventListener('change',event => {
+  const input = event.target.closest('[data-select-question]');
+  if (!input) return;
+  if (input.checked) selectedQuestions.add(input.dataset.selectQuestion); else selectedQuestions.delete(input.dataset.selectQuestion);
+  updateSelection();
+});
+$('questions').addEventListener('click',event => {
+  const button = event.target.closest('[data-download-question]');
+  if (button) openExport([button.dataset.downloadQuestion]);
+});
+$('export-start').addEventListener('click',startExport);
+for (const id of ['export-close','export-cancel']) $(id).addEventListener('click',() => $('export-dialog').close());
+$('export-dialog').addEventListener('close',cancelExport);
+$('export-dialog').addEventListener('cancel',cancelExport);
 
 function questionTitle(q, bodyText) {
   if (q.title) return q.id === 'chemy32-12-22' ? q.title.replace('5-4', `${numbers[q.id]}-4`) : q.title;
@@ -143,9 +218,10 @@ function render() {
   $('questions').innerHTML = list.map(q => {
     const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
     const answerOpen = openAnswers.has(q.id);
-    return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details></article>`;
+    return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="question-download"><label><input type="checkbox" data-select-question="${escapeHtml(q.id)}"${selectedQuestions.has(q.id) ? ' checked' : ''} aria-label="勾选${q.topic}第${numbers[q.id]}题">选入练习卷</label><button data-download-question="${escapeHtml(q.id)}" aria-label="下载${q.topic}第${numbers[q.id]}题 PDF">下载本题 PDF</button></div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details></article>`;
   }).join('') || '<section class="empty"><h2>当前筛选下没有题目</h2><p>请在目录中选择其他届次或全部试卷。</p></section>';
   $('questions').setAttribute('aria-busy','false');
+  updateSelection();
   $('number-status').textContent = '';
   renderDirectory(list);
   observer?.disconnect();
@@ -419,6 +495,7 @@ $('search-results').addEventListener('click',event => {
   if (event.target.closest('#more-results')) { const previous = shownResults; appendResults(); $('search-results').querySelectorAll('.search-result')[previous]?.focus({preventScroll:true}); }
 });
 window.addEventListener('popstate',restoreUrl); window.addEventListener('hashchange',restoreUrl);
+window.addEventListener('resize',() => { if (ready && selectedQuestions.size) updateSelection(); });
 
 async function loadLibrary() {
   try {
