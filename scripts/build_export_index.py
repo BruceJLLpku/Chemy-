@@ -24,22 +24,24 @@ def merge(bands):
             result.append([a, b])
     return result
 
-def build(slug):
-    index = json.loads((ROOT / 'data/print_index.json').read_text(encoding='utf8'))[slug+'-questions']
+def index_book(slug, kind='questions', book=None, index=None, heads=None):
+    index = index or json.loads((ROOT / 'data/print_index.json').read_text(encoding='utf8'))[slug+'-'+kind]
     records = {r['id']: r for r in index}
-    heads = {}
-    for path in PARTS.glob('*-'+slug+'-q.layout.json'):
-        layout = json.loads(path.read_text(encoding='utf8'))
-        if not layout['ledger'] or layout['ledger'][0]['id'] not in records:
-            continue
-        first = layout['ledger'][0]
-        offset = records[first['id']]['firstPage'] - first['firstPage']
-        for h in layout['heads']:
-            if h['id'] in records:
-                heads[h['id']] = (h['page']+offset-1, h['cursor'])
+    if heads is None:
+        heads = {}
+        key = 'q' if kind == 'questions' else 'a'
+        for path in PARTS.glob('*-'+slug+'-'+key+'.layout.json'):
+            layout = json.loads(path.read_text(encoding='utf8'))
+            if not layout['ledger'] or layout['ledger'][0]['id'] not in records:
+                continue
+            first = layout['ledger'][0]
+            offset = records[first['id']]['firstPage'] - first['firstPage']
+            for h in layout['heads']:
+                if h['id'] in records:
+                    heads[h['id']] = (h['page']+offset-1, h['cursor'])
     assert set(heads) == set(records), (slug, set(records)-set(heads))
     output = {}
-    original_ink = unwatermarked_bytes(BOOKS / (slug+'-questions.pdf'))
+    original_ink = unwatermarked_bytes(book or BOOKS / (slug+'-'+kind+'.pdf'))
     rendered = pdfium.PdfDocument(original_ink)
     with pdfplumber.open(BytesIO(original_ink)) as pdf:
         page_regions = {}
@@ -86,13 +88,29 @@ def build(slug):
             page.close()
             bitmap.close()
             if n % 50 == 0:
-                print(slug, n+1, '/', len(pdf.pages), flush=True)
+                print(slug, kind, n+1, '/', len(pdf.pages), flush=True)
     rendered.close()
     assert set(output) == set(records)
+    return output
+
+
+def build(slug):
+    # The continuous-book builder records its exact final placement geometry.
+    layout = ROOT / 'data/continuous-books' / (slug+'-questions.json')
+    if layout.exists():
+        data = json.loads(layout.read_text(encoding='utf8'))
+        import hashlib
+        if data['sha256'] == hashlib.sha256((BOOKS/(slug+'-questions.pdf')).read_bytes()).hexdigest():
+            output = data['questions']
+        else:
+            output = index_book(slug, heads={h['id']:(h['page'],h['cursor']) for h in data['heads']})
+    else:
+        output = index_book(slug)
     target = ROOT / 'dist/export-index' / (slug+'.json')
     target.parent.mkdir(exist_ok=True)
-    version = json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))['version']
-    target.write_text(json.dumps({'version':1,'bookVersion':version,'questions':output},ensure_ascii=False,separators=(',',':')),encoding='utf8')
+    numbering = json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))
+    version = numbering.get('pdfVersion',numbering['version'])
+    target.write_text(json.dumps({'version':2,'bookVersion':version,'questions':output},ensure_ascii=False,separators=(',',':')),encoding='utf8')
     print('DONE',slug,len(output),target.stat().st_size,flush=True)
 
 if __name__ == '__main__':

@@ -4,100 +4,108 @@
   "numberedCaptures": 574,
   "preservedPixelsOutsideLabels": true,
   "pdfs": {
-    "organic-questions.pdf": {
-      "pages": 691,
-      "sha256": "2bb4fcb5f4b560a463a8c350171b86b7c0595d4cea993ffa0142ef2541b77e13",
-      "numberedQuestions": 656
-    },
-    "organic-answers.pdf": {
-      "pages": 828,
-      "sha256": "ff44d64a60ddc4d9ea1d5c1f39086b2fa6bd73f2bf6ed81e302794991c8ddd9e",
-      "numberedQuestions": 656
-    },
-    "polymer-questions.pdf": {
+    "analysis-answers.pdf": {
       "pages": 63,
-      "sha256": "2e840b7d6e6e90a9c6f8b60dde02d5bf42dd7f719043f8e072785f788dca27f6",
-      "numberedQuestions": 55
-    },
-    "polymer-answers.pdf": {
-      "pages": 83,
-      "sha256": "4254bd104c96fb8e963a267302a4c671d5a69ee2cb18ff8cf699e9bf232fae2d",
-      "numberedQuestions": 55
-    },
-    "crystal-questions.pdf": {
-      "pages": 176,
-      "sha256": "821ea08eed96e4712872490e7f0ee565eb6f4384b01bd8bfedfd90f0579576a6",
-      "numberedQuestions": 177
-    },
-    "crystal-answers.pdf": {
-      "pages": 220,
-      "sha256": "5343b4d43e2ec052d5fdca1902aef8c9481afaed166ed7120b7ea1f3c105c2c4",
-      "numberedQuestions": 177
-    },
-    "inference-questions.pdf": {
-      "pages": 401,
-      "sha256": "253d22fdb34e36c84410d070158534de13a0ec42cb361fe26aa559c0c66624f9",
-      "numberedQuestions": 552
-    },
-    "inference-answers.pdf": {
-      "pages": 610,
-      "sha256": "8e4e705df0b4486af6439f05662e87c7942727750f4ac96563010ed389a2fbb6",
-      "numberedQuestions": 552
-    },
-    "elements-questions.pdf": {
-      "pages": 149,
-      "sha256": "0b5a796224f81db9854c1eefa2845f40f473d7df3a42e268532c89a8c568840d",
-      "numberedQuestions": 181
-    },
-    "elements-answers.pdf": {
-      "pages": 170,
-      "sha256": "03d3ff93747fa7af4eb6169d5eb96d9f3c20bfd743384d73e69f0e01089f13b0",
-      "numberedQuestions": 181
-    },
-    "equilibrium-questions.pdf": {
-      "pages": 121,
-      "sha256": "5ac02ddc3cfe8bc07b884c4822f20af1acb72ae64986eae49621365071986105",
-      "numberedQuestions": 127
-    },
-    "equilibrium-answers.pdf": {
-      "pages": 149,
-      "sha256": "150481587c01d59d13c606059df41a83b4334dcfc15f54a14876b373629c9556",
-      "numberedQuestions": 127
-    },
-    "electrochemistry-questions.pdf": {
-      "pages": 58,
-      "sha256": "bf5364172dff28c00ac54167696ea4a53acea7926f371fb0c79980acab812cd7",
-      "numberedQuestions": 51
-    },
-    "electrochemistry-answers.pdf": {
-      "pages": 66,
-      "sha256": "5cbb89efc1eb6daa66454c487db1bdb8a8e6b79d5ef5fa35c847be2a53d74440",
-      "numberedQuestions": 51
-    },
-    "kinetics-questions.pdf": {
-      "pages": 65,
-      "sha256": "09c27d8a2fa332ee2d834df71aeac333c56e49546f6c819535f2c7ad6444ed73",
-      "numberedQuestions": 52
-    },
-    "kinetics-answers.pdf": {
-      "pages": 75,
-      "sha256": "50aeae49c45551a64ca24501439ab7c44fc401e027596673e393192515528021",
-      "numberedQuestions": 52
+      "sha256": "87bf02d2b8b87d62ee003064a14c7e63a164a461034bb4f5b5f4e9b489cfdd38",
+      "numberedQuestions": 82
     },
     "analysis-questions.pdf": {
-      "pages": 84,
-      "sha256": "64ed3def2fb08837a89118761af8ab54a9d141ce4d262fe571847a5ac783464d",
+      "pages": 47,
+      "sha256": "f382026e6e5450e468ea85be752881d52e8d4f0a262db3fd9e6d1ba23ff6a51b",
       "numberedQuestions": 82
     },
-    "analysis-answers.pdf": {
-      "pages": 101,
-      "sha256": "e8430efd5ef5799622160f485986ed2a841bef3e493e361680d90bacca70bd67",
-      "numberedQuestions": 82
+    "crystal-answers.pdf": {
+      "pages": 166,
+      "sha256": "84f7795ded3ea2e444e3d407679796e146beba779a27cbc07b38ab5761a33fbb",
+      "numberedQuestions": 177
+    },
+    "crystal-questions.pdf": {
+      "pages": 109,
+      "sha256": "5509a53a742a5617f0322309261c6bd143eabfeac3c67ba66aa1746b69437273",
+      "numberedQuestions": 177
+    },
+    "electrochemistry-answers.pdf": {
+      "pages": 47,
+      "sha256": "caefc21e63e88ae999d2c5ff22e8011dc530b4eba99325b5af9614acd7317967",
+      "numberedQuestions": 51
+    },
+    "electrochemistry-questions.pdf": {
+      "pages": 35,
+      "sha256": "cb2e6c16b482bdbe4b874694bc6cdfe0ddad2cd114322c9369184dd77c0b3219",
+      "numberedQuestions": 51
+    },
+    "elements-answers.pdf": {
+      "pages": 113,
+      "sha256": "cca3f63d9c558e8db175359dea32f3a04a6855374d207c9c787916d19aa69710",
+      "numberedQuestions": 181
+    },
+    "elements-questions.pdf": {
+      "pages": 72,
+      "sha256": "70d34432aeac983c33cb4ce231bf78eb5367549c94749c8c72d87924c87f91ef",
+      "numberedQuestions": 181
+    },
+    "equilibrium-answers.pdf": {
+      "pages": 107,
+      "sha256": "4884293c77dba9675587c7222a6f363663fa9e9aeaa31020029f3d636413df96",
+      "numberedQuestions": 127
+    },
+    "equilibrium-questions.pdf": {
+      "pages": 64,
+      "sha256": "bb8e39fe95b9a99ffa2dd923b39aca54a227255ba463f42df669045e0d2b116d",
+      "numberedQuestions": 127
+    },
+    "inference-answers.pdf": {
+      "pages": 510,
+      "sha256": "abecb19c5a7809007d713e262de2ee8e8d7117ede27b39959700c213d7675e84",
+      "numberedQuestions": 552
+    },
+    "inference-questions.pdf": {
+      "pages": 301,
+      "sha256": "98dc3169b825b9b0b867c90e253e23e9de2d2e2026b4ff6b8eea55d505aa57c7",
+      "numberedQuestions": 552
+    },
+    "kinetics-answers.pdf": {
+      "pages": 62,
+      "sha256": "5648ba4653f9be2fae4eed2c0281417f3e6acdf718eac334f8a7b3d859a904df",
+      "numberedQuestions": 52
+    },
+    "kinetics-questions.pdf": {
+      "pages": 39,
+      "sha256": "866425fd2c9e6cfbedbe53fc2223c7388f41a7c3ad8abb62e22f0d418fb2f2ba",
+      "numberedQuestions": 52
+    },
+    "organic-answers.pdf": {
+      "pages": 704,
+      "sha256": "01204283a7ee7927a055ca96f48ebf6fbb420ee5cdfa9642e1091cb5831c4741",
+      "numberedQuestions": 656
+    },
+    "organic-questions.pdf": {
+      "pages": 506,
+      "sha256": "65bfc269c1a655d9f6b3b1550f2a318aea35793c1ec935b91b284c534b017303",
+      "numberedQuestions": 656
+    },
+    "polymer-answers.pdf": {
+      "pages": 57,
+      "sha256": "57b9761ce5fdd7fcf66973de461008b3b4f42604109ff6cce835255b7033e0ef",
+      "numberedQuestions": 55
+    },
+    "polymer-questions.pdf": {
+      "pages": 38,
+      "sha256": "6e222e44eba0ae2580c4fd69f177aaa7eb4cf069703567f9371b49c48210cef3",
+      "numberedQuestions": 55
     }
   },
   "issues": [],
   "smallFontAnswerLabelsVerified": 5,
   "smallFontLabelFormulaGapPreserved": true,
   "originalDatasetPreserved": true,
-  "passed": true
+  "passed": true,
+  "pdfLayoutAudit": {
+    "profile": "continuous-native-v2",
+    "passed": true,
+    "sourcePagesChecked": 4110,
+    "pages": 3040,
+    "pdfVersion": "topic-pdf-ce9492d23dbd31e6",
+    "report": "data/continuous-book-audit.json"
+  }
 }

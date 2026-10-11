@@ -5,7 +5,7 @@ const indexes = new Map();
 let cachedBook;
 async function getIndex(slug,version) {
   if (!indexes.has(slug)) {
-    const response = await fetch(`export-index/${slug}.json?v=1`);
+    const response = await fetch(`export-index/${slug}.json?v=${encodeURIComponent(version)}-continuous-v2`);
     if (!response.ok) throw new Error('题目下载索引暂时无法读取，请稍后重试。');
     indexes.set(slug, await response.json());
   }

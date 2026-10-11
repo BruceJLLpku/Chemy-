@@ -17,7 +17,7 @@ from build_library_pdfs import ROOT,CACHE,DATA,SLUGS,W,H,bands,part_path,render_
 from paper1_manifest import PAPER,FIGURES
 from library_config import EDITION
 from fast_pdf import page_count,stamp_template,merge_parts
-from pdf_watermark import stamp_pdf
+from build_continuous_books import flow_book,sync_pdf_version
 from source_info import source_name,question_source,score_text,set_source_color
 from import_library import foreign_float_boxes
 
@@ -187,15 +187,20 @@ def merge_book(job):
     metadata={'/Title':f'Chemy {topic}专题'+('题目册' if k=='q' else '答案册'),'/Author':'Chemy 化学奥林匹克团队（原题与答案）','/Subject':'专题连续编号，题目与小问统一编号；来源单独标注'}
     dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf'
     cache=ROOT/'tmp/library/books'/f'merge-{slug}-{kind}.json'
-    engine=hashlib.sha256((ROOT/'scripts/fast_pdf.py').read_bytes()+(ROOT/'scripts/build_numbered_pdfs.py').read_bytes()+(ROOT/'scripts/pdf_watermark.py').read_bytes()+(ROOT/'dist/assets/chemy-watermark.jpg').read_bytes()).hexdigest()
-    fingerprint=hashlib.sha256(json.dumps({'profile':'book-cache-v1','engine':engine,'parts':[hashlib.sha256(p.read_bytes()).hexdigest() for p in paths],'records':records,'metadata':metadata},sort_keys=True).encode()).hexdigest()
+    engine=hashlib.sha256(b''.join((ROOT/'scripts'/name).read_bytes() for name in ['fast_pdf.py','build_numbered_pdfs.py','build_continuous_books.py','build_export_index.py','pdf_watermark.py'])+(ROOT/'dist/assets/chemy-watermark.jpg').read_bytes()).hexdigest()
+    fingerprint=hashlib.sha256(json.dumps({'profile':'continuous-book-cache-v1','engine':engine,'parts':[hashlib.sha256(p.read_bytes()).hexdigest() for p in paths],'records':records,'metadata':metadata},sort_keys=True).encode()).hexdigest()
     if cache.exists() and dest.exists():
         previous=json.loads(cache.read_text(encoding='utf8'))
-        if previous['fingerprint']==fingerprint and previous['pages']==offset and previous['sha256']==hashlib.sha256(dest.read_bytes()).hexdigest():
-            return f'{slug}-{kind}',records,offset
-    pages=merge_parts(paths,records,dest,metadata);assert pages==offset
-    stamp_pdf(dest)
-    cache.write_text(json.dumps({'fingerprint':fingerprint,'pages':pages,'sha256':hashlib.sha256(dest.read_bytes()).hexdigest()}),encoding='utf8')
+        if previous['fingerprint']==fingerprint and previous.get('sourcePages')==offset and previous['sha256']==hashlib.sha256(dest.read_bytes()).hexdigest():
+            layout=json.loads((ROOT/'data/continuous-books'/f'{slug}-{kind}.json').read_text(encoding='utf8'))
+            return f'{slug}-{kind}',layout['records'],previous['pages']
+    raw=ROOT/'tmp/continuous/merged'/f'{slug}-{kind}.pdf';raw.parent.mkdir(parents=True,exist_ok=True)
+    assert merge_parts(paths,records,raw,metadata)==offset
+    records,pages,index=flow_book(raw,records,topic,slug,kind,dest)
+    if k=='q':
+        numbering=json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'));version=numbering.get('pdfVersion',numbering['version'])
+        (ROOT/'dist/export-index'/f'{slug}.json').write_text(json.dumps({'version':2,'bookVersion':version,'questions':index},separators=(',',':')),encoding='utf8')
+    cache.write_text(json.dumps({'fingerprint':fingerprint,'sourcePages':offset,'pages':pages,'sha256':hashlib.sha256(dest.read_bytes()).hexdigest()}),encoding='utf8')
     return f'{slug}-{kind}',records,pages
 
 def merge_all():
@@ -204,6 +209,7 @@ def merge_all():
         for key,records,pages in pool.map(merge_book,jobs):
             all_index[key]=records;total+=pages;print('BOOK',key+'.pdf',pages,'pages',flush=True)
     (ROOT/'data/print_index.json').write_text(json.dumps(all_index,ensure_ascii=False,indent=2),encoding='utf8');print('TOTAL',total,'pages',flush=True)
+    sync_pdf_version()
 
 if __name__=='__main__':
     if args.merge_only:merge_all()
