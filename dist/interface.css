@@ -1,6 +1,6 @@
 /* Navigation and search; original-paper typography stays in styles.css. */
 /* The unchanged Chemy illustration overlays white diagrams as well as text. */
-:root{--reader-offset:calc(var(--topics-width) + var(--directory-width))}.reader-watermark{position:fixed;left:calc((100vw + var(--reader-offset))/2);top:calc((100dvh + var(--header-height))/2);transform:translate(-50%,-50%);width:min(460px,calc((100vw - var(--reader-offset))*.65));height:auto;max-height:calc(100dvh - var(--header-height) - 140px);object-fit:contain;opacity:.18;mix-blend-mode:multiply;pointer-events:none;user-select:none;z-index:2}.show-introduction .reader-watermark{display:none}
+:root{--reader-offset:calc(var(--topics-width) + var(--directory-width))}.reader-watermark{position:fixed;left:calc((100vw + var(--reader-offset))/2);top:calc((100dvh + var(--header-height))/2);transform:translate(-50%,-50%);width:min(460px,calc((100vw - var(--reader-offset))*.65));height:auto;max-height:calc(100dvh - var(--header-height) - 140px);object-fit:contain;opacity:.06;mix-blend-mode:multiply;pointer-events:none;user-select:none;z-index:2}.show-introduction .reader-watermark{display:none}
 @media(max-width:1199px){:root{--reader-offset:var(--topics-width)}}
 @media(max-width:760px){:root{--reader-offset:0px}.reader-watermark{width:72vw;max-height:62dvh}}
 @media print{.reader-watermark{left:50%;top:50%;width:62%;max-height:60%;opacity:.18}}

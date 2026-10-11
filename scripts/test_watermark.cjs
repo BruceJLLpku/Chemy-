@@ -20,7 +20,7 @@ function check(name,ok){assert.ok(ok,name);checks.push(name);console.log('PASS',
    check(name+' watermark stays inside reading viewport',before.x>=offset&&before.x+before.width<=width&&before.y>=64&&before.y+before.height<=height);
    await page.evaluate(()=>scrollBy(0,160));const after=await mark.boundingBox();
    check(name+' watermark stays centered when scrolling',Math.abs(before.y-after.y)<1);
-   check(name+' watermark leaves controls clickable',await mark.evaluate(el=>getComputedStyle(el).pointerEvents==='none'&&getComputedStyle(el).mixBlendMode==='multiply'&&getComputedStyle(el).opacity==='0.18'));
+   check(name+' watermark leaves controls clickable',await mark.evaluate(el=>getComputedStyle(el).pointerEvents==='none'&&getComputedStyle(el).mixBlendMode==='multiply'&&getComputedStyle(el).opacity==='0.06'));
    await page.screenshot({path:path.join(out,`website-${name}.png`)});
   }
   await page.locator('.answers').first().locator('summary').click();
