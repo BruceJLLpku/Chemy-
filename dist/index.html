@@ -8,8 +8,8 @@
   <meta name="description" content="按九个化学专题、届次和试卷查找 Chemy 竞赛题目，搜索题干关键词，查看原卷参考答案，下载专题 PDF。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="interface.css?v=question-pdf-v1">
-  <script src="app.js?v=question-pdf-v1" defer></script>
+  <link rel="stylesheet" href="interface.css?v=question-picker-v2">
+  <script src="app.js?v=question-picker-v2" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
@@ -50,7 +50,7 @@
         <p>你可以先选择想练习的专题，再沿着“届次—试卷—题目”的目录逐层查找。若只想看某一届或某一份试卷，也可以用筛选缩小范围；知道专题题号时，直接输入题号就能定位。筛选不会改变专题编号，因此在网页和下载的题目册中，同一道题始终对应同一个编号。</p>
         <p>如果心里已有想找的知识点，可以在顶部的搜索窗口输入关键词，如“电极电势”或“EDTA”。搜索默认覆盖全部专题的标题与题干，也可以限定专题、届次和试卷。多个关键词用空格分隔，便能查找同时包含这些词的题目；勾选“同时搜索答案”后，还能把参考答案纳入查找。</p>
         <p>搜索结果会列出题目来源与含关键词的片段，点击即可定位原题；看完后点“返回搜索结果”，便能回到刚才的位置。图片中的文字和结构式未必能通过关键词搜到，查找时仍需要结合原题阅读。</p>
-        <p>你可以直接在网页上读题、思考，再展开参考答案核对思路与评分细则；也可以下载 PDF，打印后练习。每道题旁都有“下载本题 PDF”，勾选多道题后，还可以合并下载一份自己的练习卷。所选题目按专题与题号排列，保留原有编号与出处，题与题接续排版，不另起一页。</p>
+        <p>你可以直接在网页上读题、思考，再展开参考答案核对思路与评分细则；也可以下载 PDF，打印后练习。每道题旁都有“下载本题 PDF”。若想自己选一份练习，可以打开“按题目 / 试卷选题”，沿着目录勾选题号与名称，也可以整卷、整届选入；把专题切换为“全部专题”，就能一次选中某一届所有试卷的题目。窗口支持按名称或专题题号查找，例如输入“12、15-18”，再勾选筛选结果。所选题目合并成一份 PDF，按专题与题号排列，保留原有编号与出处，题与题接续排版，不另起一页。</p>
         <p>若想保留整个专题，也可以下载专题题目册与答案册，先做题，再对照答案复盘。这两个专题下载按钮提供完整累计册，不随网页上的届次或试卷筛选缩小范围；选题下载则只包含你勾选的题目，暂不附参考答案。</p>
         <p>若时间有限，也可以快速浏览感兴趣的专题，如有机化学，在阅读中积累反应、结构与解题素材。</p>
         <p>Chemy 的模拟试题有很高的整套训练价值，建议提前规划，留出部分试卷用于完整的套题练习；对于来不及整套完成的试卷，则可以按专题选题，围绕自己的薄弱环节进行针对性训练。</p>
@@ -61,7 +61,7 @@
     </section>
     <div class="reading" id="reading" tabindex="-1" hidden>
       <div class="topic-head"><div><h1 id="topic-title">化学竞赛专题题库</h1><p id="topic-summary" role="status">正在加载题库，请稍候…</p></div><div class="downloads" id="downloads"></div></div>
-      <div class="selection-tools" id="selection-tools"><button id="select-visible">勾选当前列表</button><span id="selection-count" role="status">已选 0 题</span><button id="download-selected" disabled>下载选题 PDF</button><button id="clear-selection" disabled>清空</button></div>
+      <div class="selection-tools" id="selection-tools"><button id="select-visible" aria-haspopup="dialog" aria-controls="question-picker">按题目 / 试卷选题</button><span id="selection-count" role="status">已选 0 题</span><button id="download-selected" disabled>下载选题 PDF</button><button id="clear-selection" disabled>清空</button></div>
       <div id="questions" aria-busy="true"><p class="loading-note">正在读取题目与编号…</p></div>
       <footer class="copyright">题目与参考答案来源：Chemy 化学奥林匹克团队，第32～39届试题合集与 Chemy 联赛。版权归原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
     </div>
@@ -73,6 +73,14 @@
     <p class="search-help">多个关键词用空格分隔，结果需同时包含这些词。仅检索已有文字，图片内文字可能无法查到。</p>
     <p id="search-status" class="search-status" role="status" aria-live="polite">输入关键词，搜索全部题目。</p>
     <div class="search-results" id="search-results" tabindex="0" aria-label="搜索结果"></div>
+  </dialog>
+  <dialog class="picker-dialog" id="question-picker" aria-labelledby="picker-title">
+    <div class="search-heading"><h2 id="picker-title">选择题目与试卷</h2><button id="picker-close" class="dialog-close" aria-label="关闭选题窗口">×</button></div>
+    <p class="picker-help">勾选题号与名称选单题，勾选届次或试卷选整组。选择“全部专题”后，可一次选中某一届的所有试卷。</p>
+    <div class="picker-filters"><label>专题<select id="picker-topic"></select></label><label>届次<select id="picker-edition"></select></label><label class="picker-query-label">名称 / 专题题号<input id="picker-query" type="search" placeholder="题目名称或题号，如 12、15-18" autocomplete="off"></label></div>
+    <div class="picker-batch"><label><input type="checkbox" id="picker-all">全选筛选结果</label><span id="picker-result-count" role="status"></span><label><input type="checkbox" id="picker-selected-only">只看已选</label></div>
+    <div class="picker-tree" id="picker-tree" aria-label="按届次与试卷勾选题目"></div>
+    <div class="picker-footer"><span id="picker-selection-count" role="status" aria-live="polite">已选 0 题</span><button id="picker-clear">清空已选</button><button id="picker-done">完成选题</button><button id="picker-download" disabled>下载选题 PDF</button></div>
   </dialog>
   <dialog class="export-dialog" id="export-dialog" aria-labelledby="export-title">
     <div class="search-heading"><h2 id="export-title">下载题目 PDF</h2><button id="export-close" class="dialog-close" aria-label="关闭题目下载">×</button></div>

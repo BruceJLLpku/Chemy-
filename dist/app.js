@@ -23,15 +23,85 @@ let showingIntroduction = true;
 const summaryById = new Map();
 const selectedQuestions = new Set();
 let exportItems = [], exportWorker = null, exportBusy = false;
+let pickerList = [], pickerGroups = new Map(), pickerTimer;
 
 function updateSelection() {
   $('selection-tools').classList.toggle('has-selection',selectedQuestions.size > 0);
   $('selection-count').textContent = `已选 ${selectedQuestions.size} 题`;
   $('download-selected').disabled = $('clear-selection').disabled = !selectedQuestions.size;
-  const visible = currentList();
-  $('select-visible').disabled = !visible.length;
-  $('select-visible').textContent = visible.length && visible.every(q => selectedQuestions.has(q.id)) ? '取消当前列表勾选' : '勾选当前列表';
+  $('select-visible').disabled = !ready;
   document.documentElement.style.setProperty('--selection-height',selectedQuestions.size ? `${$('selection-tools').offsetHeight}px` : '0px');
+  if ($('question-picker').open) syncPickerSelection();
+}
+function selectItems(list,checked) {
+  for (const q of list) { if (checked) selectedQuestions.add(q.id); else selectedQuestions.delete(q.id); }
+  document.querySelectorAll('#questions [data-select-question]').forEach(input => { input.checked = selectedQuestions.has(input.dataset.selectQuestion); });
+  updateSelection();
+}
+function selectionState(input,list) {
+  const count = list.filter(q => selectedQuestions.has(q.id)).length;
+  input.checked = list.length > 0 && count === list.length;
+  input.indeterminate = count > 0 && count < list.length;
+  input.disabled = !list.length;
+  return count;
+}
+function syncPickerSelection() {
+  selectionState($('picker-all'),pickerList);
+  $('picker-tree').querySelectorAll('[data-pick-question]').forEach(input => { input.checked = selectedQuestions.has(input.dataset.pickQuestion); });
+  $('picker-tree').querySelectorAll('[data-pick-group]').forEach(input => {
+    const list = pickerGroups.get(input.dataset.pickGroup) || [];
+    const count = selectionState(input,list);
+    input.parentElement.querySelector('.picker-group-count').textContent = `${count} / ${list.length} 题`;
+  });
+  $('picker-selection-count').textContent = `已选 ${selectedQuestions.size} 题`;
+  $('picker-download').disabled = $('picker-clear').disabled = !selectedQuestions.size;
+}
+function pickerMatches(q,query) {
+  if (!query) return true;
+  // Numeric searches accept one or several topic numbers/ranges.
+  if (/^\d+(?:\s*-\s*\d+)?(?:[\s,、，]+\d+(?:\s*-\s*\d+)?)*$/.test(query)) {
+    return query.replace(/\s*-\s*/g,'-').split(/[\s,、，]+/).some(part => {
+      const [a,b = a] = part.split('-').map(Number);
+      return numbers[q.id] >= Math.min(a,b) && numbers[q.id] <= Math.max(a,b);
+    });
+  }
+  const text = normalizeText(questionTitle(q)).toLowerCase();
+  return query.toLowerCase().split(/\s+/).every(word => text.includes(word));
+}
+function renderPicker() {
+  const tree = $('picker-tree');
+  const expanded = new Set([...tree.querySelectorAll('details[open]')].map(el => el.dataset.pickBranch));
+  const query = normalizeText($('picker-query').value);
+  const topic = $('picker-topic').value, edition = $('picker-edition').value;
+  pickerList = questions.filter(q => (topic === 'all' || q.topic === topic) && (edition === 'all' || String(editionOf(q)) === edition)
+    && (!$('picker-selected-only').checked || selectedQuestions.has(q.id)) && pickerMatches(q,query));
+  pickerGroups = new Map();
+  $('picker-result-count').textContent = `${pickerList.length} 题 · ${new Set(pickerList.map(paperKey)).size} 份试卷`;
+  const expandMatches = !!query || $('picker-selected-only').checked;
+  const group = (key,label,list,children,open) => {
+    pickerGroups.set(key,list);
+    return `<div class="picker-branch"><input type="checkbox" data-pick-group="${key}" aria-label="勾选${escapeHtml(label)}的筛选题目"><details data-pick-branch="${key}"${open || expanded.has(key) ? ' open' : ''}><summary><span>${escapeHtml(label)}</span><span class="picker-group-count"></span></summary>${children}</details></div>`;
+  };
+  tree.innerHTML = editionValues(pickerList).map((e,editionIndex) => {
+    const editionQs = pickerList.filter(q => editionOf(q) === e);
+    const papers = [...new Set(editionQs.map(paperKey))];
+    const children = papers.map((p,paperIndex) => {
+      const items = editionQs.filter(q => paperKey(q) === p).sort((a,b) => a.number-b.number);
+      const rows = items.map(q => `<label class="picker-question"><input type="checkbox" data-pick-question="${escapeHtml(q.id)}"><span><span class="picker-question-name"><b>专题第 ${numbers[q.id]} 题</b>　${escapeHtml(questionTitle(q))}</span><small>${escapeHtml(q.topic)} · 原第 ${q.number} 题</small></span></label>`).join('');
+      return group(`p-${p}`,shortPaperLabel(items[0]),items,rows,expandMatches || editionIndex === 0 && paperIndex === 0);
+    }).join('');
+    return group(`e-${e}`,editionLabel(e),editionQs,children,expandMatches || edition !== 'all' || editionIndex === 0);
+  }).join('') || `<p class="picker-empty">${$('picker-selected-only').checked ? '当前范围内没有已选题目。取消“只看已选”后继续选题。' : '没有符合条件的题目。试试其他名称、题号或筛选范围。'}</p>`;
+  syncPickerSelection();
+}
+function openPicker() {
+  if (!ready) return;
+  closePanel(false);
+  $('picker-topic').innerHTML = option('all','全部专题',activeTopic)+topics.map(t => option(t,t,activeTopic)).join('');
+  $('picker-edition').innerHTML = option('all','全部届次',selectedEdition)+editionValues(questions).map(e => option(e,editionLabel(e),selectedEdition)).join('');
+  $('picker-query').value = ''; $('picker-selected-only').checked = false;
+  $('picker-tree').innerHTML = '';
+  $('question-picker').showModal(); renderPicker(); $('picker-tree').scrollTop = 0;
 }
 function openExport(ids) {
   exportItems = ids.map(id => byId.get(id)).filter(Boolean).sort((a,b) => topics.indexOf(a.topic)-topics.indexOf(b.topic) || numbers[a.id]-numbers[b.id]);
@@ -72,12 +142,25 @@ function startExport() {
 function exportFailed(message) {
   cancelExport(); $('export-status').textContent = message; $('export-start').textContent = '重试下载 PDF';
 }
-$('select-visible').addEventListener('click',() => {
-  const list = currentList(), remove = list.every(q => selectedQuestions.has(q.id));
-  for (const q of list) { if (remove) selectedQuestions.delete(q.id); else selectedQuestions.add(q.id); }
-  document.querySelectorAll('[data-select-question]').forEach(input => { input.checked = selectedQuestions.has(input.dataset.selectQuestion); });
-  updateSelection();
+$('select-visible').addEventListener('click',openPicker);
+$('picker-all').addEventListener('change',event => { selectItems(pickerList,event.target.checked); if ($('picker-selected-only').checked) renderPicker(); });
+$('picker-tree').addEventListener('change',event => {
+  const input = event.target;
+  const index = pickerList.findIndex(q => q.id === input.dataset.pickQuestion);
+  const nextId = (pickerList[index+1] || pickerList[index-1])?.id;
+  if (input.dataset.pickQuestion) selectItems([byId.get(input.dataset.pickQuestion)],input.checked);
+  else if (input.dataset.pickGroup) selectItems(pickerGroups.get(input.dataset.pickGroup),input.checked);
+  if ($('picker-selected-only').checked) {
+    renderPicker();
+    (nextId && $('picker-tree').querySelector(`[data-pick-question="${CSS.escape(nextId)}"]`) || $('picker-selected-only')).focus({preventScroll:true});
+  }
 });
+for (const id of ['picker-topic','picker-edition','picker-selected-only']) $(id).addEventListener('change',() => { clearTimeout(pickerTimer); renderPicker(); $('picker-tree').scrollTop = 0; });
+$('picker-query').addEventListener('input',() => { clearTimeout(pickerTimer); pickerTimer = setTimeout(renderPicker,150); });
+for (const id of ['picker-close','picker-done']) $(id).addEventListener('click',() => $('question-picker').close());
+$('question-picker').addEventListener('close',() => clearTimeout(pickerTimer));
+$('picker-clear').addEventListener('click',() => { selectItems([...selectedQuestions].map(id => byId.get(id)),false); if ($('picker-selected-only').checked) renderPicker(); });
+$('picker-download').addEventListener('click',() => { $('question-picker').close(); openExport([...selectedQuestions]); });
 $('clear-selection').addEventListener('click',() => {
   selectedQuestions.clear(); document.querySelectorAll('[data-select-question]').forEach(input => { input.checked = false; }); updateSelection();
 });
