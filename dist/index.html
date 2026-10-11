@@ -8,8 +8,8 @@
   <meta name="description" content="按九个化学专题、届次和试卷查找 Chemy 竞赛题目，搜索题干关键词，查看原卷参考答案，下载专题 PDF。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="interface.css?v=question-picker-v2">
-  <script src="app.js?v=question-picker-v2" defer></script>
+  <link rel="stylesheet" href="interface.css?v=watermark-v1">
+  <script src="app.js?v=watermark-v1" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
@@ -60,6 +60,7 @@
       <footer class="copyright">题目与参考答案版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
     </section>
     <div class="reading" id="reading" tabindex="-1" hidden>
+      <img class="reader-watermark" src="assets/chemy-watermark.jpg" alt="" aria-hidden="true" width="786" height="841">
       <div class="topic-head"><div><h1 id="topic-title">化学竞赛专题题库</h1><p id="topic-summary" role="status">正在加载题库，请稍候…</p></div><div class="downloads" id="downloads"></div></div>
       <div class="selection-tools" id="selection-tools"><button id="select-visible" aria-haspopup="dialog" aria-controls="question-picker">按题目 / 试卷选题</button><span id="selection-count" role="status">已选 0 题</span><button id="download-selected" disabled>下载选题 PDF</button><button id="clear-selection" disabled>清空</button></div>
       <div id="questions" aria-busy="true"><p class="loading-note">正在读取题目与编号…</p></div>

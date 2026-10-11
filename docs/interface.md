@@ -36,4 +36,14 @@
 
 `scripts/test_question_picker.cjs` 验证题名勾选、整卷/整届选择、跨范围保留、题号范围、半选状态、已选管理、手机适配与窗口到 PDF 下载的完整流程。
 
+## Chemy 水印
+
+`assets/chemy-watermark.jpg` 是作者提供的完整 Chemy 图案，原图字节保留。网页题目阅读区以 18% 浓度、正向居中显示，滚动时保持在阅读区内；鼠标与触屏事件穿透，不遮挡题目操作。手机位置随阅读栏适配，介绍页、目录和选题窗口不叠加图案。
+
+单题及合成练习卷每页加一枚居中水印，宽度为 A4 页宽的 62%，浓度 18%，使用 Multiply 混合，白底不盖住正文、彩色答案或结构式。18 份专题题目册和答案册使用相同图案、大小与浓度。水印是独立 PDF 内容层，原文字、图形、页码和排版保留；按题导出时先移除源页的装饰层，再在成品每页加一次，避免裁剪和重复叠加。
+
+`python scripts/pdf_watermark.py` 为现有全部专题册添加水印，可重复运行而不重复盖印。`build_numbered_pdfs.py` 在新题册合并后自动添加；`build_export_index.py` 忽略这一层，仍根据原题可见内容确定安全换页位置。
+
+`scripts/test_watermark.cjs` 检查网页水印在电脑、平板和手机上的位置与操作；运行导出测试后，`scripts/test_pdf_watermark.py` 检查各册每页与成品每页仅有一枚水印、混合方式与原图字节一致，以及重复执行不会改动题册。可通过 `--baseline <Git版本>` 额外核对水印添加前的原文件字节和题目渲染结果。
+
 `scripts/test_interface.cjs` 使用 Playwright 检查首页、目录、筛选、编号跳转、深链接、关键词/化学式/答案搜索、搜索返回、手机和平板窗口、焦点、快捷键和失败重试。先用 HTTP 服务提供 dist/，再运行测试；默认测试地址为 http://127.0.0.1:8765/，可用 CHEMY_TEST_URL 覆盖。PLAYWRIGHT_MODULE 可指定 Playwright 包路径，CHEMY_BROWSER_CHANNEL 可指定已安装的浏览器通道。检查报告与截图写入忽略的 output/，复核摘要保存为 data/interface-review.json。

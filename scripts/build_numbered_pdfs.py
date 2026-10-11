@@ -17,6 +17,7 @@ from build_library_pdfs import ROOT,CACHE,DATA,SLUGS,W,H,bands,part_path,render_
 from paper1_manifest import PAPER,FIGURES
 from library_config import EDITION
 from fast_pdf import page_count,stamp_template,merge_parts
+from pdf_watermark import stamp_pdf
 from source_info import source_name,question_source,score_text,set_source_color
 from import_library import foreign_float_boxes
 
@@ -186,13 +187,14 @@ def merge_book(job):
     metadata={'/Title':f'Chemy {topic}专题'+('题目册' if k=='q' else '答案册'),'/Author':'Chemy 化学奥林匹克团队（原题与答案）','/Subject':'专题连续编号，题目与小问统一编号；来源单独标注'}
     dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf'
     cache=ROOT/'tmp/library/books'/f'merge-{slug}-{kind}.json'
-    engine=hashlib.sha256((ROOT/'scripts/fast_pdf.py').read_bytes()+(ROOT/'scripts/build_numbered_pdfs.py').read_bytes()).hexdigest()
+    engine=hashlib.sha256((ROOT/'scripts/fast_pdf.py').read_bytes()+(ROOT/'scripts/build_numbered_pdfs.py').read_bytes()+(ROOT/'scripts/pdf_watermark.py').read_bytes()+(ROOT/'dist/assets/chemy-watermark.jpg').read_bytes()).hexdigest()
     fingerprint=hashlib.sha256(json.dumps({'profile':'book-cache-v1','engine':engine,'parts':[hashlib.sha256(p.read_bytes()).hexdigest() for p in paths],'records':records,'metadata':metadata},sort_keys=True).encode()).hexdigest()
     if cache.exists() and dest.exists():
         previous=json.loads(cache.read_text(encoding='utf8'))
         if previous['fingerprint']==fingerprint and previous['pages']==offset and previous['sha256']==hashlib.sha256(dest.read_bytes()).hexdigest():
             return f'{slug}-{kind}',records,offset
     pages=merge_parts(paths,records,dest,metadata);assert pages==offset
+    stamp_pdf(dest)
     cache.write_text(json.dumps({'fingerprint':fingerprint,'pages':pages,'sha256':hashlib.sha256(dest.read_bytes()).hexdigest()}),encoding='utf8')
     return f'{slug}-{kind}',records,pages
 

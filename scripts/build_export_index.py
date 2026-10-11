@@ -4,10 +4,12 @@ Only geometry is published. Original books, source content, and numbering stay i
 Run with the bundled Python runtime (pdfplumber and pypdf).
 """
 import json
+from io import BytesIO
 from pathlib import Path
 import pdfplumber
 import pypdfium2 as pdfium
 import numpy as np
+from pdf_watermark import unwatermarked_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 PARTS = ROOT / 'tmp/library/books'
@@ -37,8 +39,9 @@ def build(slug):
                 heads[h['id']] = (h['page']+offset-1, h['cursor'])
     assert set(heads) == set(records), (slug, set(records)-set(heads))
     output = {}
-    rendered = pdfium.PdfDocument(BOOKS / (slug+'-questions.pdf'))
-    with pdfplumber.open(BOOKS / (slug+'-questions.pdf')) as pdf:
+    original_ink = unwatermarked_bytes(BOOKS / (slug+'-questions.pdf'))
+    rendered = pdfium.PdfDocument(original_ink)
+    with pdfplumber.open(BytesIO(original_ink)) as pdf:
         page_regions = {}
         for i, record in enumerate(index):
             page, cursor = heads[record['id']]

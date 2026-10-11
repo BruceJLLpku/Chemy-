@@ -121,7 +121,7 @@ function startExport() {
   if (exportBusy) return;
   exportBusy = true; $('export-start').disabled = true;
   $('export-status').textContent = '正在准备题目…';
-  try { exportWorker = new Worker('pdf-worker.js?v=1'); }
+  try { exportWorker = new Worker('pdf-worker.js?v=watermark-v1'); }
   catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。'); return; }
   exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。');
   exportWorker.onmessage = ({data}) => {
@@ -297,7 +297,7 @@ function render() {
   $('topic-title').textContent = activeTopic;
   const range = selectedPaper !== 'all' ? paperLabel(selectedPaper) : selectedEdition !== 'all' ? editionLabel(selectedEdition) : `${new Set(list.map(paperKey)).size} 份试卷`;
   $('topic-summary').textContent = `${list.length} 道完整大题 · ${range}`;
-  $('downloads').innerHTML = all.length && all.every(q => q.pdfReady) ? `<a class="download" href="downloads/${slugByTopic[activeTopic]}-questions.pdf?v=${encodeURIComponent(pdfVersion)}" download title="下载本专题全部 ${all.length} 道题，包含所有试卷">专题题目 PDF</a><a class="download" href="downloads/${slugByTopic[activeTopic]}-answers.pdf?v=${encodeURIComponent(pdfVersion)}" download title="下载本专题全部参考答案，包含所有试卷">专题答案 PDF</a>` : '';
+  $('downloads').innerHTML = all.length && all.every(q => q.pdfReady) ? `<a class="download" href="downloads/${slugByTopic[activeTopic]}-questions.pdf?v=${encodeURIComponent(pdfVersion)}-watermark-v1" download title="下载本专题全部 ${all.length} 道题，包含所有试卷">专题题目 PDF</a><a class="download" href="downloads/${slugByTopic[activeTopic]}-answers.pdf?v=${encodeURIComponent(pdfVersion)}-watermark-v1" download title="下载本专题全部参考答案，包含所有试卷">专题答案 PDF</a>` : '';
   $('questions').innerHTML = list.map(q => {
     const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
     const answerOpen = openAnswers.has(q.id);

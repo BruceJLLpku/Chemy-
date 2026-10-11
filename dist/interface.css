@@ -1,4 +1,9 @@
 /* Navigation and search; original-paper typography stays in styles.css. */
+/* The unchanged Chemy illustration overlays white diagrams as well as text. */
+:root{--reader-offset:calc(var(--topics-width) + var(--directory-width))}.reader-watermark{position:fixed;left:calc((100vw + var(--reader-offset))/2);top:calc((100dvh + var(--header-height))/2);transform:translate(-50%,-50%);width:min(460px,calc((100vw - var(--reader-offset))*.65));height:auto;max-height:calc(100dvh - var(--header-height) - 140px);object-fit:contain;opacity:.18;mix-blend-mode:multiply;pointer-events:none;user-select:none;z-index:2}.show-introduction .reader-watermark{display:none}
+@media(max-width:1199px){:root{--reader-offset:var(--topics-width)}}
+@media(max-width:760px){:root{--reader-offset:0px}.reader-watermark{width:72vw;max-height:62dvh}}
+@media print{.reader-watermark{left:50%;top:50%;width:62%;max-height:60%;opacity:.18}}
 :root{--ink:#252b29;--muted:#68716d;--green:#236347;--green-soft:#edf4ef;--line:#dde2df;--rail:#f7f8f8;--header-height:74px;--topics-width:200px;--directory-width:300px;--control-radius:9px;font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif}
 [hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 button,input,select{font:inherit}button{color:inherit}input,select{min-width:0;color:var(--ink);background:#fff;border:1px solid #bfc8c2;border-radius:var(--control-radius);padding:9px 11px}input:focus-visible,select:focus-visible{outline:2px solid #52876c;outline-offset:2px}button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #52876c;outline-offset:2px}

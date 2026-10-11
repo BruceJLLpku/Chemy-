@@ -24,6 +24,8 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 
 专题题目与答案 PDF 仍为整个专题的累计册，不随网页筛选缩小范围。界面、搜索与复核方法见 [docs/interface.md](docs/interface.md)。
 
+题目阅读区、按题生成的 PDF，以及专题题目册和答案册均显示完整 Chemy 图案水印。水印正向居中、浅灰显示，原题文字与图形保留；PDF 每页一枚，连续排版不受影响。更新旧题册水印可运行 `python scripts/pdf_watermark.py`；重新合并题册会自动添加。
+
 ## 内容维护
 
 - `dist/questions.json` 保存原卷题目、答案和来源，不覆盖原始题号。

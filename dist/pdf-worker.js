@@ -1,6 +1,6 @@
 /* Original vector pages are clipped only at indexed blank gaps, then flowed onto A4. */
 importScripts('vendor/pdf-lib.min.js');
-const {PDFDocument, PageSizes, StandardFonts, rgb} = PDFLib;
+const {PDFDocument, PageSizes, StandardFonts, rgb, BlendMode, PDFArray, PDFName} = PDFLib;
 const indexes = new Map();
 let cachedBook;
 async function getIndex(slug,version) {
@@ -16,9 +16,17 @@ async function getIndex(slug,version) {
 async function getBook(slug, version) {
   if (cachedBook?.slug === slug) return cachedBook.doc;
   self.postMessage({status:'正在读取专题题册，首次下载可能需要稍候…'});
-  const response = await fetch(`downloads/${slug}-questions.pdf?v=${encodeURIComponent(version)}`);
+  const response = await fetch(`downloads/${slug}-questions.pdf?v=${encodeURIComponent(version)}-watermark-v1`);
   if (!response.ok) throw new Error('专题题册暂时无法读取，请检查网络后重试。');
   const doc = await PDFDocument.load(await response.arrayBuffer());
+  // A source-page watermark must not be clipped and repeated with each question.
+  // Remove only our separate decorative layer, then stamp each final page once.
+  for (const page of doc.getPages()) {
+    const value = page.node.Contents();
+    const streams = value instanceof PDFArray ? value.asArray() : value ? [value] : [];
+    const clean = streams.filter(ref => !doc.context.lookup(ref).dict.get(PDFName.of('ChemyWatermark')));
+    if (clean.length !== streams.length) page.node.set(PDFName.of('Contents'),doc.context.obj(clean));
+  }
   cachedBook = {slug,doc};
   return doc;
 }
@@ -30,6 +38,9 @@ self.onmessage = async ({data}) => {
     const [width,height] = PageSizes.A4;
     const margin = 48, bottom = 55;
     const font = await out.embedFont(StandardFonts.TimesRoman);
+    const watermarkResponse = await fetch('assets/chemy-watermark.jpg');
+    if (!watermarkResponse.ok) throw new Error('Chemy 水印暂时无法读取，请稍后重试。');
+    const watermark = await out.embedJpg(await watermarkResponse.arrayBuffer());
     let page, cursor, pageCount = 0, copiedSlug = '', copiedPages, footer;
     const placements = [];
     function newPage() {
@@ -86,6 +97,12 @@ self.onmessage = async ({data}) => {
       }
       cursor -= 12;
     }
+    const watermarkWidth = width*.62;
+    const watermarkHeight = watermarkWidth*watermark.height/watermark.width;
+    for (const sheet of out.getPages()) sheet.drawImage(watermark,{
+      x:(width-watermarkWidth)/2,y:(height-watermarkHeight)/2,
+      width:watermarkWidth,height:watermarkHeight,opacity:.18,blendMode:BlendMode.Multiply
+    });
     const bytes = await out.save();
     self.postMessage({bytes:bytes.buffer,placements},[bytes.buffer]);
   } catch (error) {
