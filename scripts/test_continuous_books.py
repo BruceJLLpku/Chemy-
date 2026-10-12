@@ -11,6 +11,7 @@ import pypdfium2 as pdfium
 from pypdf import PdfReader
 from build_continuous_books import ROOT, SOURCE, DATA, W, H, TOP, BOTTOM, QUESTION_GAP
 from fast_pdf import pikepdf
+from pdf_typography import STYLE,groups
 
 
 def check_book(path):
@@ -64,7 +65,19 @@ def check_book(path):
                 number = int(name.removeprefix('/Source'))
                 if number not in seen:
                     expected = source.pages[number].as_form_xobject().read_bytes()
-                    assert form.read_bytes() == expected, (book.name,number,'native drawing operators changed')
+                    if form.get('/ChemyTypography') == STYLE:
+                        assert form.read_bytes() == expected+b'\nq /ChemyTypesetHeadings Do Q\n'
+                        old_objects=source.pages[number].as_form_xobject()['/Resources']['/XObject']
+                        objects=form['/Resources']['/XObject']
+                        assert objects['/Static'].read_bytes()==old_objects['/Static'].read_bytes(),(book.name,number,'original body changed')
+                        ids=[p['id'] for p in by_source[number] if p['first']]
+                        old_overlay=next(o for key,o in old_objects.items() if key not in ['/Static','/ChemyWatermark'])
+                        new_overlay=next(o for key,o in objects.items() if key not in ['/Static','/ChemyWatermark','/ChemyTypesetHeadings'])
+                        original=old_overlay.read_bytes();blocks=groups(original)
+                        assert new_overlay.read_bytes()==original[:blocks[0][0]]+original[blocks[len(ids)-1][1]:],(book.name,number,'numbered labels changed')
+                        assert str(objects['/ChemyTypesetHeadings']['/Subtype'])=='/Form'
+                    else:
+                        assert form.read_bytes() == expected, (book.name,number,'native drawing operators changed')
                     seen.add(number)
         buf = BytesIO(); source.save(buf)
     rendered = pdfium.PdfDocument(buf.getvalue())

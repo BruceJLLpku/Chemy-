@@ -187,7 +187,7 @@ def merge_book(job):
     metadata={'/Title':f'Chemy {topic}专题'+('题目册' if k=='q' else '答案册'),'/Author':'Chemy 化学奥林匹克团队（原题与答案）','/Subject':'专题连续编号，题目与小问统一编号；来源单独标注'}
     dest=ROOT/'dist/downloads'/f'{slug}-{kind}.pdf'
     cache=ROOT/'tmp/library/books'/f'merge-{slug}-{kind}.json'
-    engine=hashlib.sha256(b''.join((ROOT/'scripts'/name).read_bytes() for name in ['fast_pdf.py','build_numbered_pdfs.py','build_continuous_books.py','build_export_index.py','pdf_watermark.py'])+(ROOT/'dist/assets/chemy-watermark.jpg').read_bytes()).hexdigest()
+    engine=hashlib.sha256(b''.join((ROOT/'scripts'/name).read_bytes() for name in ['fast_pdf.py','build_numbered_pdfs.py','build_continuous_books.py','build_export_index.py','pdf_typography.py','pdf_watermark.py'])+(ROOT/'dist/assets/chemy-watermark.jpg').read_bytes()).hexdigest()
     fingerprint=hashlib.sha256(json.dumps({'profile':'continuous-book-cache-v1','engine':engine,'parts':[hashlib.sha256(p.read_bytes()).hexdigest() for p in paths],'records':records,'metadata':metadata},sort_keys=True).encode()).hexdigest()
     if cache.exists() and dest.exists():
         previous=json.loads(cache.read_text(encoding='utf8'))

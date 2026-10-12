@@ -17,6 +17,7 @@ from build_export_index import index_book
 from fast_pdf import pikepdf, share_streams
 from pdf_watermark import stamp_pdf
 from source_info import source_name
+from pdf_typography import frame as paper_frame,style_form,STYLE
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'tmp/continuous/source'
@@ -29,20 +30,7 @@ pdfmetrics.registerFont(TTFont('ContinuousSong', 'C:/Windows/Fonts/simsun.ttc', 
 
 
 def frame(topic, kind, count, number):
-    buf = BytesIO()
-    c = canvas.Canvas(buf, pagesize=A4)
-    c.setFont('ContinuousSong', 14)
-    label = '题目册' if kind == 'questions' else '答案册'
-    c.drawString(62, H-48, f'Chemy 化学竞赛专题题库 · {topic} · {label}')
-    c.setFont('ContinuousSong', 9)
-    c.drawString(62, H-66, f'{count} 道题 · 专题连续编号')
-    c.setLineWidth(.4); c.setStrokeColorRGB(.55,.6,.57)
-    c.line(62, H-77, W-62, H-77)
-    c.setFillColorRGB(.3,.3,.3); c.setFont('ContinuousSong', 7.5)
-    c.drawString(62,35,'版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流，禁止商业用途。')
-    c.drawRightString(W-62,35,str(number))
-    c.save()
-    return buf.getvalue()
+    return paper_frame(topic,kind,count,number)
 
 
 def source_index(slug, kind, source, records):
@@ -218,6 +206,15 @@ def flow_book(source, records, topic, slug, kind, dest):
         for entry in ledger:
             title = f'第{entry["number"]}题 · {source_name(entry["sourceEdition"],entry["sourcePaper"],compact=True)}原第{entry["sourceNumber"]}题'
             outline.root.append(pikepdf.OutlineItem(title,entry['firstPage']-1))
+    owners = {}
+    bank = {q['id']:q for q in json.loads((ROOT/'dist/questions.json').read_text(encoding='utf8'))}
+    numbers = json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))['numberById']
+    for placement in placements:
+        if placement['first']:
+            owners.setdefault(placement['sourcePage'],[]).append(placement['id'])
+    for source_page,form in forms.items():
+        style_form(out,form,owners.get(source_page,[]),bank,numbers,pikepdf)
+    out.docinfo['/ChemyTypography'] = STYLE
     share_streams(out)
     dest.parent.mkdir(parents=True,exist_ok=True)
     temporary = dest.with_suffix('.flowing.pdf')
@@ -227,7 +224,7 @@ def flow_book(source, records, topic, slug, kind, dest):
     stamp_pdf(temporary)
     temporary.replace(dest)
     DATA.mkdir(parents=True,exist_ok=True)
-    layout = {'profile':PROFILE,'sourcePages':max(r['lastPage'] for r in records),'pages':pages,
+    layout = {'profile':PROFILE,'typography':STYLE,'sourcePages':max(r['lastPage'] for r in records),'pages':pages,
               'sha256':hashlib.sha256(dest.read_bytes()).hexdigest(),'sourceSha256':hashlib.sha256(source.read_bytes()).hexdigest(),
               'records':ledger,'heads':heads,'questions':final_index,'placements':placements}
     (DATA/(slug+'-'+kind+'.json')).write_text(json.dumps(layout,ensure_ascii=False,separators=(',',':')),encoding='utf8')

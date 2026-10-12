@@ -121,7 +121,7 @@ function startExport() {
   if (exportBusy) return;
   exportBusy = true; $('export-start').disabled = true;
   $('export-status').textContent = '正在准备题目…';
-  try { exportWorker = new Worker('pdf-worker.js?v=continuous-v2'); }
+  try { exportWorker = new Worker('pdf-worker.js?v=paper-type-v1'); }
   catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。'); return; }
   exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。');
   exportWorker.onmessage = ({data}) => {
@@ -582,7 +582,7 @@ window.addEventListener('resize',() => { if (ready && selectedQuestions.size) up
 
 async function loadLibrary() {
   try {
-    const [data,numbering,display] = await Promise.all(['questions.json','numbering.json?v=continuous-v2','presentation.json'].map(async path => {
+    const [data,numbering,display] = await Promise.all(['questions.json','numbering.json?v=paper-type-v1','presentation.json'].map(async path => {
       const response = await fetch(path); if (!response.ok) throw new Error('题库加载失败'); return response.json();
     }));
     questions = data; presentation = display; numbers = numbering.numberById; pdfVersion = numbering.pdfVersion || numbering.version || pdfVersion;

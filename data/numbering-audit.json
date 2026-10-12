@@ -6,92 +6,92 @@
   "pdfs": {
     "analysis-answers.pdf": {
       "pages": 63,
-      "sha256": "87bf02d2b8b87d62ee003064a14c7e63a164a461034bb4f5b5f4e9b489cfdd38",
+      "sha256": "e01ef0ae1236c2ebd0bd3f29b28aef3a82ec64f0552b40a19ae125afe9a1199e",
       "numberedQuestions": 82
     },
     "analysis-questions.pdf": {
       "pages": 47,
-      "sha256": "f382026e6e5450e468ea85be752881d52e8d4f0a262db3fd9e6d1ba23ff6a51b",
+      "sha256": "c934f7b50ec5c12f22d4cab49f9d63e1df4ac922da098b91eb55d1046940d8d1",
       "numberedQuestions": 82
     },
     "crystal-answers.pdf": {
       "pages": 166,
-      "sha256": "84f7795ded3ea2e444e3d407679796e146beba779a27cbc07b38ab5761a33fbb",
+      "sha256": "f18a8712f82fa2f2f4bdb054c6b33cc227061594e6426fe6e5588917dd980032",
       "numberedQuestions": 177
     },
     "crystal-questions.pdf": {
       "pages": 109,
-      "sha256": "5509a53a742a5617f0322309261c6bd143eabfeac3c67ba66aa1746b69437273",
+      "sha256": "b3d493bc64c44a711def63ec1239c115e6a9bad4db6331b851ed8e3163e3de13",
       "numberedQuestions": 177
     },
     "electrochemistry-answers.pdf": {
       "pages": 47,
-      "sha256": "caefc21e63e88ae999d2c5ff22e8011dc530b4eba99325b5af9614acd7317967",
+      "sha256": "6d8c777fd02dd2451289941607d0c96ccf706c870ac7ba088365b40d6d819fef",
       "numberedQuestions": 51
     },
     "electrochemistry-questions.pdf": {
       "pages": 35,
-      "sha256": "cb2e6c16b482bdbe4b874694bc6cdfe0ddad2cd114322c9369184dd77c0b3219",
+      "sha256": "841a8515498f296d7ff3ef03359be8e05cf03cf413cec2608d87050f599cb803",
       "numberedQuestions": 51
     },
     "elements-answers.pdf": {
       "pages": 113,
-      "sha256": "cca3f63d9c558e8db175359dea32f3a04a6855374d207c9c787916d19aa69710",
+      "sha256": "74f4dfa0a9c5b52923a28a99d6ab64af06eb52813b8ba1c008827a129535cebe",
       "numberedQuestions": 181
     },
     "elements-questions.pdf": {
       "pages": 72,
-      "sha256": "70d34432aeac983c33cb4ce231bf78eb5367549c94749c8c72d87924c87f91ef",
+      "sha256": "51254be997234f0d42cba4183e7ba51db4f65b0fb50c5c4a3808911d657b3fd8",
       "numberedQuestions": 181
     },
     "equilibrium-answers.pdf": {
       "pages": 107,
-      "sha256": "4884293c77dba9675587c7222a6f363663fa9e9aeaa31020029f3d636413df96",
+      "sha256": "f0c05da31808305654076bd4df7fe609d7d51fea9727b8fda9d9c7dce6680b68",
       "numberedQuestions": 127
     },
     "equilibrium-questions.pdf": {
       "pages": 64,
-      "sha256": "bb8e39fe95b9a99ffa2dd923b39aca54a227255ba463f42df669045e0d2b116d",
+      "sha256": "eded3452b9ae8090eb189cb2164a803f98325211dd5b6fc95cab0cd5a0653aab",
       "numberedQuestions": 127
     },
     "inference-answers.pdf": {
       "pages": 510,
-      "sha256": "abecb19c5a7809007d713e262de2ee8e8d7117ede27b39959700c213d7675e84",
+      "sha256": "2d234ce304a0f5c8507e5df507946c21f89607f7340f218d49498fd4f63f2dd3",
       "numberedQuestions": 552
     },
     "inference-questions.pdf": {
       "pages": 301,
-      "sha256": "98dc3169b825b9b0b867c90e253e23e9de2d2e2026b4ff6b8eea55d505aa57c7",
+      "sha256": "28b96d0e986bd7cd9841a2c1c395ed82c6ed7afca64241866d854a8ea6b72031",
       "numberedQuestions": 552
     },
     "kinetics-answers.pdf": {
       "pages": 62,
-      "sha256": "5648ba4653f9be2fae4eed2c0281417f3e6acdf718eac334f8a7b3d859a904df",
+      "sha256": "ec4f9fba1a58221307a4f94a6ce0d0a317735b150a70aa21713df31c1535d5f5",
       "numberedQuestions": 52
     },
     "kinetics-questions.pdf": {
       "pages": 39,
-      "sha256": "866425fd2c9e6cfbedbe53fc2223c7388f41a7c3ad8abb62e22f0d418fb2f2ba",
+      "sha256": "5a30fcf78b19980dbc489dd9770c2d07f3d81acd8a54c00700559f1e86f6a431",
       "numberedQuestions": 52
     },
     "organic-answers.pdf": {
       "pages": 704,
-      "sha256": "01204283a7ee7927a055ca96f48ebf6fbb420ee5cdfa9642e1091cb5831c4741",
+      "sha256": "0353f156a9a959547a106126a16278ca9ce0cc95127032385c8fd7bedf81fe56",
       "numberedQuestions": 656
     },
     "organic-questions.pdf": {
       "pages": 506,
-      "sha256": "65bfc269c1a655d9f6b3b1550f2a318aea35793c1ec935b91b284c534b017303",
+      "sha256": "9ed563b6857701f7bb14092248eb765322b80d4f522c71ad51b039de38a0521c",
       "numberedQuestions": 656
     },
     "polymer-answers.pdf": {
       "pages": 57,
-      "sha256": "57b9761ce5fdd7fcf66973de461008b3b4f42604109ff6cce835255b7033e0ef",
+      "sha256": "6bef540fb4501c6aef67b58a8d3a09fe84344ae5bb618f04668817b77df5bfa3",
       "numberedQuestions": 55
     },
     "polymer-questions.pdf": {
       "pages": 38,
-      "sha256": "6e222e44eba0ae2580c4fd69f177aaa7eb4cf069703567f9371b49c48210cef3",
+      "sha256": "708ea8cb9a652a9d0610f93d316c03a60c178a20d5919ce6e494a7bf277042ec",
       "numberedQuestions": 55
     }
   },
@@ -105,7 +105,13 @@
     "passed": true,
     "sourcePagesChecked": 4110,
     "pages": 3040,
-    "pdfVersion": "topic-pdf-ce9492d23dbd31e6",
+    "pdfVersion": "topic-pdf-848e7ea9d90dda7f",
     "report": "data/continuous-book-audit.json"
+  },
+  "pdfTypographyAudit": {
+    "passed": true,
+    "style": "original-paper-type-v3",
+    "report": "data/pdf-typography-audit.json",
+    "pdfVersion": "topic-pdf-848e7ea9d90dda7f"
   }
 }

@@ -46,3 +46,5 @@ GitHub 仓库：https://github.com/BruceJLLpku/Chemy-
 题目与答案版权归 Chemy 化学奥林匹克团队原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。
 
 本地录入与打印册生成使用 pikepdf 原生引擎；重新搭建录入环境时安装 scripts/pdf-engine-requirements.txt 中的依赖。GitHub Pages 直接发布 dist 静态文件，访问网站和下载 PDF 无需安装依赖。
+
+专题 PDF 的页眉与题目标题采用原套题格式：两行居中页眉，宋体中文与 Times New Roman 英文、数字，标题按原卷字号加粗；正文保留原字形与图形，题目之间连续接续。标题排版由 `scripts/pdf_typography.py` 统一控制。
