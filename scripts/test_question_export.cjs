@@ -8,7 +8,7 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
  const context=await browser.newContext({viewport:{width:1450,height:960},acceptDownloads:true});
  await context.addInitScript(()=>{
   const NativeWorker=window.Worker;
-  window.Worker=class extends NativeWorker{constructor(...args){super(...args);this.addEventListener('message',({data})=>{if(data.placements)window.exportPlacements=data.placements})}};
+  window.Worker=class extends NativeWorker{constructor(...args){super(...args);this.addEventListener('message',({data})=>{if(data.placements){window.exportPlacements=data.placements;window.exportHeadings=data.headings}})}};
  });
  const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
  fs.mkdirSync(path.join(root,'output/pdf'),{recursive:true});
@@ -32,6 +32,7 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
   check('Selected questions share a page',new Set(placements.map(p=>p.page)).size===1&&new Set(placements.map(p=>p.id)).size===3);
   check('Content remains inside page margins',placements.every(p=>p.top>=47&&p.top+p.height<=787));
   report.placements=placements;
+  report.pdfHeadings={'selected-continuous.pdf':await page.evaluate(()=>window.exportHeadings)};
   await page.locator('#export-close').click();
   await page.locator('#clear-selection').click();
   check('Clear resets selection',await page.locator('#download-selected').isDisabled());
@@ -40,17 +41,20 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
   check('Single download dialog contains one question',await page.locator('#export-list li').count()===1);
   const single=page.waitForEvent('download',{timeout:180000});await page.locator('#export-start').click();
   await (await single).saveAs(path.join(root,'output/pdf/single-crystal.pdf'));
+  report.pdfHeadings['single-crystal.pdf']=await page.evaluate(()=>window.exportHeadings);
   await page.locator('#export-close').click();
   await page.locator('[data-topic="有机化学"]').click();
   const organic=await page.locator('[data-download-question]').first().getAttribute('data-download-question');
   await page.locator(`[data-download-question="${organic}"]`).click();
   const organicDownload=page.waitForEvent('download',{timeout:180000});await page.locator('#export-start').click();
   await (await organicDownload).saveAs(path.join(root,'output/pdf/single-organic.pdf'));
+  report.pdfHeadings['single-organic.pdf']=await page.evaluate(()=>window.exportHeadings);
   await page.locator('#export-close').click();
   const crossIds=await page.evaluate(()=>topics.map(t=>byTopic.get(t)[0].id));
   await page.evaluate(ids=>openExport(ids),crossIds);
   const mixed=page.waitForEvent('download',{timeout:240000});await page.locator('#export-start').click();
   await (await mixed).saveAs(path.join(root,'output/pdf/nine-topics.pdf'));
+  report.pdfHeadings['nine-topics.pdf']=await page.evaluate(()=>window.exportHeadings);
   check('All nine topics export together',await page.evaluate(()=>new Set(window.exportPlacements.map(p=>p.id)).size===9));
   check('Long questions flow over page boundaries',await page.evaluate(()=>{const pages=new Map();for(const p of window.exportPlacements){if(!pages.has(p.id))pages.set(p.id,new Set());pages.get(p.id).add(p.page)}return [...pages.values()].some(p=>p.size>1)}));
   fs.writeFileSync(path.join(root,'output/pdf/nine-topics-layout.json'),JSON.stringify(await page.evaluate(()=>window.exportPlacements),null,2));

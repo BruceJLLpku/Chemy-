@@ -43,11 +43,11 @@ self.onmessage = async ({data}) => {
     const watermark = await out.embedJpg(await watermarkResponse.arrayBuffer());
     let page, cursor, pageCount = 0, copiedSlug = '', copiedPages, footer;
     const placements = [];
+    const headings = [];
     function newPage() {
       page = out.addPage([width,height]); cursor = height-margin; pageCount++;
-      page.drawText('Chemy', {x:62,y:height-30,size:10,font,color:rgb(.3,.3,.3)});
       page.drawText(String(pageCount), {x:width-68,y:30,size:9,font,color:rgb(.3,.3,.3)});
-      if (footer) page.drawPage(footer,{x:50,y:24});
+      if (footer) page.drawPage(footer,{x:50,y:31});
     }
     for (let i=0; i<data.items.length; i++) {
       const item = data.items[i];
@@ -60,11 +60,17 @@ self.onmessage = async ({data}) => {
         const copied = await out.copyPages(source,ids);
         copiedPages = new Map(ids.map((id,n) => [id,copied[n]]));
         copiedSlug = item.slug;
-        footer = await out.embedPage(copied[0],{left:50,right:width-90,bottom:24,top:44});
-        const label = await out.embedPage(copied[0],{left:0,right:width,bottom:height-51,top:height-35});
+        // Preserve the copyright line without the source book's page counter.
+        footer = await out.embedPage(copied[0],{left:50,right:width-90,bottom:31,top:44});
+        // Keep the complete centered masthead from the original-paper layout.
+        // The second line is the full-book count and does not describe a selection.
+        const headingTop = 47, headingBottom = 63;
+        const label = await out.embedPage(copied[0],{left:0,right:width,bottom:height-headingBottom,top:height-headingTop});
+        const headingHeight = headingBottom-headingTop, headingSpace = headingHeight+16;
         const firstBand = regions[0].bands[0];
-        if (!page || cursor-bottom < 30+firstBand[1]-firstBand[0]) newPage();
-        page.drawPage(label,{x:0,y:cursor-16}); cursor -= 30;
+        if (!page || cursor-bottom < headingSpace+Math.min(firstBand[1]-firstBand[0],height-margin-bottom-headingSpace)) newPage();
+        headings.push({slug:item.slug,sourcePage:ids[0],page:pageCount,top:height-cursor,height:headingHeight});
+        page.drawPage(label,{x:0,y:cursor-headingHeight}); cursor -= headingSpace;
       }
       self.postMessage({status:`正在排版第 ${i+1} / ${data.items.length} 道题…`});
       let first = true;
@@ -104,7 +110,7 @@ self.onmessage = async ({data}) => {
       width:watermarkWidth,height:watermarkHeight,opacity:.18,blendMode:BlendMode.Multiply
     });
     const bytes = await out.save();
-    self.postMessage({bytes:bytes.buffer,placements},[bytes.buffer]);
+    self.postMessage({bytes:bytes.buffer,placements,headings},[bytes.buffer]);
   } catch (error) {
     self.postMessage({error:error instanceof TypeError ? '下载中断，请检查网络后重试。' : error.message || 'PDF 生成失败，请重试。'});
   }

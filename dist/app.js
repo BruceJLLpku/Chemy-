@@ -121,7 +121,7 @@ function startExport() {
   if (exportBusy) return;
   exportBusy = true; $('export-start').disabled = true;
   $('export-status').textContent = '正在准备题目…';
-  try { exportWorker = new Worker('pdf-worker.js?v=paper-type-v1'); }
+  try { exportWorker = new Worker('pdf-worker.js?v=selected-title-v2'); }
   catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。'); return; }
   exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。');
   exportWorker.onmessage = ({data}) => {
