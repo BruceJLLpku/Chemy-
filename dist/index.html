@@ -9,13 +9,17 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="interface.css?v=watermark-v2-light">
-  <script src="app.js?v=selected-title-v2" defer></script>
+  <link rel="stylesheet" href="ai-paper.css?v=keywords-v1">
+  <script src="app.js?v=selected-answers-v1" defer></script>
+  <script src="paper-engine.js?v=keywords-v1" defer></script>
+  <script src="ai-paper.js?v=keywords-v1" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
   <header class="site-header">
     <a class="site-brand" href="#about" aria-label="Chemy 化学竞赛专题题库首页"><img src="assets/chemy-wordmark.png" alt="CHEMY" width="120" height="48"><span>化学竞赛专题题库</span></a>
     <div class="header-tools">
+      <button class="ai-launch" id="ai-launch" aria-haspopup="dialog" aria-controls="ai-dialog" disabled>AI 组卷</button>
       <button class="search-launch" id="search-launch" aria-haspopup="dialog" aria-controls="search-dialog" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="search-placeholder">搜索题目标题或题干…</span><span class="search-short">查题</span><kbd>Ctrl K</kbd></button>
       <a class="repository-link" href="https://github.com/BruceJLLpku/Chemy-" target="_blank" rel="noopener">源文件</a>
     </div>
@@ -80,12 +84,54 @@
     <div class="picker-footer"><span id="picker-selection-count" role="status" aria-live="polite">已选 0 题</span><button id="picker-clear">清空已选</button><button id="picker-done">完成选题</button><button id="picker-download" disabled>下载选题 PDF</button></div>
   </dialog>
   <dialog class="export-dialog" id="export-dialog" aria-labelledby="export-title">
-    <div class="search-heading"><h2 id="export-title">下载题目 PDF</h2><button id="export-close" class="dialog-close" aria-label="关闭题目下载">×</button></div>
-    <p class="export-help">按专题与题号排列，保留原有编号与出处，仅含题目。题与题连续排版，页满时自然换页。</p>
+    <div class="search-heading"><h2 id="export-title">下载选题 PDF</h2><button id="export-close" class="dialog-close" aria-label="关闭选题下载">×</button></div>
+    <p class="export-help">题目和参考答案可分别下载，均按同一选题清单排列，保留原有编号与出处。连续排版，页满时自然换页。</p>
     <ul id="export-list" class="export-list" aria-label="将要下载的题目"></ul>
     <p class="export-help">首次下载需读取相关专题题册，可能需要稍候。关闭窗口可取消生成。</p>
     <p id="export-status" role="status" aria-live="polite"></p>
-    <div class="export-actions"><button id="export-start">生成并下载 PDF</button><button id="export-cancel">取消</button></div>
+    <div class="export-actions"><button id="export-start">下载题目 PDF</button><button id="export-answers">下载答案 PDF</button><button id="export-cancel">取消</button></div>
   </dialog>
+  <dialog class="ai-dialog" id="ai-dialog" aria-labelledby="ai-title">
+    <div class="search-heading"><h2 id="ai-title">AI 知识点组卷</h2><button id="ai-close" class="dialog-close" aria-label="关闭 AI 组卷">×</button></div>
+    <div class="ai-scroll">
+      <p class="ai-lead">输入想练习的知识点，从 Chemy 题库中选一套完整大题。</p>
+      <p id="ai-mode" class="ai-hint" role="status">正在读取组卷服务配置…</p>
+      <form id="ai-form">
+        <div class="ai-query-row"><label class="sr-only" for="ai-query">知识点</label><input id="ai-query" type="search" placeholder="例如：羟醛缩合" maxlength="100" autocomplete="off" required><button id="ai-generate" type="submit">生成练习卷</button></div>
+        <details class="ai-advanced"><summary>高级设置</summary><div class="ai-filters">
+          <label>大题数量<input id="ai-count" type="number" min="1" max="50" step="1" value="5" required></label>
+          <label>专题<select id="ai-topic"><option value="all">全部专题</option></select></label>
+          <label>届次<select id="ai-edition"><option value="all">全部届次</option></select></label>
+          <label>原试卷<select id="ai-paper"><option value="all">全部试卷</option></select></label>
+        </div></details>
+      </form>
+      <p id="ai-coverage" class="ai-hint" role="status"></p>
+      <section class="ai-discovery" aria-label="可用组卷知识点">
+        <p class="ai-discovery-label">试试这些知识点 <span>点击即可组卷</span></p>
+        <div id="ai-suggested" class="ai-candidates"></div>
+        <details id="ai-knowledge-browser">
+          <summary id="ai-knowledge-summary">查看可用知识点</summary>
+          <label class="sr-only" for="ai-knowledge-search">搜索可用知识点名称或同义词</label>
+          <input id="ai-knowledge-search" type="search" maxlength="100" placeholder="搜索名称或同义词，例如 Aldol、NMR" autocomplete="off">
+          <p id="ai-knowledge-count" class="ai-hint" role="status" aria-live="polite"></p>
+          <div id="ai-knowledge-list" class="ai-knowledge-list" aria-label="知识点及可用题数"></div>
+        </details>
+      </section>
+      <div id="ai-status" class="ai-status" role="status" aria-live="polite"></div>
+      <button id="ai-cancel" type="button" hidden>取消本次组卷</button>
+      <div id="ai-candidates" class="ai-candidates" aria-label="候选知识点"></div>
+      <section id="ai-result" hidden aria-labelledby="ai-result-title">
+        <div class="ai-result-heading"><h3 id="ai-result-title"></h3><p id="ai-result-count"></p></div>
+        <div class="ai-actions">
+          <button type="button" id="ai-reroll">重新组卷</button>
+          <button type="button" data-ai-export="questions">下载题目 PDF</button><button type="button" data-ai-export="answers">下载答案 PDF</button>
+          <button type="button" data-ai-print="questions">打印题目</button><button type="button" data-ai-print="answers">打印答案</button>
+        </div>
+        <p id="ai-export-status" class="ai-hint" role="status" aria-live="polite"></p>
+        <div id="ai-items"></div>
+      </section>
+    </div>
+  </dialog>
+  <section id="ai-print" hidden></section>
 </body>
 </html>

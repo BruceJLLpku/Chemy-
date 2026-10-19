@@ -8,7 +8,7 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
  const context=await browser.newContext({viewport:{width:1450,height:960},acceptDownloads:true});
  await context.addInitScript(()=>{
   const NativeWorker=window.Worker;
-  window.Worker=class extends NativeWorker{constructor(...args){super(...args);this.addEventListener('message',({data})=>{if(data.placements){window.exportPlacements=data.placements;window.exportHeadings=data.headings}})}};
+  window.Worker=class extends NativeWorker{constructor(...args){super(...args);this.addEventListener('message',({data})=>{if(data.placements){window.exportPlacements=data.placements;window.exportHeadings=data.headings;window.exportAnnotations=data.annotations}})}postMessage(data,...args){window.exportRequest=data;super.postMessage(data,...args)}};
  });
  const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
  fs.mkdirSync(path.join(root,'output/pdf'),{recursive:true});
@@ -33,6 +33,11 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
   check('Content remains inside page margins',placements.every(p=>p.top>=47&&p.top+p.height<=787));
   report.placements=placements;
   report.pdfHeadings={'selected-continuous.pdf':await page.evaluate(()=>window.exportHeadings)};
+  const answersEvent=page.waitForEvent('download',{timeout:180000});await page.locator('#export-answers').click();
+  const answers=await answersEvent;await answers.saveAs(path.join(root,'output/pdf/selected-answers.pdf'));
+  check('Answer filename distinguishes it from questions',answers.suggestedFilename().includes('答案'));
+  check('Selected answers use exactly the same ordered question list',await page.evaluate(ids=>window.exportRequest.kind==='answers'&&JSON.stringify(window.exportRequest.items.map(q=>q.id))===JSON.stringify(ids)&&new Set(window.exportPlacements.map(p=>p.id)).size===3,placements.map(p=>p.id).filter((id,i,a)=>a.indexOf(id)===i)));
+  check('Manual answer download contains no AI commentary',await page.evaluate(()=>window.exportAnnotations.length===0));
   await page.locator('#export-close').click();
   await page.locator('#clear-selection').click();
   check('Clear resets selection',await page.locator('#download-selected').isDisabled());
@@ -58,6 +63,10 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
   check('All nine topics export together',await page.evaluate(()=>new Set(window.exportPlacements.map(p=>p.id)).size===9));
   check('Long questions flow over page boundaries',await page.evaluate(()=>{const pages=new Map();for(const p of window.exportPlacements){if(!pages.has(p.id))pages.set(p.id,new Set());pages.get(p.id).add(p.page)}return [...pages.values()].some(p=>p.size>1)}));
   fs.writeFileSync(path.join(root,'output/pdf/nine-topics-layout.json'),JSON.stringify(await page.evaluate(()=>window.exportPlacements),null,2));
+  const mixedAnswers=page.waitForEvent('download',{timeout:240000});await page.locator('#export-answers').click();
+  await (await mixedAnswers).saveAs(path.join(root,'output/pdf/nine-topics-answers.pdf'));
+  check('Answers from all nine topics download together',await page.evaluate(()=>window.exportRequest.kind==='answers'&&new Set(window.exportPlacements.map(p=>p.id)).size===9));
+  check('Answer content stays within printable margins',await page.evaluate(()=>window.exportPlacements.every(p=>p.top>=47&&p.top+p.height<=787)));
   await page.locator('#export-close').click();
   await page.screenshot({path:path.join(root,'output/question-export-desktop.png')});
   await page.setViewportSize({width:390,height:844});
@@ -68,12 +77,20 @@ function check(name,condition){assert.ok(condition,name);report.checks.push(name
   check('Cancel stops export worker',await page.evaluate(()=>exportWorker===null&&exportBusy===false));
   await context.route('**/export-index/organic.json*',route=>route.abort());
   await page.locator(`[data-download-question="${organic}"]`).click();await page.locator('#export-start').click();
-  await page.waitForFunction(()=>document.getElementById('export-start').textContent==='重试下载 PDF');
+  await page.waitForFunction(()=>document.getElementById('export-start').textContent==='重试下载题目 PDF');
   check('Network failure exposes retry',!await page.locator('#export-start').isDisabled());
   await context.unroute('**/export-index/organic.json*');
   const retry=page.waitForEvent('download',{timeout:180000});await page.locator('#export-start').click();
   await (await retry).saveAs(path.join(root,'output/pdf/retry-organic.pdf'));
   check('Retry successfully generates a PDF',await page.locator('#export-status').textContent()==='PDF 已生成，下载已开始。');
+  await context.route('**/export-index/organic-answers.json*',route=>route.abort());
+  await page.locator('#export-answers').click();
+  await page.waitForFunction(()=>document.getElementById('export-answers').textContent.includes('重试'));
+  check('Answer failure enables both download buttons',await page.locator('#export-answers').isEnabled()&&await page.locator('#export-start').isEnabled());
+  await context.unroute('**/export-index/organic-answers.json*');
+  const retryAnswers=page.waitForEvent('download',{timeout:180000});await page.locator('#export-answers').click();
+  await (await retryAnswers).saveAs(path.join(root,'output/pdf/retry-organic-answers.pdf'));
+  check('Answer retry produces a real PDF',fs.readFileSync(path.join(root,'output/pdf/retry-organic-answers.pdf')).subarray(0,5).toString()==='%PDF-');
   check('No browser errors',report.errors.length===0);
  } finally {fs.writeFileSync(path.join(root,'output/question-export-tests.json'),JSON.stringify(report,null,2));await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

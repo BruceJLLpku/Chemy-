@@ -1,0 +1,62 @@
+{
+  "id": "chemy39-17-10",
+  "sourceHash": "b1d8d119cab3fd55f6a659d934e39684d6477773ab38b010d16bec538e948fc4",
+  "links": [
+    {
+      "concept": "有机锂反应",
+      "aliases": [],
+      "subquestions": [
+        "10-1",
+        "10-2",
+        "10-3"
+      ],
+      "strength": 3,
+      "confidence": 0.96,
+      "reason": "二溴酯与叔丁基锂形成锂化烯醇盐并转为炔氧基锂，后者与酮反应生成含氧四元环中间体。",
+      "evidence": [
+        {
+          "kind": "image",
+          "path": "assets/e39-p17-a10-01-92234fc90c24.webp"
+        }
+      ]
+    },
+    {
+      "concept": "羟醛缩合",
+      "aliases": [],
+      "subquestions": [
+        "10-3"
+      ],
+      "strength": 1,
+      "confidence": 0.76,
+      "reason": "β内酯相关碳负离子可向第二分子环己酮羰基加成形成F的羟基；与通常酮酯烯醇盐的羟醛反应归类边界存在不确定，待复核。",
+      "evidence": [
+        {
+          "kind": "image",
+          "path": "assets/e39-p17-a10-03-5c21b250ac58.webp"
+        }
+      ]
+    },
+    {
+      "concept": "有机结构推断",
+      "aliases": [],
+      "subquestions": [
+        "10-1",
+        "10-2",
+        "10-3"
+      ],
+      "strength": 3,
+      "confidence": 0.96,
+      "reason": "利用分子式、二环中间体、随时间变化的烯烃和环酮产率推断A至F及逆合成原料。",
+      "evidence": [
+        {
+          "kind": "image",
+          "path": "assets/e39-p17-a10-01-92234fc90c24.webp"
+        }
+      ]
+    }
+  ],
+  "promptVersion": "knowledge-multimodal-v1",
+  "model": "codex-source-review",
+  "reviewMethod": "Direct AI reading of source text and question/answer images.",
+  "analyzedAt": "2026-10-16T17:00:25.287134+00:00"
+}

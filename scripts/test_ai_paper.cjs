@@ -1,0 +1,132 @@
+const {chromium}=require('playwright');
+const fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const engine=require('../dist/paper-engine.js');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'output/ai-paper');
+const base=process.env.CHEMY_TEST_URL||'http://127.0.0.1:8766/';
+fs.mkdirSync(out,{recursive:true});
+const fullIndex=JSON.parse(fs.readFileSync(path.join(root,'dist/knowledge-index.json')));
+const seedIds=new Set(['chemy35-3-10','chemy35-10-8','chemy36-22-9','chemy36-24-9']);
+const index={...fullIndex,entries:fullIndex.entries.filter(q=>seedIds.has(q.id)),analyzedQuestions:4,complete:false};
+const bank=JSON.parse(fs.readFileSync(path.join(root,'dist/questions.json')));
+const report={checks:[],errors:[]};
+function check(name,value){assert.ok(value,name);report.checks.push(name);console.log('PASS',name);}
+const aldol=engine.resolve('Aldol',index.concepts).concepts[0];
+check('Aldol normalizes to the Chinese concept',aldol.name==='羟醛缩合');
+check('Broad term requires a candidate choice',engine.resolve('缩合',index.concepts).kind==='suggestions');
+check('Typos are suggested, never silently resolved',engine.resolve('羟醛缩和',index.concepts).kind==='suggestions');
+check('Unknown terms never fall back to text search',engine.resolve('xxxxxx-no-such-point',index.concepts).kind==='unknown');
+const pool=engine.candidates(aldol.id,index,bank);
+check('All four reviewed questions qualify',pool.length===4);
+check('A smaller pool never duplicates or pads',engine.choose(pool,5).length===4);
+check('Stronger relevance takes priority',engine.choose(pool,1)[0].id==='chemy35-3-10');
+check('Original-paper filtering works',engine.candidates(aldol.id,index,bank,{paper:'36-24'}).map(x=>x.id).join()==='chemy36-24-9');
+check('Edition filtering works',engine.candidates(aldol.id,index,bank,{edition:'35'}).length===2);
+check('Topic filters never broaden the scope',engine.candidates(aldol.id,index,bank,{topic:'晶体化学'}).length===0);
+check('Replacement excludes every current question',engine.choose(pool,1,pool.map(x=>x.id)).length===0);
+assert.throws(()=>engine.choose(pool,1.2));report.checks.push('Fractional question counts rejected');
+const low={...index,entries:[{id:pool[0].id,links:[{...pool[0].links[0],confidence:.7}]}]};
+check('Uncertain links never enter a paper',engine.candidates(aldol.id,low,bank).length===0);
+(async()=>{
+ const browser=await chromium.launch({headless:true,channel:'msedge'});
+ const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
+ await context.route('**/knowledge-index.json*',route=>route.fulfill({json:index}));
+ await context.addInitScript(()=>{
+  const OriginalWorker=window.Worker;
+  window.Worker=class extends OriginalWorker{constructor(...args){super(...args);this.addEventListener('message',({data})=>{if(data.placements)window.lastAiPdf={placements:data.placements,headings:data.headings,annotations:data.annotations};});}};
+ });
+ const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
+ try {
+  await page.goto(base);await page.waitForFunction(()=>typeof ready!=='undefined'&&ready);
+  await page.locator('#ai-launch').click();
+  await page.waitForFunction(()=>document.getElementById('ai-coverage').textContent.includes('1933'));
+  check('Partial analysis coverage is disclosed',/4.*1933/.test(await page.locator('#ai-coverage').textContent()));
+  await page.locator('#ai-query').fill('羟醛缩合');await page.locator('#ai-generate').click();
+  await page.locator('#ai-items .ai-item').first().waitFor();
+  check('Default five-question request uses available four',await page.locator('#ai-items .ai-item').count()===4);
+  check('Shortage explicitly disclosed',(await page.locator('#ai-status').textContent()).includes('题量不足'));
+  check('Answers are hidden by default',await page.locator('#ai-items .answers[open]').count()===0);
+  check('Association explanation stays inside hidden answers',await page.locator('#ai-items .ai-association').first().isHidden());
+  check('Complete source question HTML is preserved',await page.evaluate(()=>[...document.querySelectorAll('[data-ai-id]')].every(a=>{
+   const expected=document.createElement('div');expected.innerHTML=presentation[a.dataset.aiId].body;
+   const actual=a.querySelector('.q-body').cloneNode(true);
+   for(const tree of [expected,actual])tree.querySelectorAll('img').forEach(img=>{img.removeAttribute('loading');img.removeAttribute('decoding');});
+   return expected.innerHTML===actual.innerHTML;
+  })));
+  await page.locator('#ai-items .answers summary').first().click();
+  check('Expanding answer reveals associated subquestions',await page.locator('#ai-items .ai-association').first().isVisible());
+  check('Answers preserve original diagrams',await page.locator('#ai-items .answer-content img').count()>0);
+  await page.locator('#ai-dialog .ai-scroll').evaluate(el=>el.scrollTop=0);
+  await page.screenshot({path:path.join(out,'desktop.png')});
+  for(const kind of ['questions','answers']) {
+   const event=page.waitForEvent('download',{timeout:240000});
+   await page.locator(`[data-ai-export="${kind}"]`).click();
+   const download=await event;await download.saveAs(path.join(out,`aldol-${kind}.pdf`));
+   check(`${kind} PDF actually downloads`,fs.readFileSync(path.join(out,`aldol-${kind}.pdf`)).subarray(0,5).toString()==='%PDF-');
+   const details=await page.evaluate(()=>window.lastAiPdf);
+   check(`${kind} PDF includes exactly the selected source questions`,new Set(details.placements.map(x=>x.id)).size===4);
+   check(`${kind} PDF respects page margins`,details.placements.every(p=>p.top>=47&&p.top+p.height<=787));
+   check(`${kind} PDF ${kind==='answers'?'includes':'excludes'} association panels`,details.annotations.filter(x=>x.id!=='paper-header').length===(kind==='answers'?4:0));
+   fs.writeFileSync(path.join(out,`aldol-${kind}-layout.json`),JSON.stringify(details,null,2));
+  }
+  // Capture the print DOM synchronously instead of opening the OS print dialog.
+  await page.evaluate(()=>{window.print=()=>{window.printCapture={html:document.getElementById('ai-print').innerHTML,visible:getComputedStyle(document.getElementById('ai-print')).display,printing:document.body.classList.contains('ai-printing')};};});
+  await page.locator('[data-ai-print="questions"]').click();
+  await page.waitForFunction(()=>window.printCapture);
+  check('Question print never contains answer commentary',await page.evaluate(()=>!window.printCapture.html.includes('ai-association')));
+  check('Print builds a dedicated paper',await page.evaluate(()=>window.printCapture.printing&&window.printCapture.html.includes('练习第 4 题')));
+  const questionPrint=await page.evaluate(()=>window.printCapture.html);
+  await page.evaluate(()=>{window.printCapture=null;});
+  await page.locator('[data-ai-print="answers"]').click();await page.waitForFunction(()=>window.printCapture);
+  check('Answer print includes commentary and original answers',await page.evaluate(()=>window.printCapture.html.includes('ai-association')&&window.printCapture.html.includes('answer-content')));
+  const answerPrint=await page.evaluate(()=>window.printCapture.html);
+  check('Printing cleans up its temporary DOM',await page.locator('#ai-print').textContent()==='');
+  await page.locator('#ai-dialog .ai-scroll').evaluate(el=>el.scrollTop=0);
+  await page.locator('.ai-advanced summary').click();await page.locator('#ai-count').fill('2');
+  await page.locator('#ai-generate').click();
+  check('Advanced count respected',await page.locator('#ai-items .ai-item').count()===2);
+  const before=await page.locator('[data-ai-id]').first().getAttribute('data-ai-id');
+  await page.locator('[data-ai-replace]').first().click();
+  check('Replacement changes one question and does not duplicate',await page.evaluate(old=>{const ids=[...document.querySelectorAll('[data-ai-id]')].map(x=>x.dataset.aiId);return ids[0]!==old&&new Set(ids).size===ids.length;},before));
+  await page.locator('[data-ai-remove]').first().click();check('Deletion reduces paper length',await page.locator('[data-ai-id]').count()===1);
+  await page.locator('#ai-reroll').click();check('Reroll restores requested count',await page.locator('[data-ai-id]').count()===2);
+  await page.locator('#ai-dialog .ai-scroll').evaluate(el=>el.scrollTop=0);
+  await page.locator('#ai-edition').selectOption('35');await page.locator('#ai-paper').selectOption('35-3');await page.locator('#ai-generate').click();
+  check('Browser applies original-paper filtering',await page.locator('[data-ai-id]').count()===1 && await page.locator('[data-ai-id]').getAttribute('data-ai-id')==='chemy35-3-10');
+  await page.locator('#ai-topic').selectOption('晶体化学');await page.locator('#ai-generate').click();
+  check('No-match filter produces a clear empty result',await page.locator('#ai-result').isHidden()&&(await page.locator('#ai-status').textContent()).includes('没有可用'));
+  await page.locator('#ai-topic').selectOption('all');await page.locator('#ai-edition').selectOption('all');
+  await page.locator('#ai-query').fill('缩合');await page.locator('#ai-generate').click();
+  check('Ambiguous input shows candidates',await page.locator('[data-ai-concept]').count()>=2 && await page.locator('#ai-result').isHidden());
+  await page.locator('[data-ai-concept]').filter({hasText:'羟醛缩合'}).click();
+  check('Candidate choice generates the selected concept',await page.locator('#ai-result-title').textContent()==='羟醛缩合 · 专题练习');
+  await page.locator('#ai-query').fill('unrecognized-xyz');await page.locator('#ai-generate').click();
+  check('Unknown knowledge points explain next step',(await page.locator('#ai-status').textContent()).includes('未识别'));
+  await page.locator('#ai-query').fill('Aldol');await page.locator('#ai-count').fill('5');await page.locator('#ai-generate').click();
+  await page.setViewportSize({width:800,height:1000});
+  check('Tablet header fits the viewport',await page.locator('.site-header').evaluate(el=>el.scrollWidth<=innerWidth));
+  await page.setViewportSize({width:390,height:844});
+  check('Mobile dialog fits viewport',await page.locator('#ai-dialog').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth;}));
+  check('Mobile form fits viewport',await page.locator('#ai-form').evaluate(el=>el.scrollWidth<=el.clientWidth));
+  await page.screenshot({path:path.join(out,'mobile.png')});
+  await page.locator('#ai-close').click();check('Closing restores focus to entry',await page.locator('#ai-launch').evaluate(el=>el===document.activeElement));
+  // Real worker loading/index failures remain retryable.
+  await page.locator('#ai-launch').click();
+  await context.route('**/export-index/organic-answers.json*',route=>route.abort());
+  await page.locator('[data-ai-export="answers"]').click();
+  await page.waitForFunction(()=>document.getElementById('ai-export-status').textContent.includes('重试'));
+  check('PDF failure enables retry',await page.locator('[data-ai-export="answers"]').isEnabled());
+  await context.unroute('**/export-index/organic-answers.json*');
+  const retry=page.waitForEvent('download',{timeout:240000});await page.locator('[data-ai-export="answers"]').click();await (await retry).saveAs(path.join(out,'aldol-answers-retry.pdf'));
+  check('Retry yields a real answer PDF',fs.statSync(path.join(out,'aldol-answers-retry.pdf')).size>1000);
+  await page.emulateMedia({media:'print'});
+  for(const [kind,html] of [['questions',questionPrint],['answers',answerPrint]]){
+   await page.evaluate(html=>{document.getElementById('ai-print').innerHTML=html;document.body.classList.add('ai-printing');},html);
+   await page.evaluate(async()=>{await Promise.all([...document.querySelectorAll('#ai-print img')].map(img=>img.decode()));});
+   check(`${kind} print target is actually visible under print CSS`,await page.locator('#ai-print').evaluate(el=>getComputedStyle(el).display==='block'));
+   await page.pdf({path:path.join(out,`printed-${kind}.pdf`),format:'A4',printBackground:true,margin:{top:'16mm',bottom:'16mm',left:'16mm',right:'16mm'}});
+  }
+  await page.evaluate(()=>{document.body.classList.remove('ai-printing');document.getElementById('ai-print').replaceChildren();});
+  await page.emulateMedia({media:'screen'});
+  check('No browser errors',report.errors.length===0);
+ } finally {fs.writeFileSync(path.join(out,'test-report.json'),JSON.stringify(report,null,2));await browser.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

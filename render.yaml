@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: chemy-deepseek-agent
+    runtime: node
+    plan: free
+    buildCommand: node scripts/build_agent_bundle.mjs
+    startCommand: node output/agent-service/server/agent.mjs
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: SERVE_STATIC
+        value: "false"
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_MODEL
+        value: deepseek-flash
+      - key: ALLOWED_ORIGINS
+        value: https://brucejllpku.github.io
+      - key: AGENT_MAX_CONCURRENT
+        value: "2"
+      - key: AGENT_REQUESTS_PER_MINUTE
+        value: "6"
+      - key: AGENT_DAILY_CALL_LIMIT
+        value: "200"

@@ -9,7 +9,7 @@ const editionOf = q => q.edition ?? 39;
 const paperKey = q => editionOf(q) === 39 ? String(q.paper) : `${editionOf(q)}-${q.paper}`;
 const editionLabel = e => String(e) === '0' ? 'Chemy 联赛' : `第${e}届`;
 const chevron = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
-let questions = [], presentation = {}, numbers = {}, pdfVersion = 'topic-numbering-v1';
+let questions = [], presentation = {}, numbers = {}, pdfVersion = 'topic-numbering-v1', numberingVersion = '';
 let byId = new Map(), byTopic = new Map(), paperLabels = new Map();
 let activeTopic = topics[0], selectedEdition = 'all', selectedPaper = 'all', activeQuestion = '';
 let ready = false, observer, lastUrl = '', scrollLockUntil = 0;
@@ -110,37 +110,41 @@ function openExport(ids) {
   $('export-title').textContent = exportItems.length === 1 ? '下载本题 PDF' : `下载 ${exportItems.length} 道题 PDF`;
   $('export-list').innerHTML = exportItems.map(q => `<li><strong>${escapeHtml(q.topic)} · 第 ${numbers[q.id]} 题</strong><span>${escapeHtml(questionTitle(q))}</span><small>${escapeHtml(paperLabel(paperKey(q)))} · 原第 ${q.number} 题</small></li>`).join('');
   $('export-status').textContent = '';
-  $('export-start').disabled = false; $('export-start').textContent = '生成并下载 PDF';
+  $('export-start').disabled = false; $('export-start').textContent = '下载题目 PDF';
+  $('export-answers').disabled = false; $('export-answers').textContent = '下载答案 PDF';
   $('export-dialog').showModal();
 }
 function cancelExport() {
   exportWorker?.terminate(); exportWorker = null; exportBusy = false;
   $('export-start').disabled = false;
+  $('export-answers').disabled = false;
 }
-function startExport() {
+function startExport(kind='questions') {
   if (exportBusy) return;
-  exportBusy = true; $('export-start').disabled = true;
-  $('export-status').textContent = '正在准备题目…';
-  try { exportWorker = new Worker('pdf-worker.js?v=selected-title-v2'); }
-  catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。'); return; }
-  exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。');
+  const answers=kind==='answers',button=answers?'export-answers':'export-start';
+  const snapshot=exportItems.slice(),label=answers?'答案':'题目';
+  exportBusy = true; $('export-start').disabled = true; $('export-answers').disabled = true;
+  $('export-status').textContent = `正在准备${label}…`;
+  try { exportWorker = new Worker('pdf-worker.js?v=selected-answers-v1'); }
+  catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。',button,label); return; }
+  exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。',button,label);
   exportWorker.onmessage = ({data}) => {
     if (data.status) $('export-status').textContent = data.status;
-    else if (data.error) exportFailed(data.error);
+    else if (data.error) exportFailed(data.error,button,label);
     else if (data.bytes) {
       const blob = new Blob([data.bytes],{type:'application/pdf'});
       const url = URL.createObjectURL(blob), link = document.createElement('a');
-      const single = exportItems.length === 1 ? `${exportItems[0].topic}-第${numbers[exportItems[0].id]}题` : `选题-${exportItems.length}题`;
-      link.href = url; link.download = `Chemy-${single}.pdf`; document.body.append(link); link.click(); link.remove();
+      const single = snapshot.length === 1 ? `${snapshot[0].topic}-第${numbers[snapshot[0].id]}题` : `选题-${snapshot.length}题`;
+      link.href = url; link.download = `Chemy-${single}-${label}.pdf`; document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url),60000);
       $('export-status').textContent = 'PDF 已生成，下载已开始。';
-      cancelExport(); $('export-start').textContent = '再次下载 PDF';
+      cancelExport(); $(button).textContent = `再次下载${label} PDF`;
     }
   };
-  exportWorker.postMessage({items:exportItems.map(q => ({id:q.id,slug:slugByTopic[q.topic]})),version:pdfVersion,title:`Chemy · ${exportItems.map(q => `${q.topic}第${numbers[q.id]}题`).join('、')}`});
+  exportWorker.postMessage({kind:answers?'answers':'questions',items:snapshot.map(q => ({id:q.id,slug:slugByTopic[q.topic]})),version:pdfVersion,title:`Chemy · ${label} · ${snapshot.map(q => `${q.topic}第${numbers[q.id]}题`).join('、')}`});
 }
-function exportFailed(message) {
-  cancelExport(); $('export-status').textContent = message; $('export-start').textContent = '重试下载 PDF';
+function exportFailed(message,button='export-start',label='题目') {
+  cancelExport(); $('export-status').textContent = message; $(button).textContent = `重试下载${label} PDF`;
 }
 $('select-visible').addEventListener('click',openPicker);
 $('picker-all').addEventListener('change',event => { selectItems(pickerList,event.target.checked); if ($('picker-selected-only').checked) renderPicker(); });
@@ -175,8 +179,9 @@ $('questions').addEventListener('click',event => {
   const button = event.target.closest('[data-download-question]');
   if (button) openExport([button.dataset.downloadQuestion]);
 });
-$('export-start').addEventListener('click',startExport);
-for (const id of ['export-close','export-cancel']) $(id).addEventListener('click',() => $('export-dialog').close());
+$('export-start').addEventListener('click',()=>startExport('questions'));
+$('export-answers').addEventListener('click',()=>startExport('answers'));
+for (const id of ['export-close','export-cancel']) $(id).addEventListener('click',() => {cancelExport();$('export-dialog').close();});
 $('export-dialog').addEventListener('close',cancelExport);
 $('export-dialog').addEventListener('cancel',cancelExport);
 
@@ -585,7 +590,7 @@ async function loadLibrary() {
     const [data,numbering,display] = await Promise.all(['questions.json','numbering.json?v=paper-type-v1','presentation.json'].map(async path => {
       const response = await fetch(path); if (!response.ok) throw new Error('题库加载失败'); return response.json();
     }));
-    questions = data; presentation = display; numbers = numbering.numberById; pdfVersion = numbering.pdfVersion || numbering.version || pdfVersion;
+    questions = data; presentation = display; numbers = numbering.numberById; pdfVersion = numbering.pdfVersion || numbering.version || pdfVersion; numberingVersion = numbering.version;
     if (questions.some(q => !Number.isInteger(numbers[q.id]) || !presentation[q.id]?.body || !presentation[q.id]?.answer)) throw new Error('编号与题库不一致');
     byId = new Map(questions.map(q => [q.id,q])); byTopic = new Map(topics.map(t => [t,questions.filter(q => q.topic === t)]));
     for (const q of questions) paperLabels.set(paperKey(q),editionOf(q) === 0 ? `第${q.paper}届 Chemy 联赛` : `第${editionOf(q)}届 · ${q.sourcePaperLabel || '模拟试题 '+q.paper}`);
@@ -593,6 +598,7 @@ async function loadLibrary() {
     $('search-topic').innerHTML = option('all','全部专题','all')+topics.map(t => option(t,t,'all')).join('');
     $('search-edition').innerHTML = option('all','全部届次','all')+editionValues(questions).map(e => option(e,editionLabel(e),'all')).join('');
     refreshSearchPapers(); ready = true; $('search-launch').disabled = false;
+    document.dispatchEvent(new Event('chemy-library-ready'));
     readUrl(); const target = activeQuestion; render();
     if (!showingIntroduction) writeUrl(target,false);
     if (target && !showingIntroduction) scrollToQuestion(target,false);

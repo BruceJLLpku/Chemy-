@@ -94,29 +94,30 @@ def index_book(slug, kind='questions', book=None, index=None, heads=None):
     return output
 
 
-def build(slug):
+def build(slug, kind='questions'):
     # The continuous-book builder records its exact final placement geometry.
-    layout = ROOT / 'data/continuous-books' / (slug+'-questions.json')
+    layout = ROOT / 'data/continuous-books' / (slug+'-'+kind+'.json')
     if layout.exists():
         data = json.loads(layout.read_text(encoding='utf8'))
         import hashlib
-        if data['sha256'] == hashlib.sha256((BOOKS/(slug+'-questions.pdf')).read_bytes()).hexdigest():
+        if data['sha256'] == hashlib.sha256((BOOKS/(slug+'-'+kind+'.pdf')).read_bytes()).hexdigest():
             output = data['questions']
         else:
-            output = index_book(slug, heads={h['id']:(h['page'],h['cursor']) for h in data['heads']})
+            output = index_book(slug, kind, heads={h['id']:(h['page'],h['cursor']) for h in data['heads']})
     else:
-        output = index_book(slug)
-    target = ROOT / 'dist/export-index' / (slug+'.json')
+        output = index_book(slug, kind)
+    target = ROOT / 'dist/export-index' / (slug+('-answers' if kind == 'answers' else '')+'.json')
     target.parent.mkdir(exist_ok=True)
     numbering = json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))
     version = numbering.get('pdfVersion',numbering['version'])
     target.write_text(json.dumps({'version':2,'bookVersion':version,'questions':output},ensure_ascii=False,separators=(',',':')),encoding='utf8')
-    print('DONE',slug,len(output),target.stat().st_size,flush=True)
+    print('DONE',slug,kind,len(output),target.stat().st_size,flush=True)
 
 if __name__ == '__main__':
     import sys
     from concurrent.futures import ProcessPoolExecutor
-    slugs = sys.argv[1:] or [p.stem.removesuffix('-questions') for p in BOOKS.glob('*-questions.pdf')]
+    kind = 'answers' if '--answers' in sys.argv else 'questions'
+    slugs = [s for s in sys.argv[1:] if s != '--answers'] or [p.stem.removesuffix('-questions') for p in BOOKS.glob('*-questions.pdf')]
     # Separate processes are required because PDFium itself is not thread-safe.
     with ProcessPoolExecutor(max_workers=3) as pool:
-        list(pool.map(build,slugs))
+        list(pool.map(build,slugs,[kind]*len(slugs)))

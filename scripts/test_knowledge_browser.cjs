@@ -1,0 +1,55 @@
+const {chromium}=require('playwright');
+const fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const engine=require('../dist/paper-engine.js');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'output/ai-paper');
+const index=JSON.parse(fs.readFileSync(path.join(root,'dist/knowledge-index.json')));
+const bank=JSON.parse(fs.readFileSync(path.join(root,'dist/questions.json')));
+const available=engine.availableConcepts(index,bank),aldol=available.find(c=>c.name==='羟醛缩合');
+const report={checks:[],errors:[],analyzed:index.entries.length,available:available.length};
+function check(name,value){assert.ok(value,name);report.checks.push(name);console.log('PASS',name);}
+check('Every listed count matches the selectable original-question pool',available.every(c=>c.count===engine.candidates(c.id,index,bank).length));
+const duplicate={...index,entries:[...index.entries,index.entries[0]],concepts:[...index.concepts,{id:'empty',name:'empty',aliases:[]}]};
+check('Counts deduplicate records and omit points with no usable questions',JSON.stringify(engine.availableConcepts(duplicate,bank))===JSON.stringify(available));
+const uncertain={...index,entries:index.entries.map(e=>({...e,links:e.links.map(l=>({...l,confidence:.2}))}))};
+check('Uncertain annotations never appear as available points',engine.availableConcepts(uncertain,bank).length===0);
+(async()=>{
+ const browser=await chromium.launch({headless:true,channel:'msedge'});
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});
+ page.on('pageerror',e=>report.errors.push(e.message));
+ try{
+  await page.goto(process.env.CHEMY_TEST_URL||'http://127.0.0.1:8768/');
+  await page.locator('#ai-launch').click();
+  await page.waitForFunction(()=>document.getElementById('ai-knowledge-summary').textContent.includes('共'));
+  check('Actual saved coverage is displayed',(await page.locator('#ai-coverage').textContent()).includes(`${index.entries.length} / ${bank.length}`));
+  check('Browse lists all available knowledge points',await page.locator('#ai-knowledge-list [data-ai-keyword]').count()===available.length);
+  check('Shortcut exposes the actual Aldol pool size',(await page.locator(`#ai-suggested [data-ai-keyword="${aldol.id}"]`).textContent()).includes(`${aldol.count} 道`));
+  await page.locator('#ai-knowledge-browser summary').click();
+  await page.locator('#ai-knowledge-search').fill('Aldol');
+  const choices=page.locator('#ai-knowledge-list [data-ai-keyword]');
+  check('Alias search finds the canonical knowledge point',await choices.count()===1&&(await choices.textContent()).includes('羟醛缩合'));
+  await choices.click();
+  await page.locator('#ai-items .ai-item').first().waitFor();
+  check('Choosing a keyword composes a real paper',await page.locator('#ai-items .ai-item').count()===Math.min(5,aldol.count));
+  check('Keyword-generated answers stay collapsed',await page.locator('#ai-items .answers[open]').count()===0);
+  await page.locator('#ai-knowledge-search').fill('');
+  await page.locator('.ai-advanced summary').click();
+  await page.locator('#ai-topic').selectOption('电化学');
+  const filtered=engine.availableConcepts(index,bank,{topic:'电化学'});
+  check('Advanced filters refresh the visible keyword catalogue',await choices.count()===filtered.length);
+  const displayed=await choices.evaluateAll(nodes=>nodes.map(n=>({id:n.dataset.aiKeyword,count:Number(n.querySelector('small').textContent.replace(/\D/g,''))})));
+  check('Filtered counts match the current selection scope',displayed.every(c=>c.count===engine.candidates(c.id,index,bank,{topic:'电化学'}).length));
+  await page.locator('#ai-topic').selectOption('all');
+  await page.locator('#ai-edition').selectOption('35');await page.locator('#ai-paper').selectOption('35-3');
+  check('Original-paper filtering also updates keyword counts',await choices.count()===engine.availableConcepts(index,bank,{edition:'35',paper:'35-3'}).length);
+  await page.locator('#ai-knowledge-search').fill('no-such-knowledge-point');
+  check('Empty search explains how to recover',await choices.count()===0&&(await page.locator('#ai-knowledge-list').textContent()).includes('放宽'));
+  await page.locator('#ai-edition').selectOption('all');await page.locator('#ai-paper').selectOption('all');await page.locator('#ai-knowledge-search').fill('');
+  await page.locator('.ai-advanced summary').click();
+  await page.locator('#ai-dialog .ai-scroll').evaluate(el=>el.scrollTop=0);
+  await page.screenshot({path:path.join(out,'knowledge-browser-desktop.png')});
+  await page.setViewportSize({width:390,height:844});
+  check('Mobile keyword browser has no horizontal overflow',await page.locator('.ai-discovery').evaluate(el=>el.scrollWidth<=el.clientWidth));
+  await page.screenshot({path:path.join(out,'knowledge-browser-mobile.png')});
+  check('No browser errors',report.errors.length===0);
+ } finally{fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'knowledge-browser-report.json'),JSON.stringify(report,null,2));await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

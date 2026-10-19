@@ -3,4 +3,7 @@ tmp/
 *.tar.gz
 __pycache__/
 .openai/
+.env
+.env.*
+!.env.example
 output/

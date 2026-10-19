@@ -1,0 +1,78 @@
+{
+  "id": "chemy39-11-8",
+  "sourceHash": "c7ef72c54dedb92bc564636a5a7165bb82ece17d600a57ebddb5b37d5d6846cf",
+  "links": [
+    {
+      "concept": "Wittig反应",
+      "aliases": [],
+      "subquestions": [
+        "8-1"
+      ],
+      "strength": 3,
+      "confidence": 0.96,
+      "reason": "磷催化二聚先生成磷叶立德，分子内Wittig反应将羰基转成桥环双键。",
+      "evidence": [
+        {
+          "kind": "body",
+          "quote": "X 发生分子内 Wittig 反应得到产物"
+        }
+      ]
+    },
+    {
+      "concept": "Nazarov环化",
+      "aliases": [],
+      "subquestions": [
+        "8-2-2-1",
+        "8-2-2-2"
+      ],
+      "strength": 3,
+      "confidence": 0.96,
+      "reason": "4π正离子热顺旋电环化及其中断路径构建[3.2.1]环系，要求产物立体化学。",
+      "evidence": [
+        {
+          "kind": "body",
+          "quote": "Nazarov 环化是一类 4π 正离子体系的电环化反应"
+        }
+      ]
+    },
+    {
+      "concept": "周环反应",
+      "aliases": [],
+      "subquestions": [
+        "8-2-1",
+        "8-2-2-1",
+        "8-2-3-1"
+      ],
+      "strength": 3,
+      "confidence": 0.96,
+      "reason": "比较环加成、电环化与[3,3]σ迁移三类成环模式。",
+      "evidence": [
+        {
+          "kind": "answer",
+          "quote": "[3,3]σ 重排"
+        }
+      ]
+    },
+    {
+      "concept": "立体化学",
+      "aliases": [],
+      "subquestions": [
+        "8-2-2-2",
+        "8-2-3-2"
+      ],
+      "strength": 3,
+      "confidence": 0.96,
+      "reason": "关环与σ迁移保持特定空间关系，要求标出最终多个手性碳的绝对构型。",
+      "evidence": [
+        {
+          "kind": "image",
+          "path": "assets/e39-p11-a08-05-8ca33672971b.webp"
+        }
+      ]
+    }
+  ],
+  "promptVersion": "knowledge-multimodal-v1",
+  "model": "codex-source-review",
+  "reviewMethod": "Direct AI reading of source text and question/answer images.",
+  "analyzedAt": "2026-10-16T16:51:59.947594+00:00"
+}
