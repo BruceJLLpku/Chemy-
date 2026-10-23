@@ -16,6 +16,7 @@ from reportlab.pdfgen import canvas
 from build_export_index import index_book
 from fast_pdf import pikepdf, share_streams
 from pdf_watermark import stamp_pdf
+from pdf_version import sync_pdf_version
 from source_info import source_name
 from pdf_typography import frame as paper_frame,style_form,STYLE
 
@@ -243,25 +244,6 @@ def build(job):
         target = ROOT/'dist/export-index'/f'{slug}.json'
         target.write_text(json.dumps({'version':2,'bookVersion':version,'questions':index},separators=(',',':')),encoding='utf8')
     return slug+'-'+kind,ledger
-
-
-def sync_pdf_version():
-    """Publish one content version for the full PDF set and its crop indexes."""
-    target = ROOT/'dist/numbering.json'
-    numbering = json.loads(target.read_text(encoding='utf8'))
-    digest = hashlib.sha256(numbering['version'].encode()+PROFILE.encode())
-    for book in sorted((ROOT/'dist/downloads').glob('*.pdf')):
-        digest.update(book.name.encode()+hashlib.sha256(book.read_bytes()).digest())
-    version = 'topic-pdf-'+digest.hexdigest()[:16]
-    numbering['pdfVersion'] = version
-    target.write_text(json.dumps(numbering,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
-    for index in (ROOT/'dist/export-index').glob('*.json'):
-        data = json.loads(index.read_text(encoding='utf8'))
-        data['version'] = 2
-        data['bookVersion'] = version
-        index.write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')),encoding='utf8')
-    print('PDF VERSION',version,flush=True)
-    return version
 
 
 if __name__ == '__main__':

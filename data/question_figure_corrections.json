@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "corrections": [
+    {
+      "id": "chemy39-5-4",
+      "edition": 39,
+      "paper": 5,
+      "number": 4,
+      "page": 38,
+      "box": [
+        84,
+        120.960032,
+        514,
+        273.00003275
+      ],
+      "asset": "e39-p05-a04-02-7c3ecd819cef.webp",
+      "sha256": "7c3ecd819cefe685763fb7cc5d3dcd2955e06d38df3fdf360578f3da32405563",
+      "replaces": [
+        "e39-p05-q04-03-a6bc96343b25.webp",
+        "e39-p05-q04-04-41b99a873f83.webp"
+      ],
+      "originalSource": "第39届Chemy化学奥林匹克竞赛模拟试题题目合集.pdf",
+      "originalSourceSha256": "08fcd8f57cd3b5d5fce19712db54e83ea75aa2236d5e2c81b954ad631dcdbab3",
+      "repeatedPromptSource": "第39届Chemy化学奥林匹克竞赛模拟试题参考答案合集.pdf",
+      "repeatedPromptSha256": "dc6613857ca0be1f71f3133ed5aebbc0c2894be35b171e8851bfd03bce808f97",
+      "repeatedPromptPage": 63,
+      "repeatedPromptBox": [
+        84,
+        604.560032,
+        514,
+        756.60003275
+      ],
+      "note": "题目原PDF第38页及独立第5套第3页均缺失谱线与横轴，仅留D/E/X标签。由官方参考答案第63页重复题干中的同一完整谱图恢复；解答在第64页。复用最终渲染像素，保留原遮盖和X标签，不能直接提取内嵌JPEG（JPEG的THF字样已由源PDF遮盖）。未增加解答、结构式或峰归属。"
+    }
+  ]
+}

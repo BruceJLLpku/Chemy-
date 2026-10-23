@@ -1,0 +1,61 @@
+name: Check release snapshot
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release inputs
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dist
+            scripts
+            data
+            sources
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/export-requirements.txt
+      - name: Install PDF regression dependencies
+        run: python -m pip install -r scripts/export-requirements.txt
+      - name: Set up Node for native PDF composition regression
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test browser worker pattern placement
+        run: |
+          node scripts/test_pdf_worker_patterns.cjs
+          node scripts/test_pdf_worker_annotations.cjs
+          python -X utf8 scripts/test_pdf_export_pixels.py --synthetic
+          python -X utf8 scripts/test_pdf_export_pixel_glyphs.py
+      - name: Test clipped PDF cleanup
+        run: python -X utf8 scripts/test_pdf_clip_cleanup.py
+      - name: Test tile-cache-independent visual verification
+        run: python -X utf8 scripts/test_pdf_render_verify.py
+      - name: Test embedded PDF font subsetting
+        run: python -X utf8 scripts/test_pdf_font_subset.py
+      - name: Test safe PDF object compaction
+        run: python -X utf8 scripts/test_pdf_compact_objects.py
+      - name: Test clean topic books and bookmarks
+        run: python -X utf8 scripts/test_export_book.py
+      - name: Test interrupted export cache recovery
+        run: python -X utf8 scripts/test_export_cache_recovery.py
+      - name: Test export fragment verification provenance
+        run: python -X utf8 scripts/test_export_parts_validation.py
+      - name: Test spectrum source correction
+        run: python -X utf8 scripts/test_question_figure_corrections.py
+      - name: Test release-check failure cases
+        run: python -X utf8 -m unittest discover -s scripts -p test_release_check.py
+      - name: Test staging safety and size limits
+        run: python -X utf8 -m unittest discover -s scripts -p test_stage_site.py
+      - name: Check current release metadata and PDF hashes
+        run: python -X utf8 scripts/check_release.py --pdfs

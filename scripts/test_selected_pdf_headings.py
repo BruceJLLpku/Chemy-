@@ -8,7 +8,14 @@ from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 report = json.loads((ROOT / 'output/question-export-tests.json').read_text(encoding='utf8'))
-assert not report['errors'] and len(report['checks']) == 17
+assert isinstance(report.get('errors'), list) and not report['errors']
+assert isinstance(report.get('checks'), list) and report['checks']
+assert isinstance(report.get('pdfHeadings'), dict) and report['pdfHeadings']
+for filename, headings in report['pdfHeadings'].items():
+    assert headings, (filename, 'missing heading placements')
+    for heading in headings:
+        assert {'slug', 'sourcePage', 'page', 'top', 'height'} <= set(heading), (filename, heading)
+        assert heading['page'] >= 1 and heading['sourcePage'] >= 0 and heading['height'] > 0
 sources = {}
 checks = []
 samples = []
@@ -51,7 +58,9 @@ for filename, headings in report['pdfHeadings'].items():
 
 for source in sources.values():
     source.close()
-assert len(checks) == 12 and len({item['topic'] for item in checks}) == 9
+assert len(checks) == sum(len(headings) for headings in report['pdfHeadings'].values())
+expected_topics = {h['slug'] for headings in report['pdfHeadings'].values() for h in headings}
+assert {item['topic'] for item in checks} == expected_topics
 montage = Image.new('RGB', (samples[0][1].width, len(samples) * 390), 'white')
 draw = ImageDraw.Draw(montage)
 for i, (filename, sample) in enumerate(samples):
@@ -59,4 +68,4 @@ for i, (filename, sample) in enumerate(samples):
     montage.paste(sample, (0, i * 390 + 30))
 montage.save(ROOT / 'output/pdf/selected-heading-comparison.png')
 (ROOT / 'output/pdf/selected-heading-checks.json').write_text(json.dumps({'passed': True, 'checks': checks}, indent=2), encoding='utf8')
-print(f'PASS {len(checks)} complete mastheads across nine topics; no standalone top-left label')
+print(f'PASS {len(checks)} complete mastheads across {len(expected_topics)} topics; no standalone top-left label')

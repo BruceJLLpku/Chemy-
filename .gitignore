@@ -7,3 +7,5 @@ __pycache__/
 .env.*
 !.env.example
 output/
+work/
+dist/export-parts/
