@@ -85,7 +85,7 @@ def complete_pdf(path):
 
 def blank_source(k,n):
     render_page(k,n);labels=LABELS.get(f'{k}-{n}',[])
-    signature=hashlib.sha256(json.dumps([p['box'] for p in labels]).encode()).hexdigest()
+    signature=hashlib.sha256(json.dumps([p['box'] for p in labels]).encode()+(CACHE/k/f'{n:03}-clean.pdf').read_bytes()).hexdigest()
     path=NUMBERED/f'blank-{k}-{n:03}.pdf';stamp=path.with_suffix('.sha256')
     if complete_pdf(path) and stamp.exists() and stamp.read_text()==signature:return path
     source=PdfReader(CACHE/k/f'{n:03}-clean.pdf');p=copy.copy(source.pages[0]);h=float(p.mediabox.height);w=float(p.mediabox.width)

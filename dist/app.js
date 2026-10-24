@@ -24,6 +24,8 @@ const summaryById = new Map();
 const selectedQuestions = new Set();
 let exportItems = [], exportWorker = null, exportBusy = false;
 let pickerList = [], pickerGroups = new Map(), pickerTimer;
+let libraryLoading = false;
+const localPreviewMessage = '直接打开 HTML 文件无法读取题库或生成选题 PDF。请在项目根目录运行 python -m http.server 8765 --bind 127.0.0.1 --directory dist，然后用浏览器打开 http://127.0.0.1:8765/（Windows 也可将 python 换为 py）。';
 
 function updateSelection() {
   $('selection-tools').classList.toggle('has-selection',selectedQuestions.size > 0);
@@ -109,9 +111,10 @@ function openExport(ids) {
   closePanel(false);
   $('export-title').textContent = exportItems.length === 1 ? '下载本题 PDF' : `下载 ${exportItems.length} 道题 PDF`;
   $('export-list').innerHTML = exportItems.map(q => `<li><strong>${escapeHtml(q.topic)} · 第 ${numbers[q.id]} 题</strong><span>${escapeHtml(questionTitle(q))}</span><small>${escapeHtml(paperLabel(paperKey(q)))} · 原第 ${q.number} 题</small></li>`).join('');
-  $('export-status').textContent = '';
-  $('export-start').disabled = false; $('export-start').textContent = '下载题目 PDF';
-  $('export-answers').disabled = false; $('export-answers').textContent = '下载答案 PDF';
+  const localFile = location.protocol === 'file:';
+  $('export-status').textContent = localFile ? localPreviewMessage : '';
+  $('export-start').disabled = localFile; $('export-start').textContent = '下载题目 PDF';
+  $('export-answers').disabled = localFile; $('export-answers').textContent = '下载答案 PDF';
   $('export-dialog').showModal();
 }
 function cancelExport() {
@@ -122,13 +125,16 @@ function cancelExport() {
 function startExport(kind='questions') {
   if (exportBusy) return;
   const answers=kind==='answers',button=answers?'export-answers':'export-start';
+  if (location.protocol === 'file:') { $('export-status').textContent = localPreviewMessage; return; }
   const snapshot=exportItems.slice(),label=answers?'答案':'题目';
   exportBusy = true; $('export-start').disabled = true; $('export-answers').disabled = true;
   $('export-status').textContent = `正在准备${label}…`;
-  try { exportWorker = new Worker('pdf-worker.js?v=selected-answers-v1'); }
+  try { exportWorker = new Worker('pdf-worker.js?v=clean-vector-v1'); }
   catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。',button,label); return; }
-  exportWorker.onerror = () => exportFailed('PDF 工具加载失败，请检查网络后重试。',button,label);
-  exportWorker.onmessage = ({data}) => {
+  const worker = exportWorker;
+  worker.onerror = () => { if (exportWorker === worker) exportFailed('PDF 工具加载失败，请检查网络后重试。',button,label); };
+  worker.onmessage = ({data}) => {
+    if (exportWorker !== worker) return;
     if (data.status) $('export-status').textContent = data.status;
     else if (data.error) exportFailed(data.error,button,label);
     else if (data.bytes) {
@@ -302,7 +308,7 @@ function render() {
   $('topic-title').textContent = activeTopic;
   const range = selectedPaper !== 'all' ? paperLabel(selectedPaper) : selectedEdition !== 'all' ? editionLabel(selectedEdition) : `${new Set(list.map(paperKey)).size} 份试卷`;
   $('topic-summary').textContent = `${list.length} 道完整大题 · ${range}`;
-  $('downloads').innerHTML = all.length && all.every(q => q.pdfReady) ? `<a class="download" href="downloads/${slugByTopic[activeTopic]}-questions.pdf?v=${encodeURIComponent(pdfVersion)}-watermark-v1" download title="下载本专题全部 ${all.length} 道题，包含所有试卷">专题题目 PDF</a><a class="download" href="downloads/${slugByTopic[activeTopic]}-answers.pdf?v=${encodeURIComponent(pdfVersion)}-watermark-v1" download title="下载本专题全部参考答案，包含所有试卷">专题答案 PDF</a>` : '';
+  $('downloads').innerHTML = all.length && all.every(q => q.pdfReady) ? `<a class="download" href="export-parts/${slugByTopic[activeTopic]}-questions-book.pdf?v=${encodeURIComponent(pdfVersion)}-clean-vector-v1" download title="下载本专题全部 ${all.length} 道题，包含所有试卷">专题题目 PDF</a><a class="download" href="export-parts/${slugByTopic[activeTopic]}-answers-book.pdf?v=${encodeURIComponent(pdfVersion)}-clean-vector-v1" download title="下载本专题全部参考答案，包含所有试卷">专题答案 PDF</a>` : '';
   $('questions').innerHTML = list.map(q => {
     const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
     const answerOpen = openAnswers.has(q.id);
@@ -586,7 +592,16 @@ window.addEventListener('popstate',restoreUrl); window.addEventListener('hashcha
 window.addEventListener('resize',() => { if (ready && selectedQuestions.size) updateSelection(); });
 
 async function loadLibrary() {
+  if (libraryLoading) return;
+  libraryLoading = true;
+  const fromRetry = document.activeElement === $('retry-load');
+  $('retry-load').disabled = true;
+  $('library-notice').setAttribute('aria-busy','true');
+  $('library-error-message').textContent = '正在重新加载题库…';
+  $('library-status').textContent = '正在加载题库…';
+  $('questions').setAttribute('aria-busy','true');
   try {
+    if (location.protocol === 'file:') throw new Error('请使用本地 HTTP 服务');
     const [data,numbering,display] = await Promise.all(['questions.json','numbering.json?v=paper-type-v1','presentation.json'].map(async path => {
       const response = await fetch(path); if (!response.ok) throw new Error('题库加载失败'); return response.json();
     }));
@@ -598,19 +613,29 @@ async function loadLibrary() {
     $('search-topic').innerHTML = option('all','全部专题','all')+topics.map(t => option(t,t,'all')).join('');
     $('search-edition').innerHTML = option('all','全部届次','all')+editionValues(questions).map(e => option(e,editionLabel(e),'all')).join('');
     refreshSearchPapers(); ready = true; $('search-launch').disabled = false;
+    $('library-notice').hidden = true;
     document.dispatchEvent(new Event('chemy-library-ready'));
     readUrl(); const target = activeQuestion; render();
     if (!showingIntroduction) writeUrl(target,false);
     if (target && !showingIntroduction) scrollToQuestion(target,false);
+    if (fromRetry) $(showingIntroduction ? 'introduction' : 'reading').focus({preventScroll:true});
   } catch (error) {
     ready = false; $('search-launch').disabled = true;
     $('topic-summary').textContent = '题库尚未加载完成';
-    $('library-status').innerHTML = '题库暂时无法加载。<br><button id="retry-library">重新加载</button>';
-    $('retry-library').addEventListener('click',() => { $('library-status').textContent = '正在重新加载题库…'; loadLibrary(); });
+    $('library-status').textContent = '题库暂时无法加载。请查看页面上方的提示。';
     $('directory-tree').innerHTML = '<p class="loading-note">题库加载后显示目录。</p>';
     $('questions').setAttribute('aria-busy','false');
-    $('questions').innerHTML = '<section class="load-error"><h2>题目暂时无法加载</h2><p>请检查网络后重试。</p><button id="retry-load">重新加载</button></section>';
-    $('retry-load').addEventListener('click',() => { $('questions').setAttribute('aria-busy','true'); $('questions').innerHTML = '<p class="loading-note">正在重新加载题库…</p>'; loadLibrary(); });
+    $('questions').innerHTML = '';
+    const localFile = location.protocol === 'file:';
+    $('library-error-message').textContent = localFile ? '直接打开 HTML 文件无法读取题库或生成选题 PDF，请通过本地 HTTP 服务访问。' : '题库暂时无法加载，请检查网络后重新加载。';
+    $('local-preview-help').hidden = !localFile;
+    $('retry-load').hidden = localFile;
+    $('library-notice').hidden = false;
+  } finally {
+    libraryLoading = false;
+    $('retry-load').disabled = false;
+    $('library-notice').setAttribute('aria-busy','false');
   }
 }
+$('retry-load').addEventListener('click',loadLibrary);
 loadLibrary();

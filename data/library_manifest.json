@@ -4777,25 +4777,14 @@
                 "page": 38,
                 "box": [
                   84,
-                  126.37053304267715,
+                  120.960032,
                   514,
-                  139.35429481348785
+                  273.00003275
                 ],
-                "asset": "e39-p05-q04-03-a6bc96343b25.webp",
+                "asset": "e39-p05-a04-02-7c3ecd819cef.webp",
                 "mode": "band",
-                "sha256": "a6bc96343b251877c7ed66ce8d80f44ef1b9aa381cff38362bca3f7f660c06d7"
-              },
-              {
-                "page": 38,
-                "box": [
-                  84,
-                  185.77001023325238,
-                  514,
-                  219.39560743962727
-                ],
-                "asset": "e39-p05-q04-04-41b99a873f83.webp",
-                "mode": "band",
-                "sha256": "41b99a873f83df4283e50b2b68873c9422ca8001aa8ec09a407864f959fcc818"
+                "sha256": "7c3ecd819cefe685763fb7cc5d3dcd2955e06d38df3fdf360578f3da32405563",
+                "restoredFrom": "data/question_figure_corrections.json"
               },
               {
                 "page": 38,
@@ -4893,7 +4882,7 @@
                 ],
                 "selectedCharacters": 246,
                 "nativeCharacters": 186,
-                "figures": 3
+                "figures": 2
               }
             ],
             "a": [

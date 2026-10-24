@@ -243,6 +243,7 @@
   }
   async function download(kind) {
     if(state.worker || !state.items.length)return;
+    if(location.protocol==='file:'){el('ai-export-status').textContent=localPreviewMessage;return;}
     const snapshot=state.items.slice(),name=state.concept.name;
     const nonce=++state.exportNonce;
     busy(true);el('ai-export-status').textContent='正在准备 PDF…';
@@ -252,10 +253,12 @@
       // Only our added commentary is rasterized; source answers remain vector pages.
       const header=canvasNote([`${name} · ${kind==='answers'?'参考答案':'专题练习'}`,`共 ${snapshot.length} 道完整大题，保留原专题编号与来源。`],true);
       const items=snapshot.map((item,i)=>({id:item.id,slug:slugByTopic[byId.get(item.id).topic],annotation:kind==='answers'?canvasNote([`练习第 ${i+1} 题 · 知识点关联说明`,...labels(item),'关联说明由 AI 分析；下方为原卷参考答案。']):null}));
-      state.worker=new Worker('pdf-worker.js?v=ai-paper-v1');
-      const fail=message=>{state.worker?.terminate();state.worker=null;busy(false);el('ai-export-status').textContent=message;};
+      state.worker=new Worker('pdf-worker.js?v=clean-vector-v1');
+      const worker=state.worker;
+      const fail=message=>{if(state.worker!==worker)return;worker.terminate();state.worker=null;busy(false);el('ai-export-status').textContent=message;};
       state.worker.onerror=()=>fail('PDF 工具加载失败，请检查网络后重新下载。');
       state.worker.onmessage=({data})=>{
+        if(state.worker!==worker || nonce!==state.exportNonce)return;
         if(data.status)el('ai-export-status').textContent=data.status;
         else if(data.error)fail(data.error);
         else if(data.bytes){
@@ -266,7 +269,7 @@
         }
       };
       state.worker.postMessage({items,version:pdfVersion,kind,title:`Chemy · ${name} · ${kind==='answers'?'答案':'题目'}`,paperHeader:header});
-    }catch(_){state.worker?.terminate();state.worker=null;busy(false);el('ai-export-status').textContent='PDF 生成失败，请重试下载。';}
+    }catch(_){if(nonce!==state.exportNonce)return;state.worker?.terminate();state.worker=null;busy(false);el('ai-export-status').textContent='PDF 生成失败，请重试下载。';}
   }
   document.querySelectorAll('[data-ai-export]').forEach(button=>button.addEventListener('click',()=>download(button.dataset.aiExport)));
   async function printPaper(kind) {

@@ -12,6 +12,7 @@ from library_config import ROOT,Q_SOURCE,A_SOURCE,CACHE,EDITION,paper_key,editio
 from source_info import source_name,paper_name
 from import_paper1 import native_blocks,in_box
 from display_numbering import write_numbering
+from question_figure_corrections import corrections as figure_corrections, correction_signature, patch_source_page
 
 ASSETS=ROOT/'dist/assets'; DATA=ROOT/'data/library_manifest.json'
 SOURCES={'q':Q_SOURCE,'a':A_SOURCE}
@@ -70,7 +71,8 @@ def spans(k,paper,number,heading=False):
     return ranges
 def render_page(k,n):
     dest=CACHE/k/f'{n:03}-clean.png'
-    if dest.exists() and dest.with_suffix('.pdf').exists():return dest
+    correction=correction_signature(EDITION,k,n);stamp=dest.with_suffix('.correction')
+    if dest.exists() and dest.with_suffix('.pdf').exists() and (not correction or stamp.exists() and stamp.read_text()==correction):return dest
     if k not in READERS:READERS[k]=PdfReader(SOURCES[k])
     reader=READERS[k];p=copy.copy(reader.pages[n-1]);d=load(k,n)
     stream=ContentStream(p.get_contents(),reader);names={'/'+im['name'] for im in d['images'] if background(im,k)}
@@ -81,6 +83,8 @@ def render_page(k,n):
         resources[NameObject('/XObject')]=DictionaryObject({key:v for key,v in xo.get_object().items() if str(key) not in names})
     p[NameObject('/Resources')]=resources
     writer=PdfWriter();writer.add_page(p);pdf=CACHE/k/f'{n:03}-clean.pdf';writer.write(pdf)
+    patch_source_page(pdf,EDITION,k,n)
+    if correction:stamp.write_text(correction)
     subprocess.run(['pdftoppm','-singlefile','-r','252','-png',str(pdf),str(dest.with_suffix(''))],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     return dest
 def merge(bands,gap=5):
@@ -127,7 +131,8 @@ def section(k,ranges,paper,number,label):
     parts=[];captures=[];audit=[];count=0
     for n,lo,hi in ranges:
         d=load(k,n);special=[f for f in exceptions(k,paper,number,n) if 'rangeTop' not in f or abs(f['rangeTop']-lo)<.01];floats=[f['box'] for f in special if f['mode']=='float'];foreign=foreign_float_boxes(k,paper,number,n);excluded=floats+foreign;bands=figure_bands(k,d,lo,hi,excluded)
-        bands=merge(bands+[[f['box'][1],f['box'][3]] for f in special if f['mode']=='band'])
+        restored=figure_corrections(EDITION,k,n,paper,number)
+        bands=merge(bands+[[f['box'][1],f['box'][3]] for f in special if f['mode']=='band']+[[f['box'][1],f['box'][3]] for f in restored])
         selected=[c for c in d['chars'] if lo-1<=c['top']<hi and 85<=c['x0']<514 and (k=='q' or colored(c['non_stroking_color'])) and not any(char_inside(c,box) for box in foreign)]
         text=[c for c in selected if not any(a<=(c['top']+c['bottom'])/2<=b for a,b in bands) and not any(char_inside(c,box) for box in floats)]
         anchors=[c for c in text if c['text'].strip() and c['size']>=9.8]

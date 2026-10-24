@@ -1,36 +1,79 @@
-/* Original vector pages are clipped only at indexed blank gaps, then flowed onto A4. */
+/* Compose clean, font-subsetted native fragments, without whole-page Forms. */
 importScripts('vendor/pdf-lib.min.js');
-const {PDFDocument, PageSizes, StandardFonts, rgb, BlendMode, PDFArray, PDFName} = PDFLib;
+const {PDFDocument, PageSizes, StandardFonts, rgb, BlendMode, PDFArray, PDFDict, PDFName, PDFRef} = PDFLib;
+const PROFILE = 'clean-vector-v1';
+const MIN_ANNOTATED_SCALE = .85;
 const indexes = new Map();
-let cachedBook;
-async function getIndex(slug,version,kind='questions') {
+
+async function getIndex(slug, version, kind) {
+  if (!/^[a-z]+$/.test(slug)) throw new Error('专题标识无效。');
   const key = `${slug}-${kind}-${version}`;
   if (!indexes.has(key)) {
-    const response = await fetch(`export-index/${slug}${kind === 'answers' ? '-answers' : ''}.json?v=${encodeURIComponent(version)}-continuous-v2`);
-    if (!response.ok) throw new Error('题目下载索引暂时无法读取，请稍后重试。');
-    indexes.set(key, await response.json());
+    const response = await fetch(`export-parts/${slug}-${kind}.json?v=${encodeURIComponent(version)}-${PROFILE}`);
+    if (!response.ok) throw new Error('分题 PDF 尚未准备好。维护者需运行 python scripts/build_export_parts.py 后重新发布；本地预览也需先完成这一步。');
+    const data = await response.json();
+    if (data.profile !== PROFILE || data.bookVersion !== version) throw new Error('题册正在更新，请刷新页面后重试。');
+    indexes.set(key, data);
   }
-  const data = indexes.get(key);
-  if (data.bookVersion !== version) throw new Error('题册正在更新，请刷新页面后重试。');
-  return data.questions;
+  return indexes.get(key);
 }
-async function getBook(slug, version,kind='questions') {
-  if (cachedBook?.slug === slug && cachedBook?.kind === kind && cachedBook?.version === version) return cachedBook.doc;
-  self.postMessage({status:'正在读取专题题册，首次下载可能需要稍候…'});
-  const response = await fetch(`downloads/${slug}-${kind}.pdf?v=${encodeURIComponent(version)}-watermark-v1`);
-  if (!response.ok) throw new Error('专题题册暂时无法读取，请检查网络后重试。');
-  const doc = await PDFDocument.load(await response.arrayBuffer());
-  // A source-page watermark must not be clipped and repeated with each question.
-  // Remove only our separate decorative layer, then stamp each final page once.
-  for (const page of doc.getPages()) {
-    const value = page.node.Contents();
-    const streams = value instanceof PDFArray ? value.asArray() : value ? [value] : [];
-    const clean = streams.filter(ref => !doc.context.lookup(ref).dict.get(PDFName.of('ChemyWatermark')));
-    if (clean.length !== streams.length) page.node.set(PDFName.of('Contents'),doc.context.obj(clean));
+
+async function loadFragment(record) {
+  if (!record || !/^[a-zA-Z0-9/._-]+\.pdf$/.test(record.path) || record.path.split('/').includes('..') || record.path.startsWith('/')) throw new Error('分题 PDF 索引无效。');
+  const response = await fetch(`export-parts/${record.path}?v=${record.sha256}`);
+  if (!response.ok) throw new Error('分题 PDF 暂时无法读取，请检查网络后重试。');
+  const bytes = await response.arrayBuffer();
+  if (record.bytes && bytes.byteLength !== record.bytes) throw new Error('分题 PDF 正在更新，请刷新页面后重试。');
+  if (self.crypto?.subtle) {
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    const actual = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+    if (actual !== record.sha256) throw new Error('分题 PDF 与索引不一致，请刷新页面后重试。');
   }
-  cachedBook = {slug,kind,version,doc};
-  return doc;
+  return PDFDocument.load(bytes);
 }
+
+// Every fragment resource has a unique name assigned by the builder. Copy its
+// original content streams straight onto the target page, preserving native text.
+function drawNative(out, target, source, x, y, scale=1) {
+  const box = source.getMediaBox();
+  const tx = x-box.x*scale, ty = y-box.y*scale;
+  const resources = target.node.Resources();
+  for (const [category, value] of source.node.Resources().entries()) {
+    const dictionary = out.context.lookup(value);
+    if (!(dictionary instanceof PDFDict)) continue;
+    let destination = resources.lookupMaybe(category, PDFDict);
+    if (!destination) { destination = out.context.obj({}); resources.set(category, destination); }
+    for (const [name, ref] of dictionary.entries()) {
+      const previous = destination.get(name);
+      if (previous && previous.toString() !== ref.toString()) throw new Error('PDF 资源名称冲突，请重新生成分题文件。');
+      if (category.toString() === '/Pattern') {
+        // Pattern matrices use the page's initial coordinates, not the current
+        // cm. Each band has its own names; clone rather than mutate a shared
+        // font/graphics object used by another band or another output page.
+        if (previous) throw new Error('PDF 图案被重复放置，请检查选题是否重复。');
+        const pattern = out.context.lookup(ref).clone(out.context);
+        const settings = pattern instanceof PDFDict ? pattern : pattern.dict;
+        const matrix = settings.lookupMaybe(PDFName.of('Matrix'), PDFArray);
+        const [a,b,c,d,e,f] = matrix ? matrix.asArray().map(v=>out.context.lookup(v).asNumber()) : [1,0,0,1,0,0];
+        settings.set(PDFName.of('Matrix'), out.context.obj([scale*a,scale*b,scale*c,scale*d,scale*e+tx,scale*f+ty]));
+        destination.set(name, out.context.register(pattern));
+      } else destination.set(name, ref);
+    }
+  }
+  const contentsRef = source.node.get(PDFName.of('Contents'));
+  const contents = out.context.lookup(contentsRef);
+  const streams = contents instanceof PDFArray ? contents.asArray() : contents ? [contentsRef] : [];
+  // Ensure subsequent pdf-lib drawings start a new stream after the raw content.
+  target.contentStream = undefined;
+  target.contentStreamRef = undefined;
+  // A cropped page clips even partially visible paths to its MediaBox. Preserve
+  // that boundary when copying operators: a diagram's larger white background
+  // must not cover previously placed bands on the destination page.
+  target.node.addContentStream(out.context.register(out.context.stream(`q\n${scale} 0 0 ${scale} ${tx} ${ty} cm\n${box.x} ${box.y} ${box.width} ${box.height} re W n\n`)));
+  for (const stream of streams) target.node.addContentStream(stream instanceof PDFRef ? stream : out.context.register(stream));
+  target.node.addContentStream(out.context.register(out.context.stream('\nQ\n')));
+}
+
 self.onmessage = async ({data}) => {
   try {
     const kind = data.kind === 'answers' ? 'answers' : 'questions';
@@ -44,19 +87,17 @@ self.onmessage = async ({data}) => {
     const watermarkResponse = await fetch('assets/chemy-watermark.jpg');
     if (!watermarkResponse.ok) throw new Error('Chemy 水印暂时无法读取，请稍后重试。');
     const watermark = await out.embedJpg(await watermarkResponse.arrayBuffer());
-    let page, cursor, pageCount = 0, copiedSlug = '', copiedPages, footer;
-    const placements = [];
-    const headings = [];
-    const annotations = [];
+    let page, cursor, pageCount = 0, previousSlug = '', footer;
+    const frames = new Map(), placements = [], headings = [], annotations = [];
     const footerPages = new Set();
     function newPage() {
       page = out.addPage([width,height]); cursor = height-margin; pageCount++;
       page.drawText(String(pageCount), {x:width-68,y:30,size:9,font,color:rgb(.3,.3,.3)});
-      if (footer) { page.drawPage(footer,{x:50,y:31}); footerPages.add(pageCount); }
+      if (footer) { drawNative(out,page,footer,50,31); footerPages.add(pageCount); }
     }
-    async function drawNote(note,id,keep=0) {
+    async function drawNote(note,id,keep=0,prepared) {
       if (!note?.bytes) return;
-      const image = await out.embedPng(note.bytes);
+      const image = prepared || await out.embedPng(note.bytes);
       const drawWidth = width-2*margin, drawHeight = drawWidth*image.height/image.width;
       if (drawHeight+keep > height-margin-bottom) throw new Error('关联说明过长，无法安全排版。');
       if (!page || cursor-bottom < drawHeight+keep) newPage();
@@ -64,68 +105,78 @@ self.onmessage = async ({data}) => {
       annotations.push({id,page:pageCount,top:height-cursor,height:drawHeight});
       cursor -= drawHeight+10;
     }
-    await drawNote(data.paperHeader,'paper-header',90);
+    const paperHeaderImage = data.paperHeader?.bytes ? await out.embedPng(data.paperHeader.bytes) : null;
     for (let i=0; i<data.items.length; i++) {
       const item = data.items[i];
       const index = await getIndex(item.slug,data.version,kind);
-      const regions = index[item.id];
-      if (!regions?.length) throw new Error('这道题的下载索引缺失，请稍后重试。');
-      const source = await getBook(item.slug,data.version,kind);
-      if (copiedSlug !== item.slug) {
-        const ids = [...new Set(data.items.filter(q => q.slug === item.slug).flatMap(q => {
-          if (!index[q.id]?.length) throw new Error('所选题目的下载索引缺失，请刷新后重试。');
-          return index[q.id].map(r => r.page);
-        }))];
-        const copied = await out.copyPages(source,ids);
-        copiedPages = new Map(ids.map((id,n) => [id,copied[n]]));
-        copiedSlug = item.slug;
-        // Preserve the copyright line without the source book's page counter.
-        footer = await out.embedPage(copied[0],{left:50,right:width-90,bottom:31,top:44});
-        if (page && !footerPages.has(pageCount)) { page.drawPage(footer,{x:50,y:31}); footerPages.add(pageCount); }
-        // Keep the complete centered masthead from the original-paper layout.
-        // The second line is the full-book count and does not describe a selection.
-        const headingTop = 47, headingBottom = 63;
-        const label = await out.embedPage(copied[0],{left:0,right:width,bottom:height-headingBottom,top:height-headingTop});
-        const headingHeight = headingBottom-headingTop, headingSpace = headingHeight+16;
-        const firstBand = regions[0].bands[0];
-        if (!page || cursor-bottom < headingSpace+Math.min(firstBand[1]-firstBand[0],height-margin-bottom-headingSpace)) newPage();
-        headings.push({slug:item.slug,sourcePage:ids[0],page:pageCount,top:height-cursor,height:headingHeight});
-        page.drawPage(label,{x:0,y:cursor-headingHeight}); cursor -= headingSpace;
+      const record = index.questions[item.id];
+      if (!record?.regions?.length) throw new Error('这道题的分题 PDF 缺失，请联系维护者重新生成。');
+      self.postMessage({status:`正在读取第 ${i+1} / ${data.items.length} 道题…`});
+      const source = await loadFragment(record);
+      if (source.getPageCount() !== record.pages.length) throw new Error('分题 PDF 页数与索引不一致，请刷新后重试。');
+      const copied = await out.copyPages(source,source.getPageIndices());
+      const regions = record.regions;
+      const annotationImage = kind === 'answers' && item.annotation?.bytes ? await out.embedPng(item.annotation.bytes) : null;
+      const annotationSpace = annotationImage ? (width-2*margin)*annotationImage.height/annotationImage.width+10 : 0;
+      const firstBand = regions[0].bands[0];
+      const firstBandHeight = firstBand.bottom-firstBand.top;
+      const headingHeight = 16, headingSpace = headingHeight+16;
+      const headerImage = i === 0 ? paperHeaderImage : null;
+      const headerSpace = headerImage ? (width-2*margin)*headerImage.height/headerImage.width+10 : 0;
+      const hasNotes = !!(annotationImage || headerImage);
+      // Plan the complete opening group before painting any note: paper
+      // header, topic heading, answer annotation and the first safe block.
+      // Reduce source text by at most 15%, even when both notes are present.
+      const firstScale = hasNotes ? Math.min(1,
+        (height-margin-bottom-headerSpace-annotationSpace-(previousSlug !== item.slug ? headingSpace : 0))/firstBandHeight) : 1;
+      if (firstScale < MIN_ANNOTATED_SCALE) throw new Error(`${headerImage ? '卷首或关联' : '关联'}说明过长，无法在保证题目和答案字号清晰的同时与正文放在同一页；请减少说明内容后重试。`);
+      const firstKeep = firstBandHeight*firstScale;
+      if (headerImage) await drawNote(data.paperHeader,'paper-header',headingSpace+annotationSpace+firstKeep+10-1e-6,headerImage);
+      if (previousSlug !== item.slug) {
+        if (!frames.has(item.slug)) {
+          const frameSource = await loadFragment(index.frame);
+          frames.set(item.slug,await out.copyPages(frameSource,[0,1]));
+        }
+        const frame = frames.get(item.slug);
+        footer = frame[0];
+        if (page && !footerPages.has(pageCount)) { drawNative(out,page,footer,50,31); footerPages.add(pageCount); }
+        const keep = hasNotes ? firstKeep : Math.min(firstBandHeight,height-margin-bottom-headingSpace);
+        if (!page || cursor-bottom+(hasNotes ? 1e-6 : 0) < headingSpace+annotationSpace+keep) newPage();
+        headings.push({slug:item.slug,sourcePage:0,page:pageCount,top:height-cursor,height:headingHeight});
+        drawNative(out,page,frame[1],0,cursor-headingHeight); cursor -= headingSpace;
+        previousSlug = item.slug;
       }
-      if (kind === 'answers') await drawNote(item.annotation,item.id,Math.min(90,regions[0].bands[0][1]-regions[0].bands[0][0]));
+      if (annotationImage) await drawNote(item.annotation,item.id,firstKeep+10-1e-6,annotationImage);
       self.postMessage({status:`正在排版第 ${i+1} / ${data.items.length} 道题…`});
       let first = true;
       for (const region of regions) {
         let offset = 0;
         while (offset < region.bands.length) {
-          const top = region.bands[offset][0];
-          const initialHeight = region.bands[offset][1]-top;
-          if (!page || cursor-bottom < Math.min(initialHeight,height-margin-bottom)) newPage();
+          const top = region.bands[offset].top;
+          const initialHeight = region.bands[offset].bottom-top;
+          const preferredScale = first && hasNotes ? firstScale : 1;
+          if (!page || cursor-bottom+(first && hasNotes ? 1e-6 : 0) < Math.min(initialHeight*preferredScale,height-margin-bottom)) newPage();
           const capacity = cursor-bottom;
           let end = offset;
-          while (end+1 < region.bands.length && region.bands[end+1][1]-top <= capacity) end++;
-          const inkBottom = region.bands[end][1];
+          while (end+1 < region.bands.length && (region.bands[end+1].bottom-top)*preferredScale <= capacity) end++;
+          const inkBottom = region.bands[end].bottom;
           const naturalHeight = inkBottom-top;
-          // A single oversized diagram stays whole and is scaled to a fresh page.
-          const scale = Math.min(1,capacity/naturalHeight);
-          const sourcePage = copiedPages.get(region.page);
-          const h = sourcePage.getHeight();
-          const embedded = await out.embedPage(sourcePage,{left:0,right:sourcePage.getWidth(),top:h-top,bottom:h-inkBottom});
+          const scale = Math.min(preferredScale,capacity/naturalHeight);
+          for (let n=offset; n<=end; n++) {
+            const band = region.bands[n];
+            drawNative(out,page,copied[band.page],(width-band.width*scale)/2,cursor-(band.bottom-top)*scale,scale);
+          }
           const drawnHeight = naturalHeight*scale;
-          page.drawPage(embedded,{x:(width-sourcePage.getWidth()*scale)/2,y:cursor-drawnHeight,xScale:scale,yScale:scale});
-          placements.push({id:item.id,slug:item.slug,sourcePage:region.page,sourceTop:top,sourceBottom:inkBottom,scale,page:pageCount,top:height-cursor,height:drawnHeight,first});
+          placements.push({id:item.id,slug:item.slug,sourcePage:region.sourcePage,sourceTop:top,sourceBottom:inkBottom,scale,page:pageCount,top:height-cursor,height:drawnHeight,first});
           first = false; cursor -= drawnHeight;
           offset = end+1;
-          if (offset < region.bands.length) {
-            const gap = region.bands[offset][0]-inkBottom;
-            cursor -= Math.min(18, Math.max(3,gap));
-          } else cursor -= 10;
+          if (offset < region.bands.length) cursor -= Math.min(18,Math.max(3,region.bands[offset].top-inkBottom));
+          else cursor -= 10;
         }
       }
       cursor -= 12;
     }
-    const watermarkWidth = width*.62;
-    const watermarkHeight = watermarkWidth*watermark.height/watermark.width;
+    const watermarkWidth = width*.62, watermarkHeight = watermarkWidth*watermark.height/watermark.width;
     for (const sheet of out.getPages()) sheet.drawImage(watermark,{
       x:(width-watermarkWidth)/2,y:(height-watermarkHeight)/2,
       width:watermarkWidth,height:watermarkHeight,opacity:.18,blendMode:BlendMode.Multiply

@@ -8,11 +8,11 @@
   <meta name="description" content="按九个化学专题、届次和试卷查找 Chemy 竞赛题目，搜索题干关键词，查看原卷参考答案，下载专题或自选题目 PDF。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="interface.css?v=watermark-v2-light">
+  <link rel="stylesheet" href="interface.css?v=load-recovery-v1">
   <link rel="stylesheet" href="ai-paper.css?v=keywords-v1">
-  <script src="app.js?v=selected-answers-v1" defer></script>
+  <script src="app.js?v=load-recovery-v1" defer></script>
   <script src="paper-engine.js?v=keywords-v1" defer></script>
-  <script src="ai-paper.js?v=keywords-v1" defer></script>
+  <script src="ai-paper.js?v=load-recovery-v1" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
@@ -41,6 +41,16 @@
   <div class="overlay" id="overlay" hidden></div>
   <main class="app-main" id="main">
     <div class="browse-tools"><button id="topic-toggle" aria-expanded="false" aria-controls="sidebar">专题</button><button id="directory-toggle" aria-expanded="false" aria-controls="directory-pane">题目目录</button><button id="return-search" hidden>返回搜索结果</button></div>
+    <section class="load-error library-notice" id="library-notice" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <h2>题库尚未就绪</h2>
+      <p id="library-error-message"></p>
+      <div id="local-preview-help" hidden>
+        <p>在项目根目录打开终端并运行：</p>
+        <pre><code>python -m http.server 8765 --bind 127.0.0.1 --directory dist</code></pre>
+        <p>Windows 也可将 <code>python</code> 换为 <code>py</code>。保持终端运行，然后打开 <a href="http://127.0.0.1:8765/">本地题库</a>。</p>
+      </div>
+      <button id="retry-load" type="button">重新加载</button>
+    </section>
     <section class="introduction" id="introduction" aria-labelledby="introduction-title" tabindex="-1">
       <h1 id="introduction-title">写在前面</h1>
       <p class="intro-lead">这个网站，起于备赛时的一个小小愿望。</p>
