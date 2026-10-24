@@ -85,6 +85,39 @@ def namespace_page(page, reader, prefix):
     page[NameObject('/Resources')] = renamed
 
 
+class _BandCuller(fitz.mupdf.PdfSanitizeFilterOptions2):
+    """Remove out-of-band paint while retaining zero-advance combining marks."""
+    def __init__(self, clip):
+        super().__init__()
+        self.clip = clip
+        self.use_virtual_culler()
+
+    def culler(self, ctx, bbox, kind):
+        # Keep clipping paths: dropping one can reveal previously hidden paint.
+        if kind in (0, 4, 5, 6, 7):
+            return 0
+        rect = fitz.Rect(bbox.x0, bbox.y0, bbox.x1, bbox.y1)
+        if kind == 8 and (rect.x0 == rect.x1 or rect.y0 == rect.y1):
+            # MuPDF's default clip_page rejects an empty advance rectangle even
+            # when the glyph has visible ink (e.g. U+0305 COMBINING OVERLINE).
+            # Compare coordinates directly; an off-band zero-width glyph must
+            # still be physically removed, not kept by Rect.contains(empty).
+            return int(rect.x1 < self.clip.x0 or rect.x0 > self.clip.x1
+                       or rect.y1 < self.clip.y0 or rect.y0 > self.clip.y1)
+        return int((rect & self.clip).is_empty)
+
+
+def _clip_band(page, box):
+    clip = fitz.Rect(box)
+    if clip.is_infinite or (clip & page.rect).is_empty:
+        raise ValueError('Band must intersect the source page')
+    clip *= page.transformation_matrix
+    pdfpage = fitz._as_pdf_page(page)
+    culler = _BandCuller(clip)
+    options = fitz._make_PdfFilterOptions(sanitize=1, sopts=culler)
+    fitz.mupdf.pdf_filter_page_contents(pdfpage.doc(), pdfpage, options)
+
+
 def make_part(clean_pages, bands, identity):
     """Each mini-page physically contains one safe band, never the source page."""
     doc = fitz.open()
@@ -100,10 +133,11 @@ def make_part(clean_pages, bands, identity):
             # Cleaning a source page uses temporary PDFs. Their inline font
             # dictionaries must not contaminate this document's clip metrics.
             fitz.TOOLS.store_shrink(100)
-            page.clip_to_rect(fitz.Rect(band['box']))
+            _clip_band(page, band['box'])
             page.clean_contents()
-        fitz.TOOLS.store_shrink(100)
-        doc.subset_fonts()
+        # Only the guarded subsetter below may replace font programs. Native
+        # subset_fonts() can alter glyph hinting before that guard establishes
+        # its baseline, causing the later check to accept already changed ink.
         raw = doc.tobytes(garbage=1, deflate=True, use_objstms=1, no_new_id=True)
     finally:
         doc.close()

@@ -423,5 +423,75 @@ class NativeCharacterPaintTests(unittest.TestCase):
                 validation.metric_warning_pairs(warnings)
 
 
+class CombiningMarkCropTests(unittest.TestCase):
+    def test_unguarded_font_optimization_cannot_replace_the_reference_ink(self):
+        from fontTools.ttLib import TTFont
+        from pypdf import PdfReader
+
+        def unsafe_native_subset(doc, *args, **kwargs):
+            # Fault injection models an optimizer changing a glyph before the
+            # guarded subsetter captures its reference. A later self-comparison
+            # cannot discover that the original letter was already distorted.
+            reader = PdfReader(BytesIO(doc.tobytes(garbage=1)))
+            font = next(iter(reader.pages[0]['/Resources']['/Font'].values())).get_object()
+            descendant = font['/DescendantFonts'][0].get_object()
+            stream = descendant['/FontDescriptor'].raw_get('/FontFile2')
+            program = TTFont(BytesIO(stream.get_object().get_data()))
+            program['glyf']['A'].coordinates.scale((2, 1))
+            changed = BytesIO(); program.save(changed); program.close()
+            doc.update_stream(stream.idnum, changed.getvalue())
+
+        raw = counter_fixture('A')
+        band = {'sourcePage': 0, 'box': [0, 0, 200, 100]}
+        with patch.object(builder.fitz.Document, 'subset_fonts', autospec=True,
+                          side_effect=unsafe_native_subset):
+            result = builder.make_part(lambda number: raw, [band], 'guarded-font-baseline')
+        with fitz.open('pdf', raw) as source, fitz.open('pdf', result) as target:
+            check = validation.compare_band(source[0], target, 0, band)
+            self.assertTrue(check['textEqual'])
+            self.assertEqual(check['maxDelta'], 0)
+
+    def test_zero_advance_marks_survive_but_neighbor_content_is_removed(self):
+        from PIL import Image
+        image = BytesIO()
+        Image.new('RGB', (8, 8), (230, 10, 40)).save(image, format='PNG')
+        with fitz.open() as original:
+            page = original.new_page(width=200, height=160)
+            page.insert_font(fontname='probe', fontbuffer=counter_font())
+            page.insert_text((30, 60), 'A\u0301', fontname='probe', fontsize=20)
+            page.insert_text((30, 130), 'A\u0301', fontname='probe', fontsize=20)
+            page.draw_line((30, 64), (80, 64), width=.5)
+            page.draw_line((30, 135), (80, 135), width=.5)
+            page.insert_image((120, 110, 150, 140), stream=image.getvalue())
+            raw = original.tobytes(garbage=1)
+        band = {'sourcePage': 0, 'box': [0, 40, 200, 70]}
+        result = builder.make_part(lambda number: raw, [band], 'combining-crop')
+        with fitz.open('pdf', raw) as source, fitz.open('pdf', result) as target:
+            check = validation.compare_band(source[0], target, 0, band)
+            self.assertTrue(check['textEqual'])
+            self.assertEqual(check['maxDelta'], 0)
+            target[0].set_mediabox(source[0].mediabox)
+            self.assertEqual(validation.characters(target[0], target[0].rect), Counter({'A': 1, '\u0301': 1}))
+            self.assertEqual(len(target[0].get_drawings()), 1)
+            self.assertEqual(target[0].get_images(), [])
+            self.assertEqual(target[0].get_xobjects(), [])
+
+    def test_zero_advance_marks_outside_the_horizontal_band_are_removed(self):
+        with fitz.open() as original:
+            page = original.new_page(width=200, height=100)
+            page.insert_font(fontname='probe', fontbuffer=counter_font())
+            for x in (10, 50, 170):
+                page.insert_text((x, 50), '\u0301', fontname='probe', fontsize=20)
+            raw = original.tobytes(garbage=1)
+        band = {'sourcePage': 0, 'box': [30, 30, 100, 60]}
+        result = builder.make_part(lambda number: raw, [band], 'combining-horizontal')
+        with fitz.open('pdf', raw) as source, fitz.open('pdf', result) as target:
+            check = validation.compare_band(source[0], target, 0, band)
+            self.assertTrue(check['textEqual'])
+            self.assertEqual(check['maxDelta'], 0)
+            target[0].set_mediabox(source[0].mediabox)
+            self.assertEqual(validation.characters(target[0], target[0].rect), Counter({'\u0301': 1}))
+
+
 if __name__ == '__main__':
     unittest.main()
