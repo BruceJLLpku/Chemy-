@@ -138,6 +138,7 @@ function startExport(kind='questions') {
       link.href = url; link.download = `Chemy-${single}-${label}.pdf`; document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url),60000);
       $('export-status').textContent = 'PDF 已生成，下载已开始。';
+      window.ChemyAccount?.savePaper(snapshot.map(q=>q.id),'自选练习卷');
       cancelExport(); $(button).textContent = `再次下载${label} PDF`;
     }
   };
@@ -223,7 +224,9 @@ function writeUrl(questionId = '', push = true) {
 }
 function readUrl() {
   const params = new URLSearchParams(location.search);
-  showingIntroduction = !location.hash || location.hash === '#about';
+  // Keep email verification/recovery fragments intact until the auth SDK consumes them.
+  const authCallback = /(?:^#|&)(?:access_token|error|error_code|type)=/.test(location.hash);
+  showingIntroduction = authCallback || !location.hash || location.hash === '#about';
   activeTopic = topics[slugs.indexOf(location.hash.slice(1))] || topics[0];
   selectedEdition = params.get('edition') || 'all';
   selectedPaper = params.get('paper') || 'all';
@@ -306,9 +309,10 @@ function render() {
   $('questions').innerHTML = list.map(q => {
     const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
     const answerOpen = openAnswers.has(q.id);
-    return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="question-download"><label><input type="checkbox" data-select-question="${escapeHtml(q.id)}"${selectedQuestions.has(q.id) ? ' checked' : ''} aria-label="勾选${q.topic}第${numbers[q.id]}题">选入练习卷</label><button data-download-question="${escapeHtml(q.id)}" aria-label="下载${q.topic}第${numbers[q.id]}题 PDF">下载本题 PDF</button></div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details></article>`;
+    return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="question-download"><label><input type="checkbox" data-select-question="${escapeHtml(q.id)}"${selectedQuestions.has(q.id) ? ' checked' : ''} aria-label="勾选${q.topic}第${numbers[q.id]}题">选入练习卷</label><button type="button" data-favorite="${escapeHtml(q.id)}" aria-pressed="false">收藏</button><button data-download-question="${escapeHtml(q.id)}" aria-label="下载${q.topic}第${numbers[q.id]}题 PDF">下载本题 PDF</button></div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details></article>`;
   }).join('') || '<section class="empty"><h2>当前筛选下没有题目</h2><p>请在目录中选择其他届次或全部试卷。</p></section>';
   $('questions').setAttribute('aria-busy','false');
+  window.ChemyAccount?.refreshButtons();
   updateSelection();
   $('number-status').textContent = '';
   renderDirectory(list);

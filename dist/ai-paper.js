@@ -190,6 +190,8 @@
     return `<aside class="ai-association"><h5>知识点关联说明：${safe(state.concept.name)}</h5>${labels(item).map(t=>`<p>${safe(t)}</p>`).join('')}<p class="ai-hint">以上为 AI 分析的关联说明，以下为原卷参考答案。</p></aside>`;
   }
   function origin(q) {return `${paperLabel(paperKey(q))} · 原第 ${q.number} 题 · ${q.topic}专题第 ${numbers[q.id]} 题`;}
+  const saveButton=document.createElement('button');saveButton.type='button';saveButton.textContent='保存到组卷历史';el('ai-result').querySelector('.ai-actions').append(saveButton);
+  saveButton.onclick=()=>window.ChemyAccount?.savePaper(state.items.map(q=>q.id),state.concept.name+' · 专题练习',true);
   function render() {
     const items=state.items;
     el('ai-result').hidden=!items.length;
@@ -199,8 +201,9 @@
     status(items.length<state.count?`目标 ${state.count} 道，当前保留 ${items.length} 道。${state.pool.length<state.count?'相关题量不足，已按实际题量组卷。':'可重新组卷恢复目标题量。'}`:'');
     el('ai-items').innerHTML=items.map((item,i)=>{
       const q=byId.get(item.id);
-      return `<article class="ai-item" data-ai-id="${safe(q.id)}"><div class="ai-item-top"><h4>练习第 ${i+1} 题　${safe(q.topic)} · 专题第 ${numbers[q.id]} 题</h4><div class="ai-item-controls"><button type="button" data-ai-replace="${safe(q.id)}"${state.pool.length<=items.length?' disabled':''}>换一题</button><button type="button" data-ai-remove="${safe(q.id)}">删除</button></div></div><p class="ai-origin">${safe(origin(q))}</p><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers"><summary><span>查看答案与关联说明</span></summary>${association(item)}<div class="answer-content">${lazyFigures(presentation[q.id].answer)}</div></details></article>`;
+      return `<article class="ai-item" data-ai-id="${safe(q.id)}"><div class="ai-item-top"><h4>练习第 ${i+1} 题　${safe(q.topic)} · 专题第 ${numbers[q.id]} 题</h4><div class="ai-item-controls"><button type="button" data-favorite="${safe(q.id)}" aria-pressed="false">收藏</button><button type="button" data-ai-replace="${safe(q.id)}"${state.pool.length<=items.length?' disabled':''}>换一题</button><button type="button" data-ai-remove="${safe(q.id)}">删除</button></div></div><p class="ai-origin">${safe(origin(q))}</p><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers"><summary><span>查看答案与关联说明</span></summary>${association(item)}<div class="answer-content">${lazyFigures(presentation[q.id].answer)}</div></details></article>`;
     }).join('');
+    window.ChemyAccount?.refreshButtons();
   }
   el('ai-items').addEventListener('click',event=>{
     if(state.worker)return;
@@ -262,7 +265,7 @@
           const url=URL.createObjectURL(new Blob([data.bytes],{type:'application/pdf'})),link=document.createElement('a');
           link.href=url;link.download=`Chemy-${name.replace(/[\\/:*?"<>|]/g,'_')}-${kind==='answers'?'答案':'题目'}.pdf`;
           document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-          state.worker.terminate();state.worker=null;busy(false);el('ai-export-status').textContent='PDF 已生成，下载已开始。';
+          state.worker.terminate();state.worker=null;busy(false);el('ai-export-status').textContent='PDF 已生成，下载已开始。';window.ChemyAccount?.savePaper(state.items.map(q=>q.id),state.concept.name+' · 专题练习');
         }
       };
       state.worker.postMessage({items,version:pdfVersion,kind,title:`Chemy · ${name} · ${kind==='answers'?'答案':'题目'}`,paperHeader:header});

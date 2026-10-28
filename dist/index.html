@@ -13,12 +13,15 @@
   <script src="app.js?v=selected-answers-v1" defer></script>
   <script src="paper-engine.js?v=keywords-v1" defer></script>
   <script src="ai-paper.js?v=keywords-v1" defer></script>
+  <link rel="stylesheet" href="account.css?v=1">
+  <script src="account.js?v=1" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
   <header class="site-header">
     <a class="site-brand" href="#about" aria-label="Chemy 化学竞赛专题题库首页"><img src="assets/chemy-wordmark.png" alt="CHEMY" width="120" height="48"><span>化学竞赛专题题库</span></a>
     <div class="header-tools">
+      <button id="account-launch" type="button">登录 / 我的题库</button>
       <button class="ai-launch" id="ai-launch" aria-haspopup="dialog" aria-controls="ai-dialog" disabled>AI 组卷</button>
       <button class="search-launch" id="search-launch" aria-haspopup="dialog" aria-controls="search-dialog" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="search-placeholder">搜索题目标题或题干…</span><span class="search-short">查题</span><kbd>Ctrl K</kbd></button>
       <a class="repository-link" href="https://github.com/BruceJLLpku/Chemy-" target="_blank" rel="noopener">源文件</a>
