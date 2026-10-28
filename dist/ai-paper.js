@@ -55,10 +55,14 @@
     el('ai-paper').innerHTML=option('all','全部试卷','all')+keys.map(k=>option(k,paperLabel(k),previous)).join('');
     refreshKnowledge();
   }
+  function favoriteBank(){return el('ai-favorites-only').checked?questions.filter(q=>window.ChemyAccount?.has(q.id)):questions;}
+  function resetFavoriteScope(){if(!el('ai-favorites-only').checked)return;if(state.generating)cancelGeneration('收藏范围已变化，请重新生成。');state.pool=state.pool.filter(q=>window.ChemyAccount?.has(q.id));state.items=state.items.filter(q=>window.ChemyAccount?.has(q.id));if(state.concept)render();else el('ai-result').hidden=true;refreshKnowledge();}
+  document.addEventListener('chemy-favorites-changed',resetFavoriteScope);
+  el('ai-favorites-only').addEventListener('change',()=>{cancelGeneration('');state.pool=[];state.items=[];el('ai-result').hidden=true;refreshKnowledge();status(el('ai-favorites-only').checked?'仅从收藏中匹配知识点；题目不足时按实际题量生成。':'已恢复全部题库范围。');});
   function refreshKnowledge() {
     if(!state.index)return;
     const filters={topic:el('ai-topic').value,edition:el('ai-edition').value,paper:el('ai-paper').value};
-    const available=engine.availableConcepts(state.index,questions,filters);
+    const available=engine.availableConcepts(state.index,favoriteBank(),filters);
     const total=engine.availableConcepts(state.index,questions).length;
     el('ai-knowledge-summary').textContent=`查看全部可用知识点（当前范围 ${available.length} / 共 ${total} 个）`;
     const preferred=['羟醛缩合','Michael 加成','Diels-Alder 反应','核磁共振','配位化学','晶胞计算','化学平衡','沉淀溶解平衡','能斯特方程','阿伦尼乌斯方程','配位滴定','高分子分子量'];
@@ -125,6 +129,8 @@
   async function generate(conceptId) {
     if(state.worker||state.generating||!el('ai-form').reportValidity())return;
     const query=el('ai-query').value.trim(),count=Number(el('ai-count').value);
+    if(el('ai-favorites-only').checked&&!window.ChemyAccount?.isSignedIn()){status('请先登录，再从收藏中组卷。');return;}
+    const bank=favoriteBank();
     const filters={topic:el('ai-topic').value,edition:el('ai-edition').value,paper:el('ai-paper').value};
     const nonce=++state.agentNonce,controller=new AbortController();
     state.agentController=controller;state.generating=true;busy(true);el('ai-cancel').hidden=false;
@@ -135,11 +141,11 @@
       if(nonce!==state.agentNonce)return;
       if(!index.entries.length){status('题库的知识点分析尚未完成，请稍后再试。');return;}
       state.count=count;
-      if(config.mode==='local') {
+      if(config.mode==='local'||el('ai-favorites-only').checked) {
         const resolved=conceptId?{kind:'exact',concepts:index.concepts.filter(c=>c.id===conceptId)}:engine.resolve(query,index.concepts);
         if(resolved.kind!=='exact'||!resolved.concepts.length){showCandidates(resolved.concepts,resolved.concepts.length?'请选择你想练习的知识点，再生成试卷。':'未识别到这个知识点，请更换名称或使用更具体的表述。');return;}
         state.concept=resolved.concepts[0];
-        state.pool=engine.candidates(state.concept.id,index,questions,filters);state.items=engine.choose(state.pool,count);
+        state.pool=engine.candidates(state.concept.id,index,bank,filters);state.items=engine.choose(state.pool,count);
       } else {
         status('DeepSeek 正在理解需求并选择题目，首次唤醒服务可能需要稍候…');
         timer=setTimeout(()=>controller.abort('timeout'),180000);
@@ -265,7 +271,7 @@
           const url=URL.createObjectURL(new Blob([data.bytes],{type:'application/pdf'})),link=document.createElement('a');
           link.href=url;link.download=`Chemy-${name.replace(/[\\/:*?"<>|]/g,'_')}-${kind==='answers'?'答案':'题目'}.pdf`;
           document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-          state.worker.terminate();state.worker=null;busy(false);el('ai-export-status').textContent='PDF 已生成，下载已开始。';window.ChemyAccount?.savePaper(state.items.map(q=>q.id),state.concept.name+' · 专题练习');
+          state.worker.terminate();state.worker=null;busy(false);el('ai-export-status').textContent='PDF 已生成，下载已开始。';window.ChemyAccount?.savePaper(items.map(q=>q.id),name+' · 专题练习');
         }
       };
       state.worker.postMessage({items,version:pdfVersion,kind,title:`Chemy · ${name} · ${kind==='answers'?'答案':'题目'}`,paperHeader:header});

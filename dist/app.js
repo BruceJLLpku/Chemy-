@@ -19,9 +19,10 @@ let openPanelId = '', panelTrigger = null, panelScrollY = 0;
 let searchIndex = null, indexPromise = null, searchTimer, searchScroll = 0;
 let searchMatches = [], searchTerms = [], shownResults = 0;
 let searchSignature = '';
-let showingIntroduction = true;
+let showingIntroduction = true, showingFavorites = false;
 const summaryById = new Map();
 const selectedQuestions = new Set();
+let exportFromPaper = true;
 let exportItems = [], exportWorker = null, exportBusy = false;
 let pickerList = [], pickerGroups = new Map(), pickerTimer;
 
@@ -74,9 +75,9 @@ function renderPicker() {
   const query = normalizeText($('picker-query').value);
   const topic = $('picker-topic').value, edition = $('picker-edition').value;
   pickerList = questions.filter(q => (topic === 'all' || q.topic === topic) && (edition === 'all' || String(editionOf(q)) === edition)
-    && (!$('picker-selected-only').checked || selectedQuestions.has(q.id)) && pickerMatches(q,query));
+    && (!$('picker-selected-only').checked || selectedQuestions.has(q.id)) && (!$('picker-favorites-only').checked || window.ChemyAccount?.has(q.id)) && pickerMatches(q,query));
   pickerGroups = new Map();
-  $('picker-result-count').textContent = `${pickerList.length} 题 · ${new Set(pickerList.map(paperKey)).size} 份试卷`;
+  $('picker-result-count').textContent = `${$('picker-favorites-only').checked&&!window.ChemyAccount?.isSignedIn()?'请先登录查看收藏 · ':''}${pickerList.length} 题 · ${new Set(pickerList.map(paperKey)).size} 份试卷`;
   const expandMatches = !!query || $('picker-selected-only').checked;
   const group = (key,label,list,children,open) => {
     pickerGroups.set(key,list);
@@ -103,7 +104,8 @@ function openPicker() {
   $('picker-tree').innerHTML = '';
   $('question-picker').showModal(); renderPicker(); $('picker-tree').scrollTop = 0;
 }
-function openExport(ids) {
+function openExport(ids, fromPaper = true) {
+  exportFromPaper = fromPaper;
   exportItems = ids.map(id => byId.get(id)).filter(Boolean).sort((a,b) => topics.indexOf(a.topic)-topics.indexOf(b.topic) || numbers[a.id]-numbers[b.id]);
   if (!exportItems.length) return;
   closePanel(false);
@@ -122,6 +124,7 @@ function cancelExport() {
 function startExport(kind='questions') {
   if (exportBusy) return;
   const answers=kind==='answers',button=answers?'export-answers':'export-start';
+  const fromPaper=exportFromPaper;
   const snapshot=exportItems.slice(),label=answers?'答案':'题目';
   exportBusy = true; $('export-start').disabled = true; $('export-answers').disabled = true;
   $('export-status').textContent = `正在准备${label}…`;
@@ -138,7 +141,7 @@ function startExport(kind='questions') {
       link.href = url; link.download = `Chemy-${single}-${label}.pdf`; document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url),60000);
       $('export-status').textContent = 'PDF 已生成，下载已开始。';
-      window.ChemyAccount?.savePaper(snapshot.map(q=>q.id),'自选练习卷');
+      window.ChemyAccount?.savePaper(snapshot.map(q=>q.id),'自选练习卷',false,fromPaper);
       cancelExport(); $(button).textContent = `再次下载${label} PDF`;
     }
   };
@@ -160,7 +163,7 @@ $('picker-tree').addEventListener('change',event => {
     (nextId && $('picker-tree').querySelector(`[data-pick-question="${CSS.escape(nextId)}"]`) || $('picker-selected-only')).focus({preventScroll:true});
   }
 });
-for (const id of ['picker-topic','picker-edition','picker-selected-only']) $(id).addEventListener('change',() => { clearTimeout(pickerTimer); renderPicker(); $('picker-tree').scrollTop = 0; });
+for (const id of ['picker-topic','picker-edition','picker-selected-only','picker-favorites-only']) $(id).addEventListener('change',() => { clearTimeout(pickerTimer); renderPicker(); $('picker-tree').scrollTop = 0; });
 $('picker-query').addEventListener('input',() => { clearTimeout(pickerTimer); pickerTimer = setTimeout(renderPicker,150); });
 for (const id of ['picker-close','picker-done']) $(id).addEventListener('click',() => $('question-picker').close());
 $('question-picker').addEventListener('close',() => clearTimeout(pickerTimer));
@@ -178,7 +181,7 @@ $('questions').addEventListener('change',event => {
 });
 $('questions').addEventListener('click',event => {
   const button = event.target.closest('[data-download-question]');
-  if (button) openExport([button.dataset.downloadQuestion]);
+  if (button) openExport([button.dataset.downloadQuestion],false);
 });
 $('export-start').addEventListener('click',()=>startExport('questions'));
 $('export-answers').addEventListener('click',()=>startExport('answers'));
@@ -213,7 +216,7 @@ function rememberPosition() {
 }
 function writeUrl(questionId = '', push = true) {
   const url = new URL(location.href);
-  url.hash = slugByTopic[activeTopic];
+  url.hash = showingFavorites ? 'favorites' : slugByTopic[activeTopic];
   for (const [key,value] of [['edition',selectedEdition],['paper',selectedPaper],['question',questionId]]) {
     if (!value || value === 'all') url.searchParams.delete(key);
     else url.searchParams.set(key,value);
@@ -224,6 +227,7 @@ function writeUrl(questionId = '', push = true) {
 }
 function readUrl() {
   const params = new URLSearchParams(location.search);
+  showingFavorites = location.hash === '#favorites';
   // Keep email verification/recovery fragments intact until the auth SDK consumes them.
   const authCallback = /(?:^#|&)(?:access_token|error|error_code|type)=/.test(location.hash);
   showingIntroduction = authCallback || !location.hash || location.hash === '#about';
@@ -286,19 +290,30 @@ function markQuestion(id, reveal = false) {
     if (rect.top < viewport.top || rect.bottom > viewport.bottom) tree.scrollTop += rect.top - viewport.top - 50;
   }
 }
+function renderQuestion(q) {
+    const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
+    const answerOpen = openAnswers.has(q.id);
+    return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="question-download"><label><input type="checkbox" data-select-question="${escapeHtml(q.id)}"${selectedQuestions.has(q.id) ? ' checked' : ''} aria-label="勾选${q.topic}第${numbers[q.id]}题">选入练习卷</label><button type="button" data-favorite="${escapeHtml(q.id)}" aria-pressed="false">收藏</button><button data-download-question="${escapeHtml(q.id)}" aria-label="下载${q.topic}第${numbers[q.id]}题 PDF">下载本题 PDF</button></div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details></article>`;
+
+}
 function render() {
+  document.body.classList.toggle('show-favorites',showingFavorites);
+  $('favorites-controls').hidden=!showingFavorites;
+  $('favorites-link').toggleAttribute('data-active',showingFavorites);
+  $('favorites-link').setAttribute('aria-current',showingFavorites?'page':'false');
   document.body.classList.toggle('show-introduction',showingIntroduction);
   $('introduction').hidden = !showingIntroduction;
   $('reading').hidden = showingIntroduction;
   document.querySelector('.skip').textContent = showingIntroduction ? '跳转到介绍' : '跳转到题目';
   if (showingIntroduction) $('about-link').setAttribute('aria-current','page');
   else $('about-link').removeAttribute('aria-current');
-  $('categories').innerHTML = topics.map(t => `<button class="category" data-topic="${escapeHtml(t)}"${!showingIntroduction && t === activeTopic ? ' aria-current="page"' : ''}><span class="category-name">${t}</span><span class="count">${byTopic.get(t).length}</span></button>`).join('');
+  $('categories').innerHTML = topics.map(t => `<button class="category" data-topic="${escapeHtml(t)}"${!showingIntroduction && !showingFavorites && t === activeTopic ? ' aria-current="page"' : ''}><span class="category-name">${t}</span><span class="count">${byTopic.get(t).length}</span></button>`).join('');
   if (showingIntroduction) {
     observer?.disconnect(); document.title = 'Chemy 化学竞赛专题题库';
     $('questions').setAttribute('aria-busy','false');
     return;
   }
+  if(showingFavorites){observer?.disconnect();window.ChemyAccount?.renderFavorites();return;}
   renderFilters();
   const all = byTopic.get(activeTopic) || [], list = currentList();
   document.title = `${activeTopic} · Chemy 化学竞赛专题题库`;
@@ -306,11 +321,7 @@ function render() {
   const range = selectedPaper !== 'all' ? paperLabel(selectedPaper) : selectedEdition !== 'all' ? editionLabel(selectedEdition) : `${new Set(list.map(paperKey)).size} 份试卷`;
   $('topic-summary').textContent = `${list.length} 道完整大题 · ${range}`;
   $('downloads').innerHTML = all.length && all.every(q => q.pdfReady) ? `<a class="download" href="downloads/${slugByTopic[activeTopic]}-questions.pdf?v=${encodeURIComponent(pdfVersion)}-watermark-v1" download title="下载本专题全部 ${all.length} 道题，包含所有试卷">专题题目 PDF</a><a class="download" href="downloads/${slugByTopic[activeTopic]}-answers.pdf?v=${encodeURIComponent(pdfVersion)}-watermark-v1" download title="下载本专题全部参考答案，包含所有试卷">专题答案 PDF</a>` : '';
-  $('questions').innerHTML = list.map(q => {
-    const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
-    const answerOpen = openAnswers.has(q.id);
-    return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="question-download"><label><input type="checkbox" data-select-question="${escapeHtml(q.id)}"${selectedQuestions.has(q.id) ? ' checked' : ''} aria-label="勾选${q.topic}第${numbers[q.id]}题">选入练习卷</label><button type="button" data-favorite="${escapeHtml(q.id)}" aria-pressed="false">收藏</button><button data-download-question="${escapeHtml(q.id)}" aria-label="下载${q.topic}第${numbers[q.id]}题 PDF">下载本题 PDF</button></div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details></article>`;
-  }).join('') || '<section class="empty"><h2>当前筛选下没有题目</h2><p>请在目录中选择其他届次或全部试卷。</p></section>';
+  $('questions').innerHTML = list.map(renderQuestion).join('') || '<section class="empty"><h2>当前筛选下没有题目</h2><p>请在目录中选择其他届次或全部试卷。</p></section>';
   $('questions').setAttribute('aria-busy','false');
   window.ChemyAccount?.refreshButtons();
   updateSelection();
@@ -339,8 +350,8 @@ function scrollToQuestion(id, focus = true) {
 function navigateQuestion(id, fromSearch = false) {
   const q = byId.get(id);
   if (!q) return;
-  const needsRender = showingIntroduction || q.topic !== activeTopic || !$(id);
-  showingIntroduction = false;
+  const needsRender = showingFavorites || showingIntroduction || q.topic !== activeTopic || !$(id);
+  showingFavorites = false; showingIntroduction = false;
   if (needsRender) { activeTopic = q.topic; selectedEdition = 'all'; selectedPaper = 'all'; activeQuestion = id; render(); }
   writeUrl(id);
   closePanel(false);
@@ -499,7 +510,7 @@ function closeSearch() {
 
 function navigateTopic(topic) {
   if (!ready) return;
-  closePanel(false); showingIntroduction = false; activeTopic = topic; selectedEdition = 'all'; selectedPaper = 'all'; activeQuestion = '';
+  closePanel(false); showingFavorites = false; showingIntroduction = false; activeTopic = topic; selectedEdition = 'all'; selectedPaper = 'all'; activeQuestion = '';
   render(); writeUrl(); window.scrollTo({top:0,behavior:'instant'}); $('reading').focus({preventScroll:true});
 }
 $('categories').addEventListener('click',event => {
@@ -513,7 +524,7 @@ for (const link of [document.querySelector('.site-brand'),$('about-link')]) link
   const url = new URL(location.href); url.hash = 'about';
   for (const key of ['edition','paper','question']) url.searchParams.delete(key);
   history.pushState({},'',url); lastUrl = location.href;
-  showingIntroduction = true; activeQuestion = ''; render(); window.scrollTo({top:0,behavior:'instant'}); $('introduction').focus({preventScroll:true});
+  showingFavorites = false; showingIntroduction = true; activeQuestion = ''; render(); window.scrollTo({top:0,behavior:'instant'}); $('introduction').focus({preventScroll:true});
 });
 document.querySelector('.skip').addEventListener('click',event => {
   event.preventDefault(); const target = $(showingIntroduction ? 'introduction' : 'reading'); target.focus(); target.scrollIntoView({block:'start'});
@@ -618,3 +629,5 @@ async function loadLibrary() {
   }
 }
 loadLibrary();
+
+$('favorites-link').addEventListener('click',event=>{if(!ready)return;event.preventDefault();closePanel(false);showingFavorites=true;showingIntroduction=false;activeQuestion='';render();writeUrl();window.scrollTo({top:0,behavior:'instant'});$('reading').focus({preventScroll:true});});

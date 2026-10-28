@@ -10,11 +10,11 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="interface.css?v=watermark-v2-light">
   <link rel="stylesheet" href="ai-paper.css?v=keywords-v1">
-  <script src="app.js?v=selected-answers-v1" defer></script>
+  <script src="app.js?v=favorites-v2" defer></script>
   <script src="paper-engine.js?v=keywords-v1" defer></script>
-  <script src="ai-paper.js?v=keywords-v1" defer></script>
-  <link rel="stylesheet" href="account.css?v=1">
-  <script src="account.js?v=1" defer></script>
+  <script src="ai-paper.js?v=favorites-v2" defer></script>
+  <link rel="stylesheet" href="account.css?v=favorites-v2">
+  <script src="account.js?v=favorites-v2" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
@@ -31,6 +31,7 @@
     <a class="about-link" id="about-link" href="#about" aria-current="page">介绍与使用</a>
     <div class="panel-heading"><h2>专题</h2><button class="panel-close" data-close-panel aria-label="关闭专题目录">×</button></div>
     <nav id="categories" aria-label="化学专题"></nav>
+    <a class="category favorites-nav" id="favorites-link" href="#favorites">我的收藏 <span id="favorites-nav-count">0</span></a>
     <div class="sidebar-bottom" id="library-status">正在加载题库…</div>
   </aside>
   <aside class="directory-pane" id="directory-pane" aria-label="题目目录" tabindex="-1">
@@ -66,6 +67,7 @@
       <img class="reader-watermark" src="assets/chemy-watermark.jpg" alt="" aria-hidden="true" width="786" height="841">
       <div class="topic-head"><div><h1 id="topic-title">化学竞赛专题题库</h1><p id="topic-summary" role="status">正在加载题库，请稍候…</p></div><div class="downloads" id="downloads"></div></div>
       <div class="selection-tools" id="selection-tools"><button id="select-visible" aria-haspopup="dialog" aria-controls="question-picker">按题目 / 试卷选题</button><span id="selection-count" role="status">已选 0 题</span><button id="download-selected" disabled>下载选题 PDF</button><button id="clear-selection" disabled>清空</button></div>
+      <section id="favorites-controls" hidden aria-label="收藏筛选"><div class="account-actions"><label>专题<select id="favorites-topic"><option value="all">全部专题</option></select></label><label>搜索收藏<input id="favorites-search" type="search" placeholder="题名、题干关键词"></label></div><label class="auto-favorite-label"><input type="checkbox" data-auto-favorite checked>保存或下载组卷后自动收藏</label><p id="favorites-status" role="status"></p><button id="favorites-login" type="button">登录查看收藏</button><div class="account-actions"><button id="favorites-prev">上一页</button><span id="favorites-page"></span><button id="favorites-next">下一页</button></div></section>
       <div id="questions" aria-busy="true"><p class="loading-note">正在读取题目与编号…</p></div>
       <footer class="copyright">题目与参考答案来源：Chemy 化学奥林匹克团队，第32～39届试题合集与 Chemy 联赛。版权归原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
     </div>
@@ -82,7 +84,7 @@
     <div class="search-heading"><h2 id="picker-title">选择题目与试卷</h2><button id="picker-close" class="dialog-close" aria-label="关闭选题窗口">×</button></div>
     <p class="picker-help">勾选题号与名称选单题，勾选届次或试卷选整组。选择“全部专题”后，可一次选中某一届的所有试卷。</p>
     <div class="picker-filters"><label>专题<select id="picker-topic"></select></label><label>届次<select id="picker-edition"></select></label><label class="picker-query-label">名称 / 专题题号<input id="picker-query" type="search" placeholder="题目名称或题号，如 12、15-18" autocomplete="off"></label></div>
-    <div class="picker-batch"><label><input type="checkbox" id="picker-all">全选筛选结果</label><span id="picker-result-count" role="status"></span><label><input type="checkbox" id="picker-selected-only">只看已选</label></div>
+    <label class="auto-favorite-label"><input type="checkbox" data-auto-favorite checked>保存或下载组卷后自动收藏</label><div class="picker-batch"><label><input type="checkbox" id="picker-all">全选筛选结果</label><label><input type="checkbox" id="picker-favorites-only">仅我的收藏</label><span id="picker-result-count" role="status"></span><label><input type="checkbox" id="picker-selected-only">只看已选</label></div>
     <div class="picker-tree" id="picker-tree" aria-label="按届次与试卷勾选题目"></div>
     <div class="picker-footer"><span id="picker-selection-count" role="status" aria-live="polite">已选 0 题</span><button id="picker-clear">清空已选</button><button id="picker-done">完成选题</button><button id="picker-download" disabled>下载选题 PDF</button></div>
   </dialog>
@@ -101,6 +103,8 @@
       <p id="ai-mode" class="ai-hint" role="status">正在读取组卷服务配置…</p>
       <form id="ai-form">
         <div class="ai-query-row"><label class="sr-only" for="ai-query">知识点</label><input id="ai-query" type="search" placeholder="例如：羟醛缩合" maxlength="100" autocomplete="off" required><button id="ai-generate" type="submit">生成练习卷</button></div>
+        <label><input type="checkbox" id="ai-favorites-only">仅从我的收藏选题（按知识点匹配）</label>
+        <label class="auto-favorite-label"><input type="checkbox" data-auto-favorite checked>保存或下载组卷后自动收藏</label>
         <details class="ai-advanced"><summary>高级设置</summary><div class="ai-filters">
           <label>大题数量<input id="ai-count" type="number" min="1" max="50" step="1" value="5" required></label>
           <label>专题<select id="ai-topic"><option value="all">全部专题</option></select></label>
