@@ -4,3 +4,5 @@
 
 .discussion-toggle{margin-top:16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.discussion-toggle>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;padding:17px 0;color:var(--green);font-size:14px;font-weight:600}.discussion-toggle>summary::-webkit-details-marker{display:none}.discussion-toggle>summary svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;transition:transform .18s}.discussion-toggle[open]>summary svg{transform:rotate(180deg)}.discussion-toggle .question-discussion{border:0;margin:0;padding:0 0 18px}
 .forum-thread-card{border:1px solid #c8d8ce;border-radius:8px}
+
+.answers>summary,.discussion-toggle>summary{font-family:inherit;font-size:13px;font-weight:400}.forum-inline-replies{width:100%;box-sizing:border-box}.forum-inline-reply{border-top:1px solid #dce7df;padding:14px 0 4px 16px;margin-top:10px;border-left:2px solid #dce7df;overflow-wrap:anywhere}.forum-inline-reply .forum-meta{margin:0 0 6px}.forum-inline-reply .forum-body{font-size:14px}.forum-inline-reply.accepted{border-left-color:#2d7b4b}.forum-inline-reply>button{margin-top:8px}
