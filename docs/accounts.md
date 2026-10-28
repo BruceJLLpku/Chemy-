@@ -6,7 +6,7 @@
 
 1. 在 https://supabase.com/dashboard 创建归站点所有者管理的项目。
 2. 在 SQL Editor 执行 `supabase/001_accounts.sql`（仅执行一次）。脚本启用行级权限；每个登录用户只能读取、添加和删除自己的记录，匿名访问没有权限。
-3. 在 Authentication → URL Configuration 将 Site URL 设为 `https://chemygroup.github.io/Chemy-website-official/`，并将这个完整地址加入 Redirect URLs。本地测试时另加入实际本地地址。
+3. 在 Authentication → URL Configuration 将 Site URL 设为 `https://brucejllpku.github.io/Chemy-/`，并将这个完整地址加入 Redirect URLs。本地测试时另加入实际本地地址。
 4. 在邮箱登录设置中开启邮箱注册和邮箱验证，密码最少设为 8 位。
 5. 为公开注册配置自己的 SMTP 发信服务，测试验证邮件和找回密码邮件能送达。内置测试邮件服务不适合作为对公众开放注册的正式发信服务。按实际流量配置 Auth 限流及监控。
 6. 在 `dist/account-config.json` 填入项目 URL 和 publishable key（也可用 legacy anon key）。这两项为浏览器公开连接信息。绝对不要填 secret key、service_role key、数据库密码或 SMTP 密码。
