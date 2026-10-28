@@ -100,6 +100,7 @@ function openPicker() {
   closePanel(false);
   $('picker-topic').innerHTML = option('all','全部专题',activeTopic)+topics.map(t => option(t,t,activeTopic)).join('');
   $('picker-edition').innerHTML = option('all','全部届次',selectedEdition)+editionValues(questions).map(e => option(e,editionLabel(e),selectedEdition)).join('');
+  if(showingFavorites){$('picker-topic').value='all';$('picker-edition').value='all';$('picker-favorites-only').checked=true;}
   $('picker-query').value = ''; $('picker-selected-only').checked = false;
   $('picker-tree').innerHTML = '';
   $('question-picker').showModal(); renderPicker(); $('picker-tree').scrollTop = 0;
