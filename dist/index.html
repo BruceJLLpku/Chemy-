@@ -10,11 +10,13 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="interface.css?v=watermark-v2-light">
   <link rel="stylesheet" href="ai-paper.css?v=keywords-v1">
-  <script src="app.js?v=favorites-v2" defer></script>
+  <script src="app.js?v=forum-v1" defer></script>
   <script src="paper-engine.js?v=keywords-v1" defer></script>
   <script src="ai-paper.js?v=favorites-v2" defer></script>
-  <link rel="stylesheet" href="account.css?v=favorites-v2">
-  <script src="account.js?v=favorites-v2" defer></script>
+  <link rel="stylesheet" href="account.css?v=forum-v1">
+  <script src="account.js?v=forum-v1" defer></script>
+<link rel="stylesheet" href="forum.css?v=forum-v1">
+  <script src="forum.js?v=forum-v1" defer></script>
 </head>
 <body class="show-introduction">
   <a class="skip" href="#reading">跳转到题目</a>
@@ -32,6 +34,7 @@
     <div class="panel-heading"><h2>专题</h2><button class="panel-close" data-close-panel aria-label="关闭专题目录">×</button></div>
     <nav id="categories" aria-label="化学专题"></nav>
     <a class="category favorites-nav" id="favorites-link" href="#favorites">我的收藏 <span id="favorites-nav-count">0</span></a>
+    <a class="category" href="#history" data-community-view="history">组卷历史</a><a class="category" href="#forum" data-community-view="forum">题目讨论</a><a class="category" href="#notifications" data-community-view="notifications">消息 <span id="forum-unread">0</span></a><a class="category" href="#admin" data-community-view="admin" id="forum-admin-link" hidden>论坛管理</a>
     <div class="sidebar-bottom" id="library-status">正在加载题库…</div>
   </aside>
   <aside class="directory-pane" id="directory-pane" aria-label="题目目录" tabindex="-1">
@@ -45,6 +48,7 @@
   <div class="overlay" id="overlay" hidden></div>
   <main class="app-main" id="main">
     <div class="browse-tools"><button id="topic-toggle" aria-expanded="false" aria-controls="sidebar">专题</button><button id="directory-toggle" aria-expanded="false" aria-controls="directory-pane">题目目录</button><button id="return-search" hidden>返回搜索结果</button></div>
+    <section id="community-content" tabindex="-1" hidden></section>
     <section class="introduction" id="introduction" aria-labelledby="introduction-title" tabindex="-1">
       <h1 id="introduction-title">写在前面</h1>
       <p class="intro-lead">这个网站，起于备赛时的一个小小愿望。</p>

@@ -6,7 +6,7 @@
     <p id="account-status" role="status" aria-live="polite"></p>
     <form id="account-form"><label>邮箱<input name="email" type="email" autocomplete="email" required maxlength="254"></label><label>密码<input name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label><p>首次使用请注册，并通过邮件验证邮箱。密码至少 8 位。</p><div class="account-actions"><button name="action" value="login">登录</button><button name="action" value="signup">注册账户</button><button name="action" value="reset" formnovalidate>忘记密码</button></div></form>
     <form id="account-recovery" hidden><label>设置新密码<input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></label><button>保存新密码</button></form>
-    <section id="account-library" hidden><p id="account-email"></p><div class="account-actions"><button id="account-refresh">刷新</button><button id="account-logout">退出登录</button><button id="account-save">保存当前选题</button></div><label class="auto-favorite-label"><input type="checkbox" data-auto-favorite checked>保存或下载组卷后自动收藏</label><button type="button" id="account-retry" hidden>重试未完成的保存</button><h3>我的收藏</h3><div id="account-favorites"></div><h3>组卷历史</h3><p>下载练习卷时自动保存，也可以手动保存。点击恢复后可再次下载题目与答案。</p><div id="account-history"></div><button id="account-more" hidden>加载更多历史</button></section>`;
+    <section id="account-library" hidden><p id="account-email"></p><div class="account-actions"><button id="account-refresh">刷新</button><button id="account-logout">退出登录</button><button id="account-save">保存当前选题</button></div><label class="auto-favorite-label"><input type="checkbox" data-auto-favorite checked>保存或下载组卷后自动收藏</label><button type="button" id="account-retry" hidden>重试未完成的保存</button><div hidden><div id="account-favorites"></div><div id="account-history"></div><button id="account-more" hidden>加载更多历史</button></div><p>收藏与组卷历史已移至左侧栏。</p><button type="button" id="account-name">设置论坛昵称</button></section>`;
   document.body.append(dialog);
   const el=id=>document.getElementById(id), message=t=>{el('account-status').textContent=t;};
   let client,user=null,favorites=new Set(),history=[],epoch=0,loading=false,offset=0;
@@ -33,7 +33,7 @@
     user=data.session?.user||null;showState();if(user)await load();else message('登录后，收藏和组卷历史会保存在你的账户中。');
   }
   function connect(){if(!setup)setup=initialize().catch(e=>{setup=null;throw e;});return setup;}
-  function showState(){el('account-form').hidden=!!user;el('account-library').hidden=!user;el('account-email').textContent=user?.email||'';el('account-launch').textContent=user?'我的题库':'登录 / 我的题库';if(!user)el('account-recovery').hidden=true;}
+  function showState(){document.dispatchEvent(new Event('chemy-auth-changed'));el('account-form').hidden=!!user;el('account-library').hidden=!user;el('account-email').textContent=user?.email||'';el('account-launch').textContent=user?'我的题库':'登录 / 我的题库';if(!user)el('account-recovery').hidden=true;}
   async function requireUser(){await connect();if(!user){if(!dialog.open)dialog.showModal();throw Error('请先登录，再保存到个人题库。');}return user.id;}
   function refreshButtons(){document.querySelectorAll('[data-favorite]').forEach(b=>{const yes=favorites.has(b.dataset.favorite);b.textContent=yes?'已收藏':'收藏';b.setAttribute('aria-pressed',String(yes));});}
   function label(id){const q=byId.get(id);return q?`${q.topic} · 第 ${numbers[id]} 题 · ${questionTitle(q)}`:'题目已不在当前题库';}
@@ -45,6 +45,7 @@
     const signature=JSON.stringify([user?.id,[...favorites].sort()]);if(signature!==favoriteSignature){favoriteSignature=signature;document.dispatchEvent(new Event("chemy-favorites-changed"));}
     el('account-favorites').innerHTML=[...favorites].map(id=>`<div class="account-row"><button data-account-open="${escapeHtml(id)}">${escapeHtml(label(id))}</button><button data-favorite="${escapeHtml(id)}">取消收藏</button></div>`).join('')||'<p>还没有收藏。在题目旁点击“收藏”即可添加。</p>';
     el('account-history').innerHTML=history.map(h=>`<div class="account-row"><div><strong>${escapeHtml(h.title)}</strong><small>${escapeHtml(new Date(h.created_at).toLocaleString())} · ${h.question_ids.length} 题</small></div><button data-restore="${escapeHtml(h.id)}">恢复选题</button><button data-delete-paper="${escapeHtml(h.id)}">删除</button></div>`).join('')||'<p>还没有保存的练习卷。</p>';
+    if(ready&&window.communityView==='history')renderHistory();
     refreshButtons();
   }
   async function readFavorites(uid){
@@ -96,12 +97,14 @@
   el('account-refresh').onclick=()=>load().catch(fail);el('account-more').onclick=()=>load(true).catch(fail);
   el('account-save').onclick=()=>savePaper([...selectedQuestions],'自选练习卷',true);
   document.addEventListener('click',e=>{const b=e.target.closest('[data-favorite]');if(b)toggle(b).catch(err=>{if(!dialog.open)dialog.showModal();fail(err);});});
-  dialog.addEventListener('click',async e=>{
+  document.addEventListener('click',async e=>{
     const b=e.target.closest('button');if(!b)return;
     if(b.dataset.accountOpen){if(!byId.has(b.dataset.accountOpen))return;dialog.close();navigateQuestion(b.dataset.accountOpen);}
-    if(b.dataset.restore){const h=history.find(h=>h.id===b.dataset.restore);if(!h)return;const ids=h.question_ids.filter(id=>byId.has(id));if(!ids.length){message('这些题目已不在当前题库。');return;}selectItems(questions,false);selectItems(ids.map(id=>byId.get(id)),true);dialog.close();openExport(ids);}
+    if(b.dataset.restore){const h=history.find(h=>h.id===b.dataset.restore);if(!h)return;const ids=h.question_ids.filter(id=>byId.has(id));if(!ids.length){message('这些题目已不在当前题库。');return;}selectItems(questions,false);selectItems(ids.map(id=>byId.get(id)),true);if(dialog.open)dialog.close();openExport(ids);}
     if(b.dataset.deletePaper){b.disabled=true;try{const uid=await requireUser();const {error}=await client.from('paper_history').delete().eq('user_id',uid).eq('id',b.dataset.deletePaper);if(error)throw error;await load();}catch(e){fail(e);}finally{b.disabled=false;}}
   });
+  function renderHistory(){const host=document.getElementById('community-content');host.innerHTML='<h1>组卷历史</h1><p>恢复选题后，可以重新下载题目与答案。</p>'+(!user?'<button type="button" data-community-login>登录查看历史</button>':el('account-history').innerHTML+'<button type="button" id="history-more" '+(el('account-more').hidden?'hidden':'')+'>加载更多历史</button>');const more=document.getElementById('history-more');if(more)more.onclick=()=>load(true).catch(fail);}
+  el('account-name').onclick=()=>window.ChemyForum?.editName();
   function renderFavorites(){
     document.title='我的收藏 · Chemy';el('topic-title').textContent='我的收藏';el('downloads').replaceChildren();el('questions').setAttribute('aria-busy','false');
     el('favorites-login').hidden=!!user;el('favorites-status').textContent=personalError||(!user?'登录后可在这里查看、筛选和组卷。':'收藏题目可直接阅读、展开答案，勾选后下载练习卷。');
@@ -110,13 +113,13 @@
     const pages=Math.max(1,Math.ceil(list.length/10));favoritesPage=Math.min(favoritesPage,pages-1);
     el('topic-summary').textContent=`共收藏 ${favorites.size} 题 · 当前筛选 ${list.length} 题`;
     el('favorites-page').textContent=`第 ${favoritesPage+1} / ${pages} 页`;el('favorites-prev').disabled=favoritesPage===0;el('favorites-next').disabled=favoritesPage>=pages-1;
-    el('questions').innerHTML=list.slice(favoritesPage*10,favoritesPage*10+10).map(renderQuestion).join('')||'<section class="empty"><h2>这里还没有题目</h2><p>可在题目旁点击收藏，或保存、下载一份练习卷。</p></section>';refreshButtons();updateSelection();
+    el('questions').innerHTML=list.slice(favoritesPage*10,favoritesPage*10+10).map(renderQuestion).join('')||'<section class="empty"><h2>这里还没有题目</h2><p>可在题目旁点击收藏，或保存、下载一份练习卷。</p></section>';refreshButtons();updateSelection();window.ChemyForum?.mount();
   }
   el('favorites-topic').innerHTML=option('all','全部专题','all')+topics.map(t=>option(t,t,'all')).join('');
   for(const id of ['favorites-topic','favorites-search'])el(id).addEventListener('input',()=>{favoritesPage=0;renderFavorites();});
   for(const [id,step] of [['favorites-prev',-1],['favorites-next',1]])el(id).onclick=()=>{favoritesPage+=step;renderFavorites();window.scrollTo({top:0,behavior:'instant'});};
   el('favorites-login').onclick=()=>el('account-launch').click();
-  window.ChemyAccount={refreshButtons,savePaper,renderFavorites,has:id=>!!user&&favorites.has(id),isSignedIn:()=>!!user};
+  window.ChemyAccount={refreshButtons,savePaper,renderFavorites,has:id=>!!user&&favorites.has(id),isSignedIn:()=>!!user,connection:async()=>{await connect();return {client,user};},renderHistory};
   el('account-launch').disabled=!ready;
   document.addEventListener('chemy-library-ready',()=>{el('account-launch').disabled=false;paint();connect().catch(()=>{});});
   if(ready){paint();connect().catch(()=>{});}
