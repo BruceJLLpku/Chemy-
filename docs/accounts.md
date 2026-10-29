@@ -36,7 +36,7 @@
 
 ## 依赖与维护
 
-账户模块仅在后台配置有效时加载固定版本 `@supabase/supabase-js@2.57.4`，来源为 jsDelivr ESM。需实际验证主要访客网络能访问该 CDN 和项目服务。题库与下载功能不依赖账户模块。
+账户模块仅在后台配置有效时加载固定版本 `@supabase/supabase-js@2.57.4`，官方浏览器 bundle 随网站保存在 `dist/vendor/supabase-2.57.4/`，不再在运行时访问 jsDelivr。来源为 `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js`，同目录保留 MIT 许可证。仍需实际验证主要访客网络能访问 Supabase 项目服务；本地提供组件不能解决项目 API 本身的连通问题。题库与下载功能不依赖账户模块。
 
 数据库迁移尚未在真实 Supabase 项目执行；本地浏览器测试不能替代真实鉴权、邮件和数据库权限验收。
 

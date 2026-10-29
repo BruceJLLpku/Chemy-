@@ -19,7 +19,7 @@
     const config=await response.json();
     if(!config.url||!config.publishableKey)throw Error('账户服务尚未启用，请联系站点管理员完成配置。');
     if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(config.url))throw Error('账户服务地址无效。');
-    const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm');
+    const {createClient}=await import('./vendor/supabase-2.57.4/client.js');
     client=createClient(config.url,config.publishableKey);
     client.auth.onAuthStateChange((event,session)=>{
       const changed=user?.id!==session?.user?.id; user=session?.user||null;
