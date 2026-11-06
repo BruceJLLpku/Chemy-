@@ -65,6 +65,7 @@ self.onmessage = async ({data}) => {
       cursor -= drawHeight+10;
     }
     await drawNote(data.paperHeader,'paper-header',90);
+    for (const [index,note] of (data.paperIntro || []).entries()) await drawNote(note,`paper-intro-${index}`);
     for (let i=0; i<data.items.length; i++) {
       const item = data.items[i];
       const index = await getIndex(item.slug,data.version,kind);
