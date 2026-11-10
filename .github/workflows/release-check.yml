@@ -19,6 +19,7 @@ jobs:
             scripts
             data
             sources
+            server
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -35,6 +36,8 @@ jobs:
         run: |
           node scripts/test_pdf_worker_patterns.cjs
           node scripts/test_pdf_worker_annotations.cjs
+          node scripts/test_merge_page_ui.cjs
+          node scripts/test_merge_pdf_ui.cjs
           python -X utf8 scripts/test_pdf_export_pixels.py --synthetic
           python -X utf8 scripts/test_pdf_export_pixel_glyphs.py
       - name: Test clipped PDF cleanup
@@ -59,3 +62,36 @@ jobs:
         run: python -X utf8 -m unittest discover -s scripts -p test_stage_site.py
       - name: Check current release metadata and PDF hashes
         run: python -X utf8 scripts/check_release.py --pdfs
+      - name: Test conversational planning and handout responses
+        run: node --test scripts/test_deepseek_agent.mjs
+
+  browser-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out website and isolated forum fixtures
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dist
+            scripts
+            supabase
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install fixed browser test dependencies
+        run: |
+          npm install --prefix tmp/browser-test-deps --no-save --package-lock=false --ignore-scripts playwright@1.62.1 jszip@3.10.1 @electric-sql/pglite@0.5.16
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tmp/browser-test-deps/node_modules" >> "$GITHUB_ENV"
+          node tmp/browser-test-deps/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Test forum database rules in local PostgreSQL
+        run: node scripts/test_forum_db.cjs
+      - name: Test accounts and favorites with isolated services
+        run: |
+          node scripts/test_accounts.cjs
+          node scripts/test_favorites.cjs
+      - name: Test forum UI against local PostgreSQL
+        run: node scripts/test_forum_browser.cjs
+      - name: Test loading retries and export cancellation
+        run: node scripts/test_ui_recovery.cjs

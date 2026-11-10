@@ -106,6 +106,23 @@ self.onmessage = async ({data}) => {
       cursor -= drawHeight+10;
     }
     const paperHeaderImage = data.paperHeader?.bytes ? await out.embedPng(data.paperHeader.bytes) : null;
+    const paperIntro = kind === 'questions' && Array.isArray(data.paperIntro)
+      ? data.paperIntro.filter(note=>note?.bytes) : [];
+    if (paperIntro.length) {
+      const firstIndex = await getIndex(data.items[0].slug,data.version,kind);
+      const frameSource = await loadFragment(firstIndex.frame);
+      frames.set(data.items[0].slug,await out.copyPages(frameSource,[0,1]));
+      footer = frames.get(data.items[0].slug)[0];
+      // A lecture may span several pages. Keep its first block with the paper
+      // header, while source questions still follow the normal readable-size
+      // layout. Prepare the footer before painting any lecture-only page.
+      const firstIntroImage = await out.embedPng(paperIntro[0].bytes);
+      const firstIntroHeight = (width-2*margin)*firstIntroImage.height/firstIntroImage.width;
+      if (paperHeaderImage) await drawNote(data.paperHeader,'paper-header',firstIntroHeight+10,paperHeaderImage);
+      for (const [introIndex,note] of paperIntro.entries()) {
+        await drawNote(note,`paper-intro-${introIndex}`,0,introIndex===0?firstIntroImage:undefined);
+      }
+    }
     for (let i=0; i<data.items.length; i++) {
       const item = data.items[i];
       const index = await getIndex(item.slug,data.version,kind);
@@ -121,7 +138,7 @@ self.onmessage = async ({data}) => {
       const firstBand = regions[0].bands[0];
       const firstBandHeight = firstBand.bottom-firstBand.top;
       const headingHeight = 16, headingSpace = headingHeight+16;
-      const headerImage = i === 0 ? paperHeaderImage : null;
+      const headerImage = i === 0 && !paperIntro.length ? paperHeaderImage : null;
       const headerSpace = headerImage ? (width-2*margin)*headerImage.height/headerImage.width+10 : 0;
       const hasNotes = !!(annotationImage || headerImage);
       // Plan the complete opening group before painting any note: paper

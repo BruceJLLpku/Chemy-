@@ -44,7 +44,7 @@
     for(const entry of index.entries || []) {
       const q=byId.get(entry.id);
       if(!q || !matches(q,filters)) continue;
-      const links=(entry.links || []).filter(l=>l.conceptId===conceptId && usable(l));
+      const links=(entry.links || []).filter(l=>(conceptId===null||l.conceptId===conceptId) && usable(l));
       if(links.length) result.push({id:q.id,links,strength:Math.max(...links.map(l=>l.strength))});
     }
     return [...new Map(result.map(r=>[r.id,r])).values()];

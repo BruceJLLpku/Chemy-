@@ -4,6 +4,7 @@
  * Use --all-topics to exercise all 18 downloads; the default tests equilibrium.
  */
 const {chromium} = require('playwright');
+const {isolateAccountServices} = require('./browser_test_support.cjs');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
@@ -48,6 +49,7 @@ function serveSite() {
     if (process.env.CHEMY_TEST_CHROMIUM) launch.executablePath = process.env.CHEMY_TEST_CHROMIUM;
     browser = await chromium.launch(launch);
     const page = await browser.newPage({viewport:{width:1450,height:960},acceptDownloads:true});
+    await isolateAccountServices(page);
     page.on('pageerror', e => report.errors.push(e.message));
     await page.goto(base + '#equilibrium');
     await page.waitForFunction(() => typeof ready !== 'undefined' && ready);

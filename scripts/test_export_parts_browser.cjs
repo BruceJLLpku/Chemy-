@@ -4,6 +4,7 @@ const path = require('node:path');
 const http = require('node:http');
 const assert = require('node:assert/strict');
 const {chromium} = require('playwright');
+const {isolateAccountServices} = require('./browser_test_support.cjs');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, 'work', 'export-validation');
 const mime = {'.html':'text/html', '.js':'text/javascript', '.json':'application/json', '.css':'text/css', '.pdf':'application/pdf', '.jpg':'image/jpeg', '.webp':'image/webp'};
@@ -35,6 +36,7 @@ function check(name, result) {assert.ok(result, name);report.checks.push(name);c
       };
     });
     const page = await context.newPage();
+    await isolateAccountServices(page);
     page.on('pageerror', e => report.errors.push(e.message));
     page.on('request', req => report.requests.push(req.url()));
     await page.goto(`http://127.0.0.1:${server.address().port}/#polymer`);

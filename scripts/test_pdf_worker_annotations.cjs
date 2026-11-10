@@ -86,8 +86,45 @@ function png(width,height) {
     const result=await run(items,{paperHeader:header});assert.match(result.error,/说明过长.*字号清晰/,name);
     assert.ok(!result.bytes,'Reject unreadable '+name+' before emitting a header-only PDF');
   }
+  // Upstream lectures can span pages, but must not create a header-only cover
+  // or reintroduce whole-page Forms for the original question content.
+  const paperIntro=[{bytes:png(1000,700)},{bytes:png(1000,700)}];
+  const lecture=await run([short],{kind:'questions',paperHeader,paperIntro});
+  assert.ok(lecture.bytes,lecture.error);
+  const lectureHeader=lecture.annotations.find(note=>note.id==='paper-header');
+  const introNotes=lecture.annotations.filter(note=>note.id.startsWith('paper-intro-'));
+  assert.equal(introNotes.length,2,'Keep every lecture block');
+  assert.equal(lectureHeader.page,introNotes[0].page,'Keep the paper title with the first lecture block');
+  assert.ok(lectureHeader.top+lectureHeader.height+10<=introNotes[0].top+1e-6);
+  assert.ok(introNotes[1].page>introNotes[0].page,'Long lectures can continue on a fresh page');
+  const lectureFirst=lecture.placements[0],lectureHeading=lecture.headings[0];
+  assert.equal(lectureHeading.page,lectureFirst.page,'Keep the first question with its topic heading');
+  assert.equal(lectureFirst.scale,1,'A lecture must not shrink a short original question');
+  assert.ok(introNotes[1].page<lectureFirst.page||introNotes[1].top+introNotes[1].height+10<=lectureHeading.top+1e-6);
+  const lectureDoc=await PDFLib.PDFDocument.load(lecture.bytes);
+  for(const page of lectureDoc.getPages()){
+    const contents=page.node.Contents();
+    const streams=contents instanceof PDFLib.PDFArray?contents.asArray():[contents];
+    const operators=streams.map(ref=>Buffer.from(PDFLib.decodePDFRawStream(lectureDoc.context.lookup(ref)).decode()).toString()).join('\n');
+    assert.match(operators,/1 0 0 1 50 31 cm/,'Every lecture and question page must keep the native copyright footer');
+    const objects=page.node.Resources().lookup(PDFLib.PDFName.of('XObject'),PDFLib.PDFDict);
+    for(const [,ref] of objects.entries()){
+      const object=lectureDoc.context.lookup(ref);
+      assert.notEqual(object.dict?.get(PDFLib.PDFName.of('Subtype'))?.toString(),'/Form','Never wrap a source page in a Form again');
+    }
+  }
+  const lectureWithLongQuestion=await run([{slug:'inference',id:'long'}],{kind:'questions',paperHeader,paperIntro});
+  assert.ok(lectureWithLongQuestion.bytes,lectureWithLongQuestion.error);
+  assert.equal(lectureWithLongQuestion.placements[0].page,lectureWithLongQuestion.headings[0].page);
+  assert.equal(lectureWithLongQuestion.placements[0].scale,1,'Long source blocks move intact after a lecture');
+  const answerIgnoresIntro=await run([short],{paperHeader,paperIntro});
+  assert.ok(answerIgnoresIntro.bytes,answerIgnoresIntro.error);
+  assert.ok(!answerIgnoresIntro.annotations.some(note=>note.id.startsWith('paper-intro-')),'Question lecture must not leak into the answer document');
+  const overlongIntro=await run([short],{kind:'questions',paperHeader,paperIntro:[{bytes:png(1000,1500)}]});
+  assert.match(overlongIntro.error,/说明过长/,'Reject a lecture block that cannot fit with the paper title');
+  assert.ok(!overlongIntro.bytes);
   const plain=await run([short,{slug:'inference',id:'long'}]);assert.ok(plain.bytes,plain.error);
   assert.equal(plain.annotations.length,0);
   assert.deepEqual(Array.from(plain.placements,p=>[p.id,p.page,p.top,p.height,p.scale]),[['short',1,80,54.3633,1],['long',2,48,670,1]],'Unannotated placement and scale must remain unchanged');
-  console.log('PASS annotated and header opening groups; question/answer headers; same-topic keep-together; exact 85% boundary; oversized and combined-note rejection; unchanged unannotated layout.');
+  console.log('PASS annotated and header opening groups; readable-size boundaries; multipage lecture blocks and native footers; no whole-page Forms; answer lecture isolation; unchanged unannotated layout.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

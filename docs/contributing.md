@@ -41,6 +41,30 @@ python -X utf8 -m unittest discover -s scripts -p test_release_check.py
 
 macOS / Linux 可把 `python` 换成 `python3`。检查失败返回非零退出码；不传 `--report` 时只向终端输出。`--pdfs` 会读取全部 18 份专题 PDF 并比对布局记录的 SHA-256，不访问网络。去掉该参数仍检查 JSON、图片引用、PDF 文件头和索引的题目、版本、顺序、页码与区间。检查不判断图片是否缺谱、公式是否正确，也不宣称验证了 Acrobat 编辑效果。
 
+## 页面与组卷集成检查
+
+合并上游界面更新后，除 PDF 回归外，还应检查账号、收藏、讨论、组卷知识介绍与 Word 导出。Node.js 22+ 的浏览器测试依赖与 PR 工作流使用相同的固定版本，安装到忽略的临时目录：
+
+```sh
+npm install --prefix tmp/browser-test-deps --no-save --package-lock=false --ignore-scripts playwright@1.62.1 jszip@3.10.1 @electric-sql/pglite@0.5.16
+node tmp/browser-test-deps/node_modules/playwright/cli.js install chromium
+```
+
+运行测试前，将 `NODE_PATH` 设为仓库中 `tmp/browser-test-deps/node_modules` 的绝对路径；也可用 `CHEMY_TEST_CHROMIUM` 指定已有 Chromium 可执行文件。论坛测试在本机 PGlite 数据库中执行规则与交互；浏览器测试使用模拟账号配置，阻断真实 Supabase 服务，AI 请求使用模拟响应，不消耗模型额度。
+
+```sh
+node scripts/test_merge_page_ui.cjs
+node scripts/test_merge_pdf_ui.cjs
+node --test scripts/test_deepseek_agent.mjs
+node scripts/test_forum_db.cjs
+node scripts/test_accounts.cjs
+node scripts/test_favorites.cjs
+node scripts/test_forum_browser.cjs
+node scripts/test_ui_recovery.cjs
+```
+
+`test_ai_workspace.cjs` 还检查实际 Word/PDF 下载与打印内容，需要先完成上述 PDF 生成，再启动本地预览，将 `CHEMY_TEST_URL` 设为该地址。截图与下载保存在本仓库 `output/`，不会借用同级工程中的文件。发布目录仍需单独通过完整清单与整理检查。
+
 ## 哪些文件是输入，哪些必须一起更新
 
 | 内容 | 维护关系 |

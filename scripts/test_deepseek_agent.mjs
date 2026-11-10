@@ -36,6 +36,70 @@ test('Natural-language planning and selection use two real-shaped DeepSeek reque
   assert.deepEqual(result.items[0].links[0],pool[0].links[0]);
   assert.ok(!JSON.stringify(result).includes(env.DEEPSEEK_API_KEY));
 });
+test('Conversational compose uses the model’s order, message and available IDs without rejecting the paper',async()=>{
+  const ordered=[pool[2],pool[0]];
+  const agent=make({answers:[{...resolved,count:3},{questionIds:[ordered[0].id,'missing',ordered[1].id],message:'按从易到难排列。',introduction:'羟醛缩合的基本原理。'}]});
+  const result=await agent.compose({...request,conversation:true});
+  assert.deepEqual(result.items.map(item=>item.id),ordered.map(item=>item.id));
+  assert.equal(result.count,3);
+  assert.equal(result.message,'按从易到难排列。');
+  assert.equal(result.missingQuestions,1);
+  assert.equal(result.introduction,'羟醛缩合的基本原理。');
+});
+test('Conversational edits use the ordered paper returned by the model',async()=>{
+  const currentIds=pool.slice(0,3).map(item=>item.id);
+  const candidate=pool[3].id;
+  const edit={...request,conversation:true,conceptId:concept.id,currentIds,query:'换掉第 2 题，其余不动'};
+  const reordered=[currentIds[2],candidate,currentIds[0]];
+  const agent=make({answers:[{questionIds:reordered,message:'已按要求换题并重新排列。'},{message:'没有合适的候选。'}]});
+  const result=await agent.compose(edit);
+  assert.deepEqual(result.items.map(item=>item.id),reordered);
+  assert.equal(result.message,'已按要求换题并重新排列。');
+  assert.deepEqual(JSON.parse(agent.calls[0].body.messages[1].content).current,currentIds);
+  const unchanged=await agent.compose(edit);
+  assert.deepEqual(unchanged.items.map(item=>item.id),currentIds);
+});
+test('DeepSeek can add, revise or remove a paper introduction without changing the original questions',async()=>{
+  const currentIds=pool.slice(0,5).map(item=>item.id);
+  const introduction='羟醛缩合的基本原理。';
+  const edit={...request,conversation:true,conceptId:concept.id,currentIds,query:'前面放一下羟醛缩合的讲解介绍'};
+  const agent=make({answers:[
+    {introduction},
+    {introduction:''},
+  ]});
+  const added=await agent.compose(edit);
+  assert.equal(added.introduction,introduction);
+  assert.deepEqual(added.items.map(item=>item.id),currentIds);
+  const removed=await agent.compose({...edit,query:'移除卷首讲解',introduction});
+  assert.equal(JSON.parse(agent.calls[1].body.messages[1].content).introduction,introduction);
+  assert.equal(removed.introduction,'');
+  assert.deepEqual(removed.items.map(item=>item.id),currentIds);
+});
+test('Default introduction receives the selected questions in paper order even without a model flag',async()=>{
+  const questionIds=[pool[2].id,pool[0].id];
+  const introduction='<i>k</i><sub>1</sub> 与 <i>k</i><sub>2</sub> 对应不同温度。';
+  const agent=make({answers:[{questionIds}, {introduction}]});
+  const result=await agent.compose({...request,query:concept.name,conversation:true,conceptId:concept.id});
+  const context=JSON.parse(agent.calls[1].body.messages[1].content);
+  assert.deepEqual(context.questions.map(q=>[q.id,q.position]),questionIds.map((id,i)=>[id,i+1]));
+  assert.ok(context.questions.every(q=>q.text&&q.knowledge.length));
+  assert.equal(result.introduction,introduction);
+});
+test('Conversation combines a broad topic and a specific concept, then carries the scope and recent history into edits',async()=>{
+  const topic='方程式与元素化学';
+  const broad=engine.candidates(null,index,bank,{topic})[0].id;
+  const specific=pool.find(item=>bank.find(q=>q.id===item.id).topic!==topic).id;
+  const history=[{role:'user',text:'方程式和羟醛缩合，两个都想练'}];
+  const scope={topics:[topic],conceptIds:[concept.id]};
+  const agent=make({answers:[scope,{questionIds:[broad,specific],introduction:''},{message:'这份卷覆盖两部分。'}]});
+  const paper=await agent.compose({...request,query:'都要',count:2,conversation:true,history});
+  assert.deepEqual(paper.items.map(q=>q.id),[broad,specific]);
+  assert.deepEqual(paper.scope,scope);
+  assert.deepEqual(JSON.parse(agent.calls[0].body.messages[1].content).history,history);
+  const edit=await agent.compose({...request,query:'为什么这样搭配？',conversation:true,scope,currentIds:[broad,specific],history});
+  assert.deepEqual(edit.items.map(q=>q.id),[broad,specific]);
+  assert.deepEqual(JSON.parse(agent.calls[2].body.messages[1].content).history,history);
+});
 test('Audited candidate set obeys every server-side filter and never pads shortages',async()=>{
   const chosen=bank.find(q=>q.id===pool[0].id),edition=String(chosen.edition??39);
   const paper=(chosen.edition??39)===39?String(chosen.paper):`${edition}-${chosen.paper}`;
@@ -143,7 +207,7 @@ test('HTTP preview, CORS, body limits, rate limiting and missing-key health do n
     assert.equal((await fetch(base+'/.env')).status,404);
     assert.equal((await fetch(base+'/server/agent.mjs')).status,404);
     const blocked=await post(request,'https://attacker.example');assert.equal(blocked.status,403);assert.equal(blocked.headers.get('access-control-allow-origin'),null);
-    const oversized=await post({query:'x'.repeat(9000)});assert.equal(oversized.status,413);
+    const oversized=await post({query:'x'.repeat(33000)});assert.equal(oversized.status,413);
     const missing=await post(request);assert.equal(missing.status,503);assert.equal((await missing.json()).code,'not_configured');
     assert.equal(missing.headers.get('access-control-allow-origin'),'https://brucejllpku.github.io');
     assert.equal((await post(request)).status,429);assert.equal(agent.calls.length,0);

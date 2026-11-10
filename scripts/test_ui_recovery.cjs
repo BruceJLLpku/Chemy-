@@ -1,5 +1,6 @@
 // UI lifecycle tests use controlled workers; real PDF contents are tested separately.
 const {chromium}=require('playwright');
+const {browserLaunchOptions,isolateAccountServices}=require('./browser_test_support.cjs');
 const fs=require('fs'),path=require('path'),http=require('http'),assert=require('assert/strict');
 const {pathToFileURL}=require('url');
 const root=path.resolve(__dirname,'..'),dist=path.join(root,'dist');
@@ -35,13 +36,15 @@ async function nextWorker(page,button){
 (async()=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base=`http://127.0.0.1:${server.address().port}/`;
-  const options={headless:true};
-  if(process.env.CHEMY_BROWSER_EXECUTABLE)options.executablePath=process.env.CHEMY_BROWSER_EXECUTABLE;
-  else options.channel='msedge';
-  const browser=await chromium.launch(options);
+  const browser=await chromium.launch(browserLaunchOptions());
+  async function isolatedPage(options){
+    const page=await browser.newPage(options);
+    await isolateAccountServices(page);
+    return page;
+  }
   try{
     for(const [resource,hash,width] of [['presentation.json','',390],['questions.json','#analysis',390],['numbering.json','?question=chemy39-1-6#electrochemistry',390],['presentation.json','#analysis',1440]]){
-      const page=await browser.newPage({viewport:{width,height:844}});
+      const page=await isolatedPage({viewport:{width,height:844}});
       page.on('pageerror',error=>report.errors.push(error.message));
       const pattern=`**/${resource}*`;
       await page.route(pattern,route=>route.fulfill({status:503,body:'temporarily unavailable'}));
@@ -66,7 +69,7 @@ async function nextWorker(page,button){
       if(hash.includes('question='))check('Retry restores deep-linked question',await page.locator('#chemy39-1-6').count()===1&&new URL(page.url()).searchParams.get('question')==='chemy39-1-6');
       await page.close();
     }
-    const page=await browser.newPage({viewport:{width:390,height:844},acceptDownloads:true});
+    const page=await isolatedPage({viewport:{width:390,height:844},acceptDownloads:true});
     page.on('pageerror',error=>report.errors.push(error.message));
     await page.addInitScript(mockWorkers);
     await page.goto(pathToFileURL(path.join(dist,'index.html')).href);
@@ -102,6 +105,7 @@ async function nextWorker(page,button){
     await page.locator('#ai-launch').click();
     await page.locator('#ai-query').fill('Aldol');await page.locator('#ai-generate').click();
     await page.locator('#ai-items .ai-item').first().waitFor();
+    await page.locator('#ai-result .ai-download-menu').evaluate(menu=>{menu.open=true;});
     await nextWorker(page,'[data-ai-export="answers"]');
     const oldAi=await page.evaluate(()=>testWorkers.length-1);
     await page.locator('#ai-close').click();await page.locator('#ai-launch').click();
