@@ -38,7 +38,7 @@ test('Natural-language planning and selection use two real-shaped DeepSeek reque
 });
 test('Conversational compose uses the model’s order, message and available IDs without rejecting the paper',async()=>{
   const ordered=[pool[2],pool[0]];
-  const agent=make({answers:[{...resolved,count:3},{questionIds:[ordered[0].id,'missing',ordered[1].id],message:'按从易到难排列。',introduction:'羟醛缩合的基本原理。'}]});
+  const agent=make({answers:[{...resolved,count:3},{questionIds:[ordered[0].id,'missing',ordered[1].id],message:'按从易到难排列。'}, {introduction:'羟醛缩合的基本原理。'}]});
   const result=await agent.compose({...request,conversation:true});
   assert.deepEqual(result.items.map(item=>item.id),ordered.map(item=>item.id));
   assert.equal(result.count,3);
@@ -75,10 +75,22 @@ test('DeepSeek can add, revise or remove a paper introduction without changing t
   assert.equal(removed.introduction,'');
   assert.deepEqual(removed.items.map(item=>item.id),currentIds);
 });
-test('Default introduction receives the selected questions in paper order even without a model flag',async()=>{
+test('Lecture failure keeps the selected paper and lecture-only retry makes one request without changing order',async()=>{
+  const questionIds=pool.slice(0,3).map(item=>item.id).reverse();
+  const introduction='<strong>一、反应条件</strong>\n<strong>1.1 亲核加成</strong>\n（1）先确定亲核体与亲电中心。';
+  const agent=make({answers:[{questionIds}, {introduction:'  '}, {introduction}]});
+  const initial=await agent.compose({...request,conversation:true,conceptId:concept.id});
+  assert.deepEqual(initial.items.map(item=>item.id),questionIds);
+  assert.match(initial.lectureWarning,/重新生成/);
+  const result=await agent.compose({...request,conversation:true,scope:initial.scope,currentIds:questionIds,lectureOnly:true});
+  assert.equal(agent.calls.length,3);
+  assert.equal(result.introduction,introduction);
+  assert.deepEqual(result.items.map(item=>item.id),questionIds);
+});
+test('Empty selection-stage introduction still triggers a lecture grounded in the selected questions',async()=>{
   const questionIds=[pool[2].id,pool[0].id];
   const introduction='<i>k</i><sub>1</sub> 与 <i>k</i><sub>2</sub> 对应不同温度。';
-  const agent=make({answers:[{questionIds}, {introduction}]});
+  const agent=make({answers:[{questionIds,introduction:''}, {introduction}]});
   const result=await agent.compose({...request,query:concept.name,conversation:true,conceptId:concept.id});
   const context=JSON.parse(agent.calls[1].body.messages[1].content);
   assert.deepEqual(context.questions.map(q=>[q.id,q.position]),questionIds.map((id,i)=>[id,i+1]));
@@ -91,7 +103,7 @@ test('Conversation combines a broad topic and a specific concept, then carries t
   const specific=pool.find(item=>bank.find(q=>q.id===item.id).topic!==topic).id;
   const history=[{role:'user',text:'方程式和羟醛缩合，两个都想练'}];
   const scope={topics:[topic],conceptIds:[concept.id]};
-  const agent=make({answers:[scope,{questionIds:[broad,specific],introduction:''},{message:'这份卷覆盖两部分。'}]});
+  const agent=make({answers:[scope,{questionIds:[broad,specific],omitIntroduction:true},{message:'这份卷覆盖两部分。'}]});
   const paper=await agent.compose({...request,query:'都要',count:2,conversation:true,history});
   assert.deepEqual(paper.items.map(q=>q.id),[broad,specific]);
   assert.deepEqual(paper.scope,scope);

@@ -101,6 +101,8 @@
 .ai-paper-intro>h4{font-family:var(--question-font);font-size:20px;margin-bottom:18px;line-height:1.65}
 .ai-lecture-heading{font:inherit;font-weight:700;margin:24px 0 10px;text-align:left;break-after:avoid}
 .ai-lecture-heading:first-child{margin-top:0}
+.ai-lecture-subheading{font:inherit;font-weight:700;margin:16px 0 7px;text-align:left;break-after:avoid}
+.q-body .ai-lecture-point{margin:0 0 9px;padding-inline-start:1.65em;text-indent:-1.65em}
 .q-body .ai-lecture-paragraph{margin:0 0 13px}
 .q-body .ai-lecture-formula,.ai-lecture-formula{margin:14px 0 16px;padding:0 10px;text-align:center;line-height:1.9;overflow-wrap:anywhere;break-inside:avoid}
 .ai-item{scroll-margin-top:20px}.ai-item h4{font-family:var(--question-font);font-size:19px}

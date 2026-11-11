@@ -9,12 +9,12 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css?v=question-font-v1">
   <link rel="stylesheet" href="interface.css?v=watermark-v2-light">
-  <link rel="stylesheet" href="ai-paper.css?v=workspace-v2">
+  <link rel="stylesheet" href="ai-paper.css?v=knowledge-handout">
   <script src="app.js?v=discussion-fold-v3" defer></script>
   <script src="paper-engine.js?v=topic-conversation-v1" defer></script>
-  <script src="lecture-format.js?v=1" defer></script>
-  <script src="word-export.js?v=lecture-v3" defer></script>
-  <script src="ai-paper.js?v=workspace-v2" defer></script>
+  <script src="lecture-format.js?v=knowledge-handout" defer></script>
+  <script src="word-export.js?v=knowledge-handout" defer></script>
+  <script src="ai-paper.js?v=knowledge-handout" defer></script>
   <link rel="stylesheet" href="account.css?v=forum-v1">
   <script src="account.js?v=local-sdk-v1" defer></script>
 <link rel="stylesheet" href="forum.css?v=inline-replies-v4">
@@ -118,6 +118,7 @@
             <div id="ai-welcome">
               <h3>今天想组一套什么卷？</h3>
               <p class="ai-lead" id="ai-lead">输入想练习的知识点，从 Chemy 题库中选题。</p>
+              <p id="ai-local-note" class="ai-hint" hidden>题库索引模式会随卷列出知识点。撰写详细讲义需要 DeepSeek。已启动本机服务时，可以<a href="http://127.0.0.1:8788/">打开本机 AI 组卷</a>。</p>
               <div class="ai-starters" aria-label="组卷示例">
                 <button type="button" data-ai-prompt="组 5 道晶体化学题，从基础到进阶，卷首整理相关知识点。"><strong>准备一份讲义</strong><span>晶体化学 · 知识梳理与练习</span></button>
                 <button type="button" data-ai-prompt="组一套同时包含化学方程式和元素化学的卷子，共 5 道题，兼顾不同知识点。"><strong>组合多个主题</strong><span>化学方程式与元素化学</span></button>
@@ -175,12 +176,14 @@
           </div></details>
           <button type="button" id="ai-undo" disabled>撤销修改</button>
           <button type="button" id="ai-reroll">重新组卷</button>
+          <button type="button" id="ai-write-lecture" hidden>生成知识点讲义</button>
         </div>
         <p id="ai-export-status" class="ai-hint" role="status" aria-live="polite"></p>
         <nav class="ai-paper-nav" aria-label="试卷阅读工具"><label>跳转到 <select id="ai-jump" aria-label="跳转到试卷题目"></select></label><button type="button" id="ai-answers-toggle" aria-pressed="false">展开全部答案</button></nav>
+        <p id="ai-lecture-status" class="ai-hint" role="status"></p>
         <div class="ai-paper-body">
           <section id="ai-paper-intro" class="ai-paper-intro" hidden>
-            <h4>知识介绍</h4><div class="q-body ai-paper-intro-text"></div>
+            <h4>知识点讲义</h4><div class="q-body ai-paper-intro-text"></div>
           </section>
           <div id="ai-items"></div>
         </div>

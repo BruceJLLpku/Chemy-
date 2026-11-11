@@ -6,15 +6,18 @@
     worker:null,exporting:false,exportNonce:0,agentController:null,agentNonce:0,generating:false,undo:[]};
   let progressTimer;
   function snapshot(){
-    const {items,pool,concept,introduction,scope,count,filters,canEdit,lastQuery,history}=state;
-    return structuredClone({items,pool,concept,introduction,scope,count,filters,canEdit,lastQuery,history});
+    const {items,pool,concept,introduction,lectureWarning,scope,count,filters,canEdit,lastQuery,history}=state;
+    return structuredClone({items,pool,concept,introduction,lectureWarning,scope,count,filters,canEdit,lastQuery,history});
   }
   function remember(previous){if(previous.items.length){state.undo.push(previous);state.undo=state.undo.slice(-15);}}
   function syncTools(){
     el('ai-undo').disabled=state.generating||state.exporting||!state.undo.length;
     el('ai-answers-toggle').disabled=!state.items.length;
+    el('ai-write-lecture').hidden=!state.canEdit||!state.items.length;
+    el('ai-write-lecture').textContent=state.introduction?'重写知识点讲义':'生成知识点讲义';
     el('ai-result').querySelectorAll('[data-ai-word],[data-ai-export],[data-ai-print]').forEach(button=>{button.disabled=state.generating||state.exporting||!state.items.length;});
   }
+  el('ai-write-lecture').onclick=()=>editPaper('按竞赛专题讲义的格式整理当前试卷的知识点。',true);
   function retry(query,editing){
     state.retry={query,editing};el('ai-retry').hidden=false;
   }
@@ -63,7 +66,8 @@
       }
       state.config={mode:data.mode,backendUrl:base};
       el('ai-welcome').querySelector('.ai-starters').hidden=data.mode!=='deepseek';
-      el('ai-mode').textContent=data.mode==='deepseek'?'DeepSeek 对话式组卷':'本地知识点索引选题';
+      el('ai-mode').textContent=data.mode==='deepseek'?'DeepSeek 对话式组卷':'题库索引组卷';
+      el('ai-local-note').hidden=data.mode!=='local';
       if(data.mode==='deepseek'){
         el('ai-lead').textContent='描述想要的试卷，组卷助手会从 Chemy 题库选题。出卷后可以继续对话修改。';
         el('ai-query').placeholder='例如：组 5 道羟醛缩合题，先介绍基本原理';
@@ -175,7 +179,7 @@
   el('ai-paper-toggle').onclick=()=>showPaper(el('ai-result').hidden);
   el('ai-new').onclick=()=>{
     cancelGeneration('');
-    Object.assign(state,{canEdit:false,lastQuery:'',items:[],pool:[],concept:null,introduction:'',scope:null,history:[],undo:[]});
+    Object.assign(state,{canEdit:false,lastQuery:'',items:[],pool:[],concept:null,introduction:undefined,lectureWarning:'',scope:null,history:[],undo:[]});
     for(const id of ['ai-turns','ai-candidates','ai-items'])el(id).replaceChildren();
     el('ai-welcome').hidden=false;
     el('ai-query').value='';
@@ -214,6 +218,17 @@
   function introductionHtml(text) {
     return window.ChemyLecture.html(text);
   }
+  function currentLecture() {
+    if (!state.items.length || state.introduction==='') return {title:'',text:''};
+    if (state.introduction) return {title:'知识点讲义',text:state.introduction};
+    const ids=new Set(state.items.map(item=>item.id));
+    const entries=state.index.entries.filter(entry=>ids.has(entry.id));
+    const concepts=engine.availableConcepts({...state.index,entries},questions).slice(0,10);
+    if (state.concept?.id && !concepts.some(concept=>concept.id===state.concept.id)) {
+      concepts.unshift(state.concept);
+    }
+    return {title:'本卷知识点',text:concepts.map((concept,index)=>`（${index+1}）${concept.name}`).join('\n')};
+  }
   function addTurn(speaker,message,{introduction,paper}={}) {
     el('ai-welcome').hidden=true;
     state.history=[...(state.history||[]),{role:speaker==='你'?'user':'assistant',text:message.slice(0,400)}].slice(-8);
@@ -224,7 +239,7 @@
     turn.append(author,body);
     if(introduction){
       const note=document.createElement('details'),heading=document.createElement('summary'),text=document.createElement('div');
-      note.className='ai-chat-intro';heading.textContent='查看本轮知识介绍';text.innerHTML=introductionHtml(introduction);
+      note.className='ai-chat-intro';heading.textContent='查看本轮知识点讲义';text.innerHTML=introductionHtml(introduction);
       note.append(heading,text);turn.append(note);
     }
     if(paper){
@@ -265,9 +280,9 @@
         if(resolved.kind!=='exact'||!resolved.concepts.length){showCandidates(resolved.concepts,resolved.concepts.length?'请选择你想练习的知识点，再生成试卷。':'未识别到这个知识点，请更换名称或使用更具体的表述。');return;}
         state.concept=resolved.concepts[0];
         state.pool=engine.candidates(state.concept.id,index,bank,filters);state.items=engine.choose(state.pool,count);
-        state.introduction='';state.canEdit=false;
+        state.introduction=undefined;state.lectureWarning='';state.canEdit=false;
       } else {
-        status('DeepSeek 正在理解需求并选择题目，首次唤醒服务可能需要稍候…');
+        status('DeepSeek 正在从题库选题，并根据入选题目撰写知识点讲义…');
         timer=setTimeout(()=>controller.abort('timeout'),180000);
         const data=await requestPaper(config,{query,count,filters,history,...(conceptId?{conceptId}:{})},controller.signal);
         if(nonce!==state.agentNonce)return;
@@ -278,13 +293,18 @@
         if(data.kind!=='paper')throw new Error('暂时无法读取组卷结果，请重试。');
         response=data;
         Object.assign(state,{concept:data.concept,scope:data.scope,items:readBankItems(data.items),pool:readBankItems(data.pool),count:data.count??count,filters});
-        state.introduction=typeof data.introduction==='string'?data.introduction:'';
+        state.introduction=data.introduction;
+        state.lectureWarning=data.lectureWarning||'';
         state.canEdit=state.items.length>0;
       }
       if(nonce!==state.agentNonce)return;
       remember(previous);
       if(state.items.length||response?.message||response?.missingQuestions){
-        addTurn('组卷助手',modelReply(response||{},`已从题库选出 ${state.items.length} 道题。`),{introduction:state.introduction,paper:state.items.length>0});
+        const selectedMessage=`已从题库选出 ${state.items.length} 道原题。${state.introduction?'知识点讲义已放在卷首。':''}`;
+        const message=state.items.length
+          ?modelReply({missingQuestions:response?.missingQuestions},selectedMessage)
+          :modelReply(response||{},selectedMessage);
+        addTurn('组卷助手',message,{introduction:state.introduction,paper:state.items.length>0});
       }
       updateComposer();
       el('ai-export-status').textContent='';render();showPaper(true);
@@ -297,7 +317,7 @@
       if(nonce===state.agentNonce){state.agentController=null;state.generating=false;el('ai-cancel').hidden=true;busy(false);el('ai-query').focus();}
     }
   }
-  async function editPaper(queryOverride){
+  async function editPaper(queryOverride,lectureOnly=false){
     if(state.generating||state.exporting||state.worker||!state.canEdit)return;
     const input=el('ai-query'),query=queryOverride||input.value.trim();
     if(!query)return;
@@ -309,24 +329,34 @@
     addTurn('你',query);if(!queryOverride)input.value='';
     el('ai-retry').hidden=true;
     status('正在根据当前试卷处理修改…');
+    if(lectureOnly)el('ai-lecture-status').textContent='正在撰写知识点讲义…';
     const timer=setTimeout(()=>controller.abort('timeout'),180000);
     try {
       const data=await requestPaper(state.config,{query,history,count:state.count,filters:state.filters,
-        ...(state.scope?{scope:state.scope}:{conceptId:state.concept.id}),currentIds:[...previous.keys()],introduction:state.introduction.slice(0,4500)},controller.signal);
+        ...(state.scope?{scope:state.scope}:{conceptId:state.concept.id}),currentIds:[...previous.keys()],
+        introduction:(state.introduction||'').slice(0,4500),...(lectureOnly?{lectureOnly:true}:{})},controller.signal);
       if(nonce!==state.agentNonce)return;
       if(data.kind!=='paper')throw new Error('暂时无法读取修改结果，当前试卷已保留。');
       const items=readBankItems(data.items),pool=readBankItems(data.pool);
+      const changed=items.length!==previous.size||items.some(item=>!previous.has(item.id));
       remember(before);
       state.items=items.map(item=>previous.get(item.id)||item);state.pool=pool;
       state.count=items.length;state.canEdit=items.length>0;
       if(data.scope)state.scope=data.scope;
       if(data.concept)state.concept=data.concept;
       if(typeof data.introduction==='string')state.introduction=data.introduction;
+      else if(changed&&data.lectureWarning)state.introduction=undefined;
+      state.lectureWarning=data.lectureWarning||'';
       el('ai-export-status').textContent='';
       addTurn('组卷助手',modelReply(data,'已按本轮结果更新试卷。'),{introduction:data.introduction,paper:items.length>0});
       render();updateComposer();
     } catch(error) {
-      if(nonce===state.agentNonce){retry(query,true);status(controller.signal.aborted?'修改超时，当前试卷已保留。':error.message);}
+      if(nonce===state.agentNonce){
+        const message=controller.signal.aborted?'修改超时，当前试卷已保留。':error.message;
+        if(lectureOnly)el('ai-lecture-status').textContent=message;
+        else retry(query,true);
+        status(message);
+      }
     } finally {
       clearTimeout(timer);
       if(nonce===state.agentNonce){
@@ -364,12 +394,15 @@
     syncTools();
     showPaper(!el('ai-result').hidden);
     const introduction=el('ai-paper-intro');
-    introduction.querySelector('div').innerHTML=introductionHtml(state.introduction||'');
-    introduction.hidden=!state.introduction;
+    const lecture=currentLecture();
+    introduction.querySelector('h4').textContent=lecture.title;
+    introduction.querySelector('div').innerHTML=introductionHtml(lecture.text);
+    introduction.hidden=!lecture.text;
+    el('ai-lecture-status').textContent=state.lectureWarning||'';
     if(!items.length){el('ai-items').replaceChildren();el('ai-jump').replaceChildren();el('ai-result-count').textContent='当前试卷 0 道题';status(state.pool.length?'本卷已清空，可撤销修改或重新组卷。':'当前筛选范围内没有可用的相关题目，请放宽来源范围或更换知识点。');if(state.undo.length){el('ai-result').hidden=false;el('ai-export-status').textContent='本卷已清空，可撤销修改或重新组卷。';}return;}
     el('ai-result-title').textContent=`${state.concept.name} · 专题练习`;
     el('ai-result-count').textContent=`本卷 ${items.length} 道完整大题 · 范围内已确认相关 ${state.pool.length} 道 · 保留专题编号与来源`;
-    el('ai-jump').innerHTML=(state.introduction?'<option value="intro">知识介绍</option>':'')+items.map((_,i)=>`<option value="${i}">第 ${i+1} 题</option>`).join('');
+    el('ai-jump').innerHTML=(lecture.text?`<option value="intro">${lecture.title}</option>`:'')+items.map((_,i)=>`<option value="${i}">第 ${i+1} 题</option>`).join('');
     el('ai-answers-toggle').setAttribute('aria-pressed','false');el('ai-answers-toggle').textContent='展开全部答案';
     status(items.length<state.count?`目标 ${state.count} 道，当前保留 ${items.length} 道。${state.pool.length<state.count?'相关题量不足，已按实际题量组卷。':'可重新组卷恢复目标题量。'}`:'');
     el('ai-items').innerHTML=items.map((item,i)=>{
@@ -446,7 +479,7 @@
     const images=[],pageLength=formatted?24:wrapped.length;
     for(let start=0;start<wrapped.length;){
       let end=Math.min(wrapped.length,start+pageLength);
-      if(formatted&&end<wrapped.length){while(end>start+1&&(!wrapped[end-1].length||wrapped[end-1].kind==='heading'))end--;}
+      if(formatted&&end<wrapped.length){while(end>start+1&&(!wrapped[end-1].length||['heading','subheading'].includes(wrapped[end-1].kind)))end--;}
       const page=wrapped.slice(start,end);start=end;
       canvas.width=width;canvas.height=padding*2+page.length*lineHeight;
       ctx.fillStyle='#fff';ctx.fillRect(0,0,width,canvas.height);ctx.fillStyle='#252b29';
@@ -461,7 +494,7 @@
   const canvasNote=(lines,heading=false)=>canvasNotes(lines,heading)[0];
   async function download(kind) {
     if(state.exporting||state.generating||state.worker || !state.items.length)return;
-    const snapshot=state.items.slice(),name=state.concept.name,introduction=state.introduction;
+    const snapshot=state.items.slice(),name=state.concept.name,lecture=currentLecture();
     const nonce=++state.exportNonce;
     state.exporting=true;busy(true);el('ai-export-status').textContent='正在准备 PDF…';
     try {
@@ -469,8 +502,8 @@
       if(nonce!==state.exportNonce)return;
       // Only our added commentary is rasterized; source answers remain vector pages.
       const header=canvasNote([`${name} · ${kind==='answers'?'参考答案':'专题练习'}`,`共 ${snapshot.length} 道完整大题，保留原专题编号与来源。`],true);
-      const paperIntro=kind==='questions'&&introduction
-        ?canvasNotes([{html:'<strong>知识介绍</strong>',kind:'heading'},...window.ChemyLecture.blocks(introduction)],false,true):[];
+      const paperIntro=kind==='questions'&&lecture.text
+        ?canvasNotes([{html:`<strong>${lecture.title}</strong>`,kind:'heading'},...window.ChemyLecture.blocks(lecture.text)],false,true):[];
       const items=snapshot.map((item,i)=>({id:item.id,slug:slugByTopic[byId.get(item.id).topic],annotation:kind==='answers'?canvasNote([`练习第 ${i+1} 题 · 知识点关联说明`,...labels(item),'关联说明由 AI 分析；下方为原卷参考答案。']):null}));
       state.worker=new Worker('pdf-worker.js?v=ai-paper-intro-v1');
       const fail=message=>{state.worker?.terminate();state.worker=null;state.exporting=false;busy(false);el('ai-export-status').textContent=message;};
@@ -496,8 +529,9 @@
     const items=state.items.map(({id})=>({origin:origin(byId.get(id)),html:presentation[id][answers?'answer':'body']}));
     state.exporting=true;busy(true);el('ai-export-status').textContent='正在生成可编辑的 Word 文档…';
     try{
+      const lecture=currentLecture();
       const blob=await window.ChemyWord.build({title:`${name} ${kind}`,
-        introduction:answers?'':state.introduction||'',items});
+        introduction:answers?'':lecture.text,introductionTitle:lecture.title,items});
       if(nonce!==state.exportNonce)return;
       const url=URL.createObjectURL(blob),link=document.createElement('a');
       link.href=url;link.download=`Chemy-${name.replace(/[\\/:*?"<>|]/g,'_')}-${kind}.docx`;
@@ -515,8 +549,9 @@
     if(state.exporting||state.generating||state.worker || !state.items.length)return;
     state.exporting=true;busy(true);
     const target=el('ai-print');
-    const intro=kind==='questions'&&state.introduction
-      ?`<section class="ai-paper-intro"><h2>知识介绍</h2><div class="q-body ai-paper-intro-text">${introductionHtml(state.introduction)}</div></section>`:'';
+    const lecture=currentLecture();
+    const intro=kind==='questions'&&lecture.text
+      ?`<section class="ai-paper-intro"><h2>${lecture.title}</h2><div class="q-body ai-paper-intro-text">${introductionHtml(lecture.text)}</div></section>`:'';
     target.innerHTML=`<h1>${safe(state.concept.name)} · ${kind==='answers'?'参考答案':'专题练习'}</h1><p>共 ${state.items.length} 道完整大题，保留原专题编号与来源。</p>`+intro+state.items.map((item,i)=>{
       const q=byId.get(item.id);
       return `<article class="ai-item"><h2>练习第 ${i+1} 题 · ${safe(q.topic)}专题第 ${numbers[q.id]} 题</h2><p class="ai-origin">${safe(origin(q))}</p>${kind==='answers'?association(item):''}<div class="${kind==='answers'?'answer-content':'q-body'}">${presentation[q.id][kind==='answers'?'answer':'body']}</div></article>`;
