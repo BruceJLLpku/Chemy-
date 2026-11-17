@@ -476,6 +476,112 @@
       ],
       "mode": "band",
       "rangeTop": 717.198057
+    },
+    {
+      "edition": 40,
+      "paper": 7,
+      "kind": "q",
+      "number": 6,
+      "page": 67,
+      "box": [
+        316,
+        732,
+        499,
+        841.68
+      ],
+      "mode": "float",
+      "reason": "Complete original diagram at section boundary"
+    },
+    {
+      "edition": 40,
+      "paper": 10,
+      "kind": "q",
+      "number": 5,
+      "page": 94,
+      "box": [
+        423,
+        729,
+        578,
+        838
+      ],
+      "mode": "float",
+      "reason": "Complete original diagram at section boundary"
+    },
+    {
+      "edition": 40,
+      "paper": 11,
+      "kind": "q",
+      "number": 4,
+      "page": 99,
+      "box": [
+        403,
+        569,
+        578,
+        712
+      ],
+      "mode": "float",
+      "reason": "Complete original diagram at section boundary"
+    },
+    {
+      "edition": 40,
+      "paper": 12,
+      "kind": "q",
+      "number": 10,
+      "page": 116,
+      "box": [
+        84,
+        487.97229938390933,
+        566,
+        570.8927729706106
+      ],
+      "mode": "band",
+      "reason": "Complete original diagram at section boundary"
+    },
+    {
+      "edition": 40,
+      "paper": 13,
+      "kind": "q",
+      "number": 1,
+      "page": 117,
+      "box": [
+        394,
+        734,
+        507,
+        796
+      ],
+      "mode": "float",
+      "reason": "Complete original diagram at section boundary"
+    },
+    {
+      "edition": 40,
+      "paper": 13,
+      "kind": "q",
+      "number": 9,
+      "page": 124,
+      "box": [
+        500,
+        577,
+        576,
+        657
+      ],
+      "mode": "float",
+      "reason": "Complete original diagram at section boundary",
+      "clipOverlappingBand": true
+    },
+    {
+      "edition": 40,
+      "paper": 20,
+      "kind": "q",
+      "number": 7,
+      "page": 195,
+      "box": [
+        429,
+        485,
+        579,
+        649
+      ],
+      "mode": "float",
+      "reason": "Complete original diagram at section boundary"
     }
   ],
   "reviewNotes": "All listed boundary exceptions were reviewed against original page renders. Background hashes identify only verified pale watermark tiles; no chemistry diagram is redrawn. White fill-only rectangles behind heading text are not diagrams.",

@@ -20,7 +20,8 @@ def question_source(q):
     return result
 
 def score_text(q):
-    if q.get('points') is None:return ''
+    if q.get('points') is None:
+        return '' if q.get('percent') is None else f'（占 {q["percent"]}%）'
     percent='' if q.get('percent') is None else f'，占 {q["percent"]}%'
     return f'（{q["points"]} 分{percent}）'
 

@@ -1,6 +1,22 @@
 {
   "version": 2,
   "editions": {
+    "40": {
+      "originalFiles": [
+        {
+          "kind": "q",
+          "filename": "第40届化学奥林匹克Chemy模拟试题题目合集.pdf",
+          "sha256": "ff0bae7c4585cfeb22a8339510be1f6032fe401f8626103e1430a4424bbdd481",
+          "bytes": 13592359
+        },
+        {
+          "kind": "a",
+          "filename": "第40届化学奥林匹克Chemy模拟试题参考答案合集.pdf",
+          "sha256": "5b0044334e93d469d351387400a2b1b1be3f412d6d32b6436de93b45fdc5e22a",
+          "bytes": 18017949
+        }
+      ]
+    },
     "39": {
       "originalFiles": [
         {

@@ -1,0 +1,24 @@
+{
+  "scope": {
+    "40": {
+      "papers": 22,
+      "questions": 200
+    }
+  },
+  "methods": {
+    "losslessSourcePixelComparison": true,
+    "printChapterContentComparison": false,
+    "nativeGlyphCoverage": true,
+    "sourcePairingAndHashes": true
+  },
+  "checks": {
+    "source_questions": 200,
+    "decodable_images": 1438,
+    "paired_sections": 400,
+    "original_captures": 1438
+  },
+  "issues": [],
+  "reviewCandidates": [],
+  "automatedPassed": true,
+  "visualReviewComplete": false
+}

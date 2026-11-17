@@ -1,5 +1,5 @@
 """Append source-vector booklets for one reviewed paper to each topic."""
-import argparse,copy,json
+import argparse,copy,json,os
 from io import BytesIO
 from pathlib import Path
 from PIL import Image,ImageOps,ImageDraw
@@ -13,7 +13,7 @@ from import_library import ROOT,CACHE,DATA,load,render_page,colored,merge,figure
 from paper1_manifest import SLUGS,PAPER
 from library_config import EDITION,paper_key
 
-OUT=ROOT/'dist/downloads';PARTS=ROOT/'tmp/library/books';PARTS.mkdir(exist_ok=True)
+OUT=ROOT/'dist/downloads';PARTS=Path(os.environ.get('CHEMY_PDF_PARTS') or ROOT/'tmp/library/books');PARTS.mkdir(parents=True,exist_ok=True)
 
 def part_path(edition,paper,slug,k):
     prefix=f'{paper:02}' if edition==39 else f'e{edition}-{paper:02}'

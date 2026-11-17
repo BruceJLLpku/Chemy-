@@ -4,6 +4,7 @@ Only geometry is published. Original books, source content, and numbering stay i
 Run with the bundled Python runtime (pdfplumber and pypdf).
 """
 import json
+import os
 from io import BytesIO
 from pathlib import Path
 import pdfplumber
@@ -12,7 +13,7 @@ import numpy as np
 from pdf_watermark import unwatermarked_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
-PARTS = ROOT / 'tmp/library/books'
+PARTS = Path(os.environ.get('CHEMY_PDF_PARTS') or ROOT / 'tmp/library/books')
 BOOKS = ROOT / 'dist/downloads'
 
 def merge(bands):

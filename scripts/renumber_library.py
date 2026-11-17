@@ -53,20 +53,24 @@ for key,chapter in MANIFEST['papers'].items():
     e,p=map(int,key.split('-')) if '-' in key else (39,int(key))
     if e==EDITION:SPECS[p]=chapter['questions']
 
-def runs(chars):
+def subquestion_separator(paper):
+    return '.' if EDITION==40 and paper==19 else '-'
+
+def runs(chars,separator='-'):
     """Keep one text baseline/font and only contiguous numeric characters."""
     rows=defaultdict(list)
     for c in chars:
         if c['text'].strip() and c['size']>=8:
             rows[(round(c['bottom'],1),c['fontname'],round(c['size'],2),str(c['non_stroking_color']))].append(c)
     out=[]
+    run=re.compile(r'[\d'+re.escape(separator)+r']+')
     for cs in rows.values():
         current=[]
         for c in sorted(cs,key=lambda c:c['x0']):
-            if re.fullmatch(r'[\d-]+',c['text']) and (not current or c['x0']-current[-1]['x1']<1.4):current.append(c)
+            if run.fullmatch(c['text']) and (not current or c['x0']-current[-1]['x1']<1.4):current.append(c)
             else:
                 if current:out.append(current)
-                current=[c] if re.fullmatch(r'[\d-]+',c['text']) else []
+                current=[c] if run.fullmatch(c['text']) else []
         if current:out.append(current)
     return out
 
@@ -78,18 +82,21 @@ def neighbors(chars,group):
     right=[x for x in row if x['x0']>=group[-1]['x1']-.1]
     return max(left,key=lambda x:x['x1'],default=None),min(right,key=lambda x:x['x0'],default=None)
 
-def label_candidates(k,n,lo,hi,old):
+def label_candidates(k,n,lo,hi,old,paper):
     d=load(k,n)
     cs=[c for c in d['chars'] if 80<c['x0']<550 and lo-.5<=c['top']<hi]
     result=[]
-    for group in runs(cs):
+    separator=subquestion_separator(paper)
+    pattern=re.compile(str(old)+r'(?:'+re.escape(separator)+r'\d+)+')
+    for group in runs(cs,separator):
         text=''.join(c['text'] for c in group)
-        if not re.fullmatch(str(old)+r'-\d+(?:-\d+)*',text):continue
+        if not pattern.fullmatch(text):continue
         before,after=neighbors(cs,group)
         if after and (after['text']=='.' or after['text'].isalpha() and (after['text'].isascii() or '\u0370'<=after['text']<='\u03ff')) and after['x0']<group[-1]['x1']+2:continue
         lead=group[0]['x0']<122 and (before is None or before['text'] in ['（','('])
         # Source bold runs are question labels and explicit cross-references.
         bold=any('Bold' in c['fontname'] or re.search(r'\+F(?:7|6)$',c['fontname']) for c in group)
+        if separator=='.' and not lead:continue
         if not(lead or bold):continue
         if before and before['text'] in ',，' and before['x1']>group[0]['x0']-1:continue
         result.append((group,text,lead))
@@ -140,18 +147,19 @@ for paper,specs in sorted(SPECS.items()):
     for spec in specs:
         for k in ['q','a']:
             for n,lo,hi in spec['question' if k=='q' else 'answer']:
-                detected,_=label_candidates(k,n,lo,hi,spec['number'])
+                detected,_=label_candidates(k,n,lo,hi,spec['number'],paper)
                 LABELS[paper].update(text for _,text,_ in detected)
 for paper,specs in sorted(SPECS.items()):
+    separator=subquestion_separator(paper)
     for spec in specs:
         qid=f'chemy{EDITION}-{paper}-{spec["number"]}';q=QUESTIONS[qid];old=spec['number'];new=NUMBER[qid]
         for k in ['q','a']:
             for n,lo,hi in spec['question' if k=='q' else 'answer']:
-                labels,cs=label_candidates(k,n,lo,hi,old)
+                labels,cs=label_candidates(k,n,lo,hi,old,paper)
                 COUNTS[qid]+=len(labels)
                 seen={tuple(id(c) for c in group) for group,_,_ in labels}
                 # Non-bold question references and multi-column labels use the same map.
-                for group in runs(cs):
+                for group in runs(cs,separator) if separator=='-' else []:
                     text=''.join(c['text'] for c in group)
                     if text not in LABELS[paper] or tuple(id(c) for c in group) in seen:continue
                     source_number=int(text.split('-')[0])
@@ -162,8 +170,8 @@ for paper,specs in sorted(SPECS.items()):
                     labels.append((group,text,False))
                 for group,text,lead in labels:
                     text=LABEL_CORRECTIONS.get((qid,k,text),text)
-                    source_number=int(text.split('-')[0]);target_id=CROSS_REFERENCES.get((qid,text),qid)
-                    replacement=str(NUMBER.get(target_id,new))+text[len(str(source_number)):]
+                    source_number=int(text.split(separator)[0]);target_id=CROSS_REFERENCES.get((qid,text),qid)
+                    replacement=str(NUMBER.get(target_id,new))+text[len(str(source_number)):].replace(separator,'-')
                     original_text=''.join(c['text'] for c in group)
                     if replacement!=original_text:PATCHES[k,n].append(make_patch(k,n,group,replacement,qid,lead))
                 if new!=old:
@@ -205,12 +213,15 @@ def text_html(html,old,new,paper,kind):
         explicit=any(t in ['strong','h3','h4'] for t in tags) or (i and re.search(r'class="number"',chunks[i-1]))
         def replace_label(m):
             text=m.group();qid=f'chemy{EDITION}-{paper}-{old}';text=LABEL_CORRECTIONS.get((qid,kind,text),text)
-            source=int(text.split('-')[0]);target=CROSS_REFERENCES.get((qid,text),qid)
+            separator=subquestion_separator(paper)
+            source=int(text.split(separator)[0]);target=CROSS_REFERENCES.get((qid,text),qid)
             if source!=old and (qid,text) not in CROSS_REFERENCES:return m.group()
             if text not in LABELS[paper] and not(explicit and source==old):return text
-            return str(NUMBER.get(target,new))+text[len(str(source)):]
+            return str(NUMBER.get(target,new))+text[len(str(source)):].replace(separator,'-')
         # Decimal subtraction and chemical locants never match this complete-token rule.
-        if '原答案册将本问编号' not in part:
+        if subquestion_separator(paper)=='.':
+            if explicit:part=re.sub(r'^\d+(?:\.\d+)+$',replace_label,part)
+        elif '原答案册将本问编号' not in part:
             part=re.sub(r'(?<![\dA-Za-z,，])(\d+)-(\d+(?:-\d+)*)(?![\d.A-Za-z\u0370-\u03ff])',replace_label,part)
         part=re.sub(r'第\s*'+str(old)+r'\s*题',f'第 {new} 题',part)
         chunks[i]=part
