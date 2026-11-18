@@ -1,0 +1,104 @@
+name: Check release snapshot
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release inputs
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dist
+            scripts
+            data
+            sources
+            server
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/export-requirements.txt
+      - name: Install PDF regression dependencies
+        run: python -m pip install -r scripts/export-requirements.txt
+      - name: Set up Node for native PDF composition regression
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test browser worker pattern placement
+        run: |
+          node scripts/test_pdf_worker_patterns.cjs
+          node scripts/test_pdf_worker_annotations.cjs
+          node scripts/test_merge_page_ui.cjs
+          node scripts/test_merge_pdf_ui.cjs
+          python -X utf8 scripts/test_pdf_export_pixels.py --synthetic
+          python -X utf8 scripts/test_pdf_export_pixel_glyphs.py
+          python -X utf8 scripts/test_pdf_placement_validation.py
+      - name: Test clipped PDF cleanup
+        run: python -X utf8 scripts/test_pdf_clip_cleanup.py
+      - name: Test tile-cache-independent visual verification
+        run: python -X utf8 scripts/test_pdf_render_verify.py
+      - name: Test embedded PDF font subsetting
+        run: python -X utf8 scripts/test_pdf_font_subset.py
+      - name: Test safe PDF object compaction
+        run: python -X utf8 scripts/test_pdf_compact_objects.py
+      - name: Test clean topic books and bookmarks
+        run: python -X utf8 scripts/test_export_book.py
+      - name: Test strict independent whole-book verification
+        run: python -X utf8 scripts/test_clean_book_validation.py
+      - name: Test lossless image verification provenance
+        run: python -X utf8 scripts/test_pdf_image_verify.py
+      - name: Test interrupted export cache recovery
+        run: python -X utf8 scripts/test_export_cache_recovery.py
+      - name: Test export fragment verification provenance
+        run: python -X utf8 scripts/test_export_parts_validation.py
+      - name: Test spectrum source correction
+        run: python -X utf8 scripts/test_question_figure_corrections.py
+      - name: Test release-check failure cases
+        run: python -X utf8 -m unittest discover -s scripts -p test_release_check.py
+      - name: Test staging safety and size limits
+        run: python -X utf8 -m unittest discover -s scripts -p test_stage_site.py
+      - name: Check current release metadata and PDF hashes
+        run: python -X utf8 scripts/check_release.py --pdfs
+      - name: Test lossless packed question transport
+        run: node scripts/test_pdf_worker_packed.cjs
+      - name: Test conversational planning and handout responses
+        run: node --test scripts/test_deepseek_agent.mjs
+
+  browser-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out website and isolated forum fixtures
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dist
+            scripts
+            supabase
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install fixed browser test dependencies
+        run: |
+          npm install --prefix tmp/browser-test-deps --no-save --package-lock=false --ignore-scripts playwright@1.62.1 jszip@3.10.1 @electric-sql/pglite@0.5.16
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tmp/browser-test-deps/node_modules" >> "$GITHUB_ENV"
+          node tmp/browser-test-deps/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Test forum database rules in local PostgreSQL
+        run: node scripts/test_forum_db.cjs
+      - name: Test accounts and favorites with isolated services
+        run: |
+          node scripts/test_accounts.cjs
+          node scripts/test_favorites.cjs
+      - name: Test forum UI against local PostgreSQL
+        run: node scripts/test_forum_browser.cjs
+      - name: Test loading retries and export cancellation
+        run: node scripts/test_ui_recovery.cjs

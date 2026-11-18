@@ -1,10 +1,12 @@
 const {chromium}=require('playwright');
+const {browserLaunchOptions,isolateAccountServices}=require('./browser_test_support.cjs');
 const assert=require('node:assert/strict');
 (async()=>{
  const fs=require('node:fs'),path=require('node:path');const root=path.resolve(__dirname,'../dist');
- const server=require('node:http').createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]==='/'?'/index.html':req.url.split('?')[0]));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(fs.existsSync(file)?file:path.resolve(__dirname,'../../chemy-site/dist',path.relative(root,file)),(err,data)=>{if(err){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':file.endsWith('.html')?'text/html':'application/octet-stream');res.end(data);});});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base='http://127.0.0.1:'+server.address().port+'/';
- const browser=await chromium.launch({channel:'msedge',headless:true});
+ const server=require('node:http').createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]==='/'?'/index.html':req.url.split('?')[0]));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(err,data)=>{if(err){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':file.endsWith('.html')?'text/html':'application/octet-stream');res.end(data);});});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base='http://127.0.0.1:'+server.address().port+'/';
+ const browser=await chromium.launch(browserLaunchOptions());
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await isolateAccountServices(page);
  const externalSdk=[];
  await page.route('https://cdn.jsdelivr.net/npm/@supabase/**',r=>{externalSdk.push(r.request().url());return r.abort();});
  try{

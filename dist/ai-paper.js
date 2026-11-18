@@ -150,6 +150,7 @@
     cancelGeneration('');state.exportNonce++;
     const exporting=state.exporting;
     state.worker?.terminate();state.worker=null;state.exporting=false;busy(false);
+    document.body.classList.remove('ai-printing');el('ai-print').replaceChildren();
     if(exporting)el('ai-export-status').textContent='文档生成已取消，可重新下载。';
     el('ai-launch').focus({preventScroll:true});
   });
@@ -447,6 +448,7 @@
   }
   function canvasNotes(lines,heading=false,formatted=false) {
     const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+    const decoder=formatted?document.createElement('textarea'):null;
     const width=1000,padding=24,size=heading?27:23,lineHeight=Math.ceil(size*1.65);
     const family=getComputedStyle(document.documentElement).getPropertyValue('--question-font').trim();
     const wrapped=[],tags=[];
@@ -467,7 +469,9 @@
         const offset=tags.includes('sub')?5:tags.includes('sup')?-8:0;
         const font=`${tags.includes('i')?'italic ':''}${tags.includes('strong')?'bold ':''}${offset?Math.round(size*.72):size}px ${family}`;
         ctx.font=font;
-        for(const char of part){
+        let text=part;
+        if(decoder){decoder.innerHTML=part;text=decoder.value;}
+        for(const char of text){
           const advance=ctx.measureText(char).width;
           if(x+advance>width-2*padding&&row.length){pushRow();row=[];x=0;}
           row.push({char,x,font,offset});
@@ -494,6 +498,7 @@
   const canvasNote=(lines,heading=false)=>canvasNotes(lines,heading)[0];
   async function download(kind) {
     if(state.exporting||state.generating||state.worker || !state.items.length)return;
+    if(location.protocol==='file:'){el('ai-export-status').textContent=localPreviewMessage;return;}
     const snapshot=state.items.slice(),name=state.concept.name,lecture=currentLecture();
     const nonce=++state.exportNonce;
     state.exporting=true;busy(true);el('ai-export-status').textContent='正在准备 PDF…';
@@ -505,10 +510,12 @@
       const paperIntro=kind==='questions'&&lecture.text
         ?canvasNotes([{html:`<strong>${lecture.title}</strong>`,kind:'heading'},...window.ChemyLecture.blocks(lecture.text)],false,true):[];
       const items=snapshot.map((item,i)=>({id:item.id,slug:slugByTopic[byId.get(item.id).topic],annotation:kind==='answers'?canvasNote([`练习第 ${i+1} 题 · 知识点关联说明`,...labels(item),'关联说明由 AI 分析；下方为原卷参考答案。']):null}));
-      state.worker=new Worker('pdf-worker.js?v=ai-paper-intro-v1');
-      const fail=message=>{state.worker?.terminate();state.worker=null;state.exporting=false;busy(false);el('ai-export-status').textContent=message;};
+      state.worker=new Worker('pdf-worker.js?v=clean-vector-packed-v2');
+      const worker=state.worker;
+      const fail=message=>{if(state.worker!==worker||nonce!==state.exportNonce)return;worker.terminate();state.worker=null;state.exporting=false;busy(false);el('ai-export-status').textContent=message;};
       state.worker.onerror=()=>fail('PDF 工具加载失败，请检查网络后重新下载。');
       state.worker.onmessage=({data})=>{
+        if(state.worker!==worker || nonce!==state.exportNonce)return;
         if(data.status)el('ai-export-status').textContent=data.status;
         else if(data.error)fail(data.error);
         else if(data.bytes){
@@ -519,14 +526,15 @@
         }
       };
       state.worker.postMessage({items,version:pdfVersion,kind,title:`Chemy · ${name} · ${kind==='answers'?'答案':'题目'}`,paperHeader:header,paperIntro});
-    }catch(_){state.worker?.terminate();state.worker=null;state.exporting=false;busy(false);el('ai-export-status').textContent='PDF 生成失败，请重试下载。';}
+    }catch(_){if(nonce!==state.exportNonce)return;state.worker?.terminate();state.worker=null;state.exporting=false;busy(false);el('ai-export-status').textContent='PDF 生成失败，请重试下载。';}
   }
   document.querySelectorAll('[data-ai-export]').forEach(button=>button.addEventListener('click',()=>download(button.dataset.aiExport)));
   document.querySelectorAll('[data-ai-word]').forEach(button=>button.addEventListener('click',async()=>{
     if(state.exporting||state.worker||state.generating||button.disabled||!state.items.length)return;
     const answers=button.dataset.aiWord==='answers',kind=answers?'答案':'题目';
     const name=state.concept.name,nonce=++state.exportNonce;
-    const items=state.items.map(({id})=>({origin:origin(byId.get(id)),html:presentation[id][answers?'answer':'body']}));
+    const questionIds=state.items.map(({id})=>id);
+    const items=questionIds.map(id=>({origin:origin(byId.get(id)),html:presentation[id][answers?'answer':'body']}));
     state.exporting=true;busy(true);el('ai-export-status').textContent='正在生成可编辑的 Word 文档…';
     try{
       const lecture=currentLecture();
@@ -538,7 +546,7 @@
       document.body.append(link);link.click();link.remove();
       setTimeout(()=>URL.revokeObjectURL(url),60000);
       el('ai-export-status').textContent='Word 已生成，下载已开始。';
-      window.ChemyAccount?.savePaper(state.items.map(q=>q.id),name+' · 专题练习');
+      window.ChemyAccount?.savePaper(questionIds,name+' · 专题练习');
     }catch(error){
       if(nonce===state.exportNonce)el('ai-export-status').textContent=error.message||'Word 生成失败，请重试。';
     }finally{
@@ -547,6 +555,7 @@
   }));
   async function printPaper(kind) {
     if(state.exporting||state.generating||state.worker || !state.items.length)return;
+    const nonce=++state.exportNonce;
     state.exporting=true;busy(true);
     const target=el('ai-print');
     const lecture=currentLecture();
@@ -560,9 +569,10 @@
     target.querySelectorAll('img').forEach(img=>{img.loading='eager';});
     try{
       await Promise.all([...target.querySelectorAll('img')].map(img=>img.decode()));await document.fonts.ready;
+      if(nonce!==state.exportNonce)return;
       document.body.classList.add('ai-printing');window.print();
-    }catch(_){el('ai-export-status').textContent='有题图未能加载，请检查网络后重新打印。';}
-    finally{document.body.classList.remove('ai-printing');target.replaceChildren();state.exporting=false;busy(false);}
+    }catch(_){if(nonce===state.exportNonce)el('ai-export-status').textContent='有题图未能加载，请检查网络后重新打印。';}
+    finally{if(nonce===state.exportNonce){document.body.classList.remove('ai-printing');target.replaceChildren();state.exporting=false;busy(false);}}
   }
   document.querySelectorAll('[data-ai-print]').forEach(button=>button.addEventListener('click',()=>printPaper(button.dataset.aiPrint)));
 })();

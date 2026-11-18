@@ -1,4 +1,4 @@
-let PGlite;try{({PGlite}=require(process.env.CHEMY_PGLITE_PATH||'@electric-sql/pglite'));}catch{({PGlite}=require('../../chemy-site/tmp/forum-db-test/package/dist/index.cjs'));}
+const {PGlite}=require(process.env.CHEMY_PGLITE_PATH||'@electric-sql/pglite');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 (async()=>{
 const db=new PGlite();await db.exec(`create role anon;create role authenticated;create schema auth;create schema storage;
