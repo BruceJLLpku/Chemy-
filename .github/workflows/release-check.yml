@@ -40,6 +40,7 @@ jobs:
           node scripts/test_merge_pdf_ui.cjs
           python -X utf8 scripts/test_pdf_export_pixels.py --synthetic
           python -X utf8 scripts/test_pdf_export_pixel_glyphs.py
+          python -X utf8 scripts/test_pdf_placement_validation.py
       - name: Test clipped PDF cleanup
         run: python -X utf8 scripts/test_pdf_clip_cleanup.py
       - name: Test tile-cache-independent visual verification
@@ -50,6 +51,10 @@ jobs:
         run: python -X utf8 scripts/test_pdf_compact_objects.py
       - name: Test clean topic books and bookmarks
         run: python -X utf8 scripts/test_export_book.py
+      - name: Test strict independent whole-book verification
+        run: python -X utf8 scripts/test_clean_book_validation.py
+      - name: Test lossless image verification provenance
+        run: python -X utf8 scripts/test_pdf_image_verify.py
       - name: Test interrupted export cache recovery
         run: python -X utf8 scripts/test_export_cache_recovery.py
       - name: Test export fragment verification provenance
@@ -62,6 +67,8 @@ jobs:
         run: python -X utf8 -m unittest discover -s scripts -p test_stage_site.py
       - name: Check current release metadata and PDF hashes
         run: python -X utf8 scripts/check_release.py --pdfs
+      - name: Test lossless packed question transport
+        run: node scripts/test_pdf_worker_packed.cjs
       - name: Test conversational planning and handout responses
         run: node --test scripts/test_deepseek_agent.mjs
 

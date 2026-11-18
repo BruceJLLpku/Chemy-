@@ -1,101 +1,97 @@
 {
   "passed": true,
-  "pages": 4110,
-  "fullContentReviewComplete": true,
+  "pages": 3591,
+  "fullContentReviewComplete": false,
   "books": {
     "analysis-answers.pdf": {
-      "pages": 101,
-      "sha256": "e8430efd5ef5799622160f485986ed2a841bef3e493e361680d90bacca70bd67",
+      "pages": 83,
+      "sha256": "347cb6f9799eb999514f9b4f9904eed3470a2a2d451975682690cba5b3ee4db8",
       "sourceLinkAnnotationWarnings": []
     },
     "analysis-questions.pdf": {
-      "pages": 84,
-      "sha256": "64ed3def2fb08837a89118761af8ab54a9d141ce4d262fe571847a5ac783464d",
+      "pages": 61,
+      "sha256": "6d28298a502e293834f4196fdd1f7b4698138e6d0f7586f225b45707b0590ee7",
       "sourceLinkAnnotationWarnings": []
     },
     "crystal-answers.pdf": {
-      "pages": 220,
-      "sha256": "5343b4d43e2ec052d5fdca1902aef8c9481afaed166ed7120b7ea1f3c105c2c4",
+      "pages": 198,
+      "sha256": "2d687c68c3d616895897c1722aee84f2a40c9b62bb7f016c2586262a04a97a81",
       "sourceLinkAnnotationWarnings": []
     },
     "crystal-questions.pdf": {
-      "pages": 176,
-      "sha256": "821ea08eed96e4712872490e7f0ee565eb6f4384b01bd8bfedfd90f0579576a6",
+      "pages": 131,
+      "sha256": "e5f70a76372552adbf0ebae344e975beb1107e3d0504035fd510a2bab7d84b29",
       "sourceLinkAnnotationWarnings": []
     },
     "electrochemistry-answers.pdf": {
-      "pages": 66,
-      "sha256": "5cbb89efc1eb6daa66454c487db1bdb8a8e6b79d5ef5fa35c847be2a53d74440",
+      "pages": 67,
+      "sha256": "8aaf748e83be23209fa4a3b40bbb301c2fb1d92334e0810595e5196196cc55b0",
       "sourceLinkAnnotationWarnings": []
     },
     "electrochemistry-questions.pdf": {
-      "pages": 58,
-      "sha256": "bf5364172dff28c00ac54167696ea4a53acea7926f371fb0c79980acab812cd7",
+      "pages": 51,
+      "sha256": "006c672dba3c6bfa43de3e198803ca55195233d66e1506bda75380a23e3ad4ac",
       "sourceLinkAnnotationWarnings": []
     },
     "elements-answers.pdf": {
-      "pages": 170,
-      "sha256": "03d3ff93747fa7af4eb6169d5eb96d9f3c20bfd743384d73e69f0e01089f13b0",
+      "pages": 136,
+      "sha256": "1150ca839aa2d1ed6c8e8d0fe43d8158d0bf6a5da00b1eb197b59aed6658fea0",
       "sourceLinkAnnotationWarnings": []
     },
     "elements-questions.pdf": {
-      "pages": 149,
-      "sha256": "0b5a796224f81db9854c1eefa2845f40f473d7df3a42e268532c89a8c568840d",
+      "pages": 88,
+      "sha256": "954bf0a0e6bac82ad667f0e60f8a5b4b5d84f931e7262c5265056e7ce110cb95",
       "sourceLinkAnnotationWarnings": []
     },
     "equilibrium-answers.pdf": {
-      "pages": 149,
-      "sha256": "150481587c01d59d13c606059df41a83b4334dcfc15f54a14876b373629c9556",
+      "pages": 120,
+      "sha256": "6847dc8f1f45ae4636392fc2700614e1068b22102eaa023db91017834f610531",
       "sourceLinkAnnotationWarnings": []
     },
     "equilibrium-questions.pdf": {
-      "pages": 121,
-      "sha256": "5ac02ddc3cfe8bc07b884c4822f20af1acb72ae64986eae49621365071986105",
+      "pages": 73,
+      "sha256": "fabbed5017709c81d71a9df8081be636ef3e77fb7eb5babcd7c05fe7d60f0849",
       "sourceLinkAnnotationWarnings": []
     },
     "inference-answers.pdf": {
-      "pages": 610,
-      "sha256": "8e4e705df0b4486af6439f05662e87c7942727750f4ac96563010ed389a2fbb6",
+      "pages": 569,
+      "sha256": "47df873a72f47cb09ce5a7a2dab1bc8164942c3936639fc4f972617a9e0e56c5",
       "sourceLinkAnnotationWarnings": []
     },
     "inference-questions.pdf": {
-      "pages": 401,
-      "sha256": "253d22fdb34e36c84410d070158534de13a0ec42cb361fe26aa559c0c66624f9",
-      "sourceLinkAnnotationWarnings": [
-        "WARNING: C:\\Users\\Prettibruce\\Documents\\ChatGPT\\chemy竞赛题目分类汇总\\chemy-site\\dist\\downloads\\inference-questions.pdf object stream 6263, object 6329 0 at offset 25759: kid 319 (from 0) Annots has duplicate entry for annotation 6330 0",
-        "WARNING: C:\\Users\\Prettibruce\\Documents\\ChatGPT\\chemy竞赛题目分类汇总\\chemy-site\\dist\\downloads\\inference-questions.pdf object stream 6263, object 6329 0 at offset 25759: kid 319 (from 0) Annots has duplicate entry for annotation 6332 0"
-      ]
+      "pages": 342,
+      "sha256": "4259d69a4276249f35e130afc786b76cf7705ac5c3232ca513ae39ea2dd6bad0",
+      "sourceLinkAnnotationWarnings": []
     },
     "kinetics-answers.pdf": {
       "pages": 75,
-      "sha256": "50aeae49c45551a64ca24501439ab7c44fc401e027596673e393192515528021",
+      "sha256": "b9e9e926b9f20cf9da00dd4fc8dc4b71b584d78de558d342c4607463c4b7fbb4",
       "sourceLinkAnnotationWarnings": []
     },
     "kinetics-questions.pdf": {
-      "pages": 65,
-      "sha256": "09c27d8a2fa332ee2d834df71aeac333c56e49546f6c819535f2c7ad6444ed73",
+      "pages": 52,
+      "sha256": "3d3e75040168b190b04aa5aa26cfe9cf445dd9826b8b64e93b8846cb0ee873ba",
       "sourceLinkAnnotationWarnings": []
     },
     "organic-answers.pdf": {
-      "pages": 828,
-      "sha256": "ff44d64a60ddc4d9ea1d5c1f39086b2fa6bd73f2bf6ed81e302794991c8ddd9e",
+      "pages": 824,
+      "sha256": "5df22ade7eb58704c68ec69c7580687532cfd68cc20dd361ba61af2263477745",
       "sourceLinkAnnotationWarnings": []
     },
     "organic-questions.pdf": {
-      "pages": 691,
-      "sha256": "2bb4fcb5f4b560a463a8c350171b86b7c0595d4cea993ffa0142ef2541b77e13",
+      "pages": 603,
+      "sha256": "f968dbc167cbe56b51854809aedc31d5df292becb8fa13ed4b7e162cf9bc5bfd",
       "sourceLinkAnnotationWarnings": []
     },
     "polymer-answers.pdf": {
-      "pages": 83,
-      "sha256": "4254bd104c96fb8e963a267302a4c671d5a69ee2cb18ff8cf699e9bf232fae2d",
+      "pages": 69,
+      "sha256": "e40664ed443ffb76e57626b5d36bc6615939d46e43755c38bc020f5803bdf0f0",
       "sourceLinkAnnotationWarnings": []
     },
     "polymer-questions.pdf": {
-      "pages": 63,
-      "sha256": "2e840b7d6e6e90a9c6f8b60dde02d5bf42dd7f719043f8e072785f788dca27f6",
+      "pages": 49,
+      "sha256": "9dd5c5e8f781c09687fb34fd20ca4a152e10861a5ebc0e8b872810b08e600411",
       "sourceLinkAnnotationWarnings": []
     }
-  },
-  "reviewMethod": "Automatic source pairing, native glyph coverage, original crop pixel comparison and full print drawing resource comparison; visual inspection of flagged source boundaries, all topic booklet samples, edition transitions and official errata samples. Not a manual rereading of every printed page."
+  }
 }

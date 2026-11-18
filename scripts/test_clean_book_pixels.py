@@ -8,6 +8,7 @@ import argparse
 from concurrent.futures import ProcessPoolExecutor
 import hashlib
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -16,9 +17,10 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 import pymupdf as fitz
 from PIL import Image, ImageChops
 from pdf_clip_cleanup import _matched_image_difference
+from pdf_export_validation import open_without_browser_watermark
+from pdf_image_verify import canonical_image_proof
 from pdf_render_verify import render_no_tile_cache
 from test_export_parts import ValidatedCleanPages, code_digests, check_build_signature
-from test_pdf_export_pixels import open_without_browser_watermark
 
 
 def sha(data):
@@ -30,6 +32,54 @@ def delta(a, b):
     return max(high for low, high in ImageChops.difference(
         Image.frombytes('RGB', (a.width, a.height), a.samples),
         Image.frombytes('RGB', (b.width, b.height), b.samples)).getextrema())
+
+
+def original_page_pdfium(page, scale):
+    """Render the selected page from unchanged loaded bytes, without a page copy.
+
+    Copying a page into a new document can change the font/resource context.
+    This check must use the actual complete book bytes and original page index.
+    """
+    import pypdfium2 as pdfium
+
+    document = page.parent
+    raw, number = document.stream, page.number
+    if (document.is_dirty or document.is_repaired or not isinstance(raw, bytes) or not raw
+            or type(number) is not int or not 0 <= number < len(document)):
+        raise ValueError('Independent rendering requires unchanged loaded PDF bytes and page identity')
+    if type(scale) not in (int, float) or not math.isfinite(scale) or scale <= 0:
+        raise ValueError('Independent render scale must be finite and positive')
+    size = page.rect.width, page.rect.height
+    if page.rotation or not all(math.isfinite(value) and value > 0 for value in size):
+        raise ValueError('Unsupported native page geometry')
+    identity = {'inputSha256': sha(raw), 'pageIndex': number, 'pages': len(document)}
+    with pdfium.PdfDocument(raw) as independent:
+        if len(independent) != len(document):
+            raise ValueError('Independent page count differs from loaded PDF')
+        selected = independent[number]
+        try:
+            if selected.get_rotation():
+                raise ValueError('Independent page rotation differs')
+            width, height = selected.get_size()
+            box = 0., 0., width, height
+            if (any(abs(a - b) > 1e-4 for a, b in zip((width, height), size))
+                    or any(abs(a - b) > 1e-4 for a, b in zip(selected.get_mediabox(), box))
+                    or any(abs(a - b) > 1e-4 for a, b in zip(selected.get_cropbox(), box))):
+                raise ValueError('Independent page geometry differs from native page')
+            bitmap = selected.render(scale=scale, rotation=0, crop=(0, 0, 0, 0),
+                                     fill_color=(255, 255, 255, 255), may_draw_forms=False)
+            try:
+                if (bitmap.width, bitmap.height) != (math.ceil(width * scale), math.ceil(height * scale)):
+                    raise ValueError('Independent bitmap dimensions differ')
+                image = bitmap.to_pil().convert('RGB').copy()
+                scales = bitmap.width / width, bitmap.height / height
+            finally:
+                bitmap.close()
+        finally:
+            selected.close()
+    if document.is_dirty or document.stream is not raw:
+        raise ValueError('Loaded PDF changed during independent rendering')
+    return image, scales, identity
 
 
 def compare_page(expected, actual):
@@ -57,6 +107,17 @@ def compare_page(expected, actual):
         after = Image.frombytes('RGB', (actual_pixels.width, actual_pixels.height), actual_pixels.samples)
         proof = _matched_image_difference(expected, actual, ImageChops.difference(before, after))
         entry['imageSamplingProof'] = proof
+        if not proof['matched'] and proof.get('reason') == 'image bytes, paint, transform or clipping differs':
+            try:
+                canonical, evidence = canonical_image_proof(expected, actual, ImageChops.difference(before, after))
+            except (ValueError, RuntimeError, AssertionError) as error:
+                entry['losslessImageProofError'] = str(error)
+            else:
+                entry['losslessImageProof'] = {'proof': canonical, 'copies': evidence}
+                if canonical['matched']:
+                    entry['initialImageSamplingProof'] = proof
+                    proof = canonical
+                    entry['imageSamplingProof'] = proof
         if proof['matched']:
             phases = []
             for offset in ((.37, .23), (.73, .61)):
@@ -70,6 +131,25 @@ def compare_page(expected, actual):
             # label holes, local masks, or page-specific exceptions apply.
             if max(phases) <= 8:
                 entry['maxDelta'] = max(phases)
+            else:
+                checks = []
+                try:
+                    for scale in (2, 4):
+                        left, left_scale, left_input = original_page_pdfium(expected, scale)
+                        right, right_scale, right_input = original_page_pdfium(actual, scale)
+                        if left.size != right.size or left_scale != right_scale:
+                            raise ValueError('Independent bitmap coordinate mappings differ')
+                        maximum = max(high for low, high in ImageChops.difference(left, right).getextrema())
+                        checks.append({'dpi': scale * 72, 'maxDelta': maximum,
+                                       'pixelScales': list(left_scale),
+                                       'expectedInput': left_input, 'actualInput': right_input})
+                except (ValueError, RuntimeError, AssertionError) as error:
+                    entry['independentError'] = str(error)
+                entry.update(independentRenderer='PDFium', independentFullPageChecks=checks)
+                # Both original full-page rasters must pass. Nothing is masked
+                # or removed from this comparison, including original numbers.
+                if len(checks) == 2 and 'independentError' not in entry and max(c['maxDelta'] for c in checks) <= 8:
+                    entry['maxDelta'] = max(c['maxDelta'] for c in checks)
     return entry
 
 

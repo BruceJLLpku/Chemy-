@@ -19,7 +19,7 @@
 
   const blocks = new Set(['p', 'div', 'figure', 'figcaption', 'table', 'ol', 'ul', 'li']);
 
-  async function build({title, introduction, items}) {
+  async function build({title, introduction, introductionTitle='知识点讲义', items}) {
     const {Document, Packer, Paragraph, TextRun, ImageRun, Table, TableRow, TableCell,
       HeadingLevel, AlignmentType, WidthType, Footer, PageNumber, Math: WordMath, MathRun, MathFraction, MathSuperScript} = await loadLibrary();
     const font = {ascii: 'Times New Roman', hAnsi: 'Times New Roman', eastAsia: 'SimSun'};
@@ -143,10 +143,12 @@
       new Paragraph({alignment: AlignmentType.CENTER, keepNext: true, spacing: {after: 280},
         children: [new TextRun({text: `Chemy 化学竞赛 · 共 ${items.length} 道完整大题`, size: 18})]})];
     if (introduction) {
-      children.push(new Paragraph({text: '知识介绍', heading: HeadingLevel.HEADING_1}));
+      children.push(new Paragraph({text: introductionTitle, heading: HeadingLevel.HEADING_1}));
       for (const block of window.ChemyLecture.blocks(introduction)) {
         children.push(new Paragraph({
           ...(block.kind==='heading'?{heading: HeadingLevel.HEADING_2,keepNext:true}:{}),
+          ...(block.kind==='subheading'?{heading: HeadingLevel.HEADING_3,keepNext:true}:{}),
+          ...(block.kind==='point'?{indent:{left:360,hanging:360}}:{}),
           ...(block.kind==='formula'?{alignment:AlignmentType.CENTER,keepLines:true,spacing:{before:120,after:180}}:{}),
           children: await runs(parse(block.html)),
         }));
@@ -164,6 +166,7 @@
         title: {run: {font, size: 34, bold: true, color: '000000'}, paragraph: {alignment:AlignmentType.CENTER,spacing: {after: 120}, keepNext: true}},
         heading1: {run: {font, size: 26, bold: true, color: '000000'}, paragraph: {spacing: {before: 240, after: 100}, keepNext: true}},
         heading2: {run: {font, size: 22, bold: true, color: '000000'}, paragraph: {spacing: {before: 200, after: 100}, keepNext: true}},
+        heading3: {run: {font, size: 22, bold: true, color: '000000'}, paragraph: {spacing: {before: 120, after: 80}, keepNext: true}},
       }},
       sections: [{properties: {page: {size: {width: 11906, height: 16838},
         margin: {top: 1134, bottom: 1134, left: 1134, right: 1134}}},

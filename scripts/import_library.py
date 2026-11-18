@@ -13,6 +13,7 @@ from source_info import source_name,paper_name
 from import_paper1 import native_blocks,in_box
 from display_numbering import write_numbering
 from question_figure_corrections import corrections as figure_corrections, correction_signature, patch_source_page
+from scan_library import SCORE
 
 ASSETS=ROOT/'dist/assets'; DATA=ROOT/'data/library_manifest.json'
 SOURCES={'q':Q_SOURCE,'a':A_SOURCE}
@@ -50,7 +51,7 @@ def heading_title(h):
     rows=native_blocks(chars)
     html=' '.join(row[1] for row in rows)
     html=re.sub(r'^第\s*\d+\s*题\s*','',html)
-    html=re.sub(r'[（(]\s*[\d.]+\s*分[^）)]*[）)]','',html).strip()
+    html=(SCORE.sub('',html) if EDITION==40 else re.sub(r'[（(]\s*[\d.]+\s*分[^）)]*[）)]','',html)).strip()
     return unescape(re.sub(r'<[^>]+>','',html)),html
 def background(im,k):
     return im['hash'] in BACKGROUND_HASHES or (im['width']>400 and 89<im['x0']<92 and 190<im['top']<645
@@ -59,7 +60,13 @@ def spans(k,paper,number,heading=False):
     correction=CORRECTIONS.get(f"{paper}-{number}")
     if k=="a" and correction:return correction["effectiveRanges"]
     hs=INDEX[k]['questions']; i=next(i for i,x in enumerate(hs) if (x['paper'],x['number'])==(paper,number)); h=hs[i]
-    end=hs[i+1] if i+1<len(hs) and hs[i+1]['paper']==paper else {'page':int(INDEX[k]['papers'].get(str(paper+1),(config.get('aContentPages',len(INDEX[k]['pages'])) if k=='a' else len(INDEX[k]['pages']))+1)),'top':70}
+    if i+1<len(hs) and hs[i+1]['paper']==paper:
+        end=hs[i+1]
+    else:
+        last_page=config.get('aContentPages',len(INDEX[k]['pages'])) if k=='a' else len(INDEX[k]['pages'])
+        next_paper=str(paper+1)
+        end={'page':int(INDEX[k]['papers'].get(next_paper,last_page+1)),
+             'top':max(70,INDEX[k].get('paperStartTops',{}).get(next_paper,70)) if EDITION==40 else 70}
     ranges=[]
     for n in range(h['page'],end['page']+1):
         omitted=next((f for f in EXCEPTIONS.get('omittedGeneralNotes',[]) if (f['edition'],f['paper'],f['number'],f['kind'],f['page'])==(EDITION,paper,number,k,n)),None)
@@ -127,6 +134,20 @@ def figure_bands(k,d,lo,hi,exclude=()):
         if new==bands:break
         bands=new
     return bands
+def band_corner_clip(box, special):
+    # Leave the overlapping corner to its separate original inset.
+    left, top, right, bottom = box
+    for spec in special:
+        if not spec.get('clipOverlappingBand'):
+            continue
+        x0, y0, x1, y1 = spec['box']
+        if left < x0 < right <= x1 and y0 <= top < y1 < bottom:
+            x = 100 * (x0 - left) / (right - left)
+            y = 100 * (y1 - top) / (bottom - top)
+            return f';clip-path:polygon(0 0,{x:.3f}% 0,{x:.3f}% {y:.3f}%,100% {y:.3f}%,100% 100%,0 100%)'
+    return ''
+
+
 def section(k,ranges,paper,number,label):
     parts=[];captures=[];audit=[];count=0
     for n,lo,hi in ranges:
@@ -142,6 +163,9 @@ def section(k,ranges,paper,number,label):
             print('Layout fallback',k,n,str(err),flush=True)
             # Unusual stacked source maths: keep the source band, without guessing.
             bands=merge(bands+[(min(c['top'] for c in text)-2,max(c['bottom'] for c in text)+2)]);text=[];rows=[]
+        if EDITION==40 and paper==19:
+            dotted_label=re.compile(r'^('+str(number)+r'(?:\.\d+)+)(?=\s|[（(]|[\u4e00-\u9fff])')
+            rows=[(y,dotted_label.sub(r'<strong>\1</strong>',html) if x<122 else html,x) for y,html,x in rows]
         events=[(y,'text',html,x) for y,html,x in rows]
         boxes=[]
         for a,b in bands:
@@ -165,7 +189,8 @@ def section(k,ranges,paper,number,label):
             name=versioned;target=final
             w,h=crop.size;alt=f'{source_name(EDITION,paper)} 第{number}题 {label}原图'
             cls='source-figure source-float' if mode=='float' else 'source-figure'
-            html=f'<figure class="{cls}" style="--source-width:{round((x1-x0)*1.7)}px"><a href="assets/{name}" target="_blank" rel="noopener" aria-label="查看大图：{alt}"><img src="assets/{name}" alt="{alt}" width="{w}" height="{h}" loading="lazy" style="--figure-width:{round((x1-x0)*1.7)}px"></a></figure>'
+            clip=band_corner_clip(box,special) if mode=='band' else ''
+            html=f'<figure class="{cls}" style="--source-width:{round((x1-x0)*1.7)}px"><a href="assets/{name}" target="_blank" rel="noopener" aria-label="查看大图：{alt}"><img src="assets/{name}" alt="{alt}" width="{w}" height="{h}" loading="lazy" style="--figure-width:{round((x1-x0)*1.7)}px{clip}"></a></figure>'
             events.append((min(a,lo-2) if mode=='float' and a<lo else a,'figure',html,0));captures.append({'page':n,'box':box,'asset':name,'mode':mode,'sha256':hashlib.sha256(target.read_bytes()).hexdigest()})
         pending=[];last=None
         def flush():
@@ -198,7 +223,7 @@ def import_paper(paper,topics):
         correction=CORRECTIONS.get(f'{paper}-{number}')
         if correction:items[-1]['answerCorrectionPages']='、'.join(map(str,correction['errataPages']))
         records.append({'number':number,'topic':topic,'question':qr,'printQuestion':spans('q',paper,number,True),'answer':ar,'figures':{'q':qf,'a':af},'coverage':{'q':qa,'a':aa},'reviewed':False})
-    bank=[q for q in bank if (edition_of(q),q['paper'])!=(EDITION,paper)]+items;bank.sort(key=lambda q:(-edition_of(q),q['paper'],q['number']))
+    bank=[q for q in bank if (edition_of(q),q['paper'])!=(EDITION,paper)]+items;bank.sort(key=lambda q:(edition_of(q)==40,-edition_of(q),q['paper'],q['number']))
     assert [q for q in bank if edition_of(q)==39 and q['paper']==1]==original
     first=specs[0];begin=int(INDEX['q']['papers'][str(paper)])
     common_ranges=[]

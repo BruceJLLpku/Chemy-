@@ -4,6 +4,12 @@ const {PDFDocument, PageSizes, StandardFonts, rgb, BlendMode, PDFArray, PDFDict,
 const PROFILE = 'clean-vector-v1';
 const MIN_ANNOTATED_SCALE = .85;
 const indexes = new Map();
+const MAX_PACKED_PDF_BYTES = 100*1024*1024;
+const MAX_PACKED_SEGMENTS = 65536;
+const MAX_PACKED_DESCRIPTION_BYTES = 128*1024*1024;
+const MAX_SHARED_CACHE_BYTES = 32*1024*1024;
+const sharedBlocks = new Map();
+let sharedCacheBytes = 0;
 
 async function getIndex(slug, version, kind) {
   if (!/^[a-z]+$/.test(slug)) throw new Error('专题标识无效。');
@@ -18,15 +24,130 @@ async function getIndex(slug, version, kind) {
   return indexes.get(key);
 }
 
+const packedError = () => new Error('分题 PDF 与索引不一致，请刷新页面后重试。');
+async function sha256Hex(bytes) {
+  const digest = await self.crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function readBoundedBytes(stream, limit) {
+  if (!stream) throw packedError();
+  const reader = stream.getReader(), chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (!Number.isSafeInteger(total) || total > limit) throw packedError();
+      if (value.byteLength) chunks.push(value);
+    }
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return bytes;
+}
+
+async function sharedBlock(hash, length) {
+  const cached = sharedBlocks.get(hash);
+  if (cached) {
+    if (cached.length !== length) throw packedError();
+    sharedBlocks.delete(hash); sharedBlocks.set(hash, cached);
+    return cached.promise;
+  }
+  const entry = {length, complete:false, promise:null};
+  entry.promise = (async () => {
+    try {
+      const response = await fetch(`export-parts/shared/${hash}.bin`);
+      if (!response.ok) throw new Error('分题 PDF 暂时无法读取，请检查网络后重试。');
+      const bytes = await readBoundedBytes(response.body, length);
+      if (bytes.byteLength !== length || await sha256Hex(bytes) !== hash) throw packedError();
+      entry.complete = true; sharedCacheBytes += length;
+      for (const [key, value] of sharedBlocks) {
+        if (sharedCacheBytes <= MAX_SHARED_CACHE_BYTES) break;
+        if (value.complete) { sharedBlocks.delete(key); sharedCacheBytes -= value.length; }
+      }
+      return bytes;
+    } catch (error) {
+      if (sharedBlocks.get(hash) === entry) sharedBlocks.delete(hash);
+      throw error;
+    }
+  })();
+  sharedBlocks.set(hash, entry);
+  return entry.promise;
+}
+
+async function packedFragment(record) {
+  if (!self.crypto?.subtle?.digest) throw new Error('当前浏览器无法验证分题 PDF，请使用新版 Chrome 或 Edge。');
+  if (typeof DecompressionStream !== 'function' || typeof TransformStream !== 'function') throw new Error('当前浏览器无法读取分题 PDF，请使用新版 Chrome 或 Edge。');
+  if (!Number.isSafeInteger(record.bytes) || record.bytes <= 0 || record.bytes > MAX_PACKED_PDF_BYTES || !/^[a-f0-9]{64}$/.test(record.sha256)) throw packedError();
+  const response = await fetch(`export-parts/${record.path}.pack?v=${record.sha256}`, {cache:'no-cache'});
+  if (!response.ok) throw new Error('分题 PDF 暂时无法读取，请检查网络后重试。');
+  if (!response.body) throw packedError();
+  const limit = Math.min(MAX_PACKED_DESCRIPTION_BYTES, 8+record.bytes+36*Math.min(MAX_PACKED_SEGMENTS, record.bytes));
+  let compressedBytes = 0;
+  const compressed = response.body.pipeThrough(new TransformStream({transform(chunk, controller) {
+    compressedBytes += chunk.byteLength;
+    if (!Number.isSafeInteger(compressedBytes) || compressedBytes > limit+1024*1024) throw packedError();
+    controller.enqueue(chunk);
+  }}));
+  const packed = await readBoundedBytes(compressed.pipeThrough(new DecompressionStream('gzip')), limit);
+  const magic = 'CHEMYPK1';
+  if (packed.length < magic.length || !Array.from(magic).every((char, i) => packed[i] === char.charCodeAt(0))) throw packedError();
+  const view = new DataView(packed.buffer, packed.byteOffset, packed.byteLength), literals = [], blocks = new Map();
+  let cursor = 8, total = 0, segments = 0;
+  while (cursor < packed.length) {
+    if (++segments > MAX_PACKED_SEGMENTS || cursor+4 > packed.length) throw packedError();
+    const tag = view.getUint32(cursor, true), length = tag & 0x7fffffff;
+    cursor += 4;
+    if (!length || total+length > record.bytes) throw packedError();
+    if (tag & 0x80000000) {
+      if (cursor+32 > packed.length) throw packedError();
+      const hash = Array.from(packed.subarray(cursor, cursor+32), b => b.toString(16).padStart(2, '0')).join('');
+      cursor += 32;
+      if (blocks.has(hash) && blocks.get(hash).length !== length) throw packedError();
+      if (!blocks.has(hash)) blocks.set(hash, {hash, length, offsets:[]});
+      blocks.get(hash).offsets.push(total);
+    } else {
+      if (cursor+length > packed.length) throw packedError();
+      literals.push({offset:total, bytes:packed.subarray(cursor, cursor+length)});
+      cursor += length;
+    }
+    total += length;
+  }
+  if (total !== record.bytes) throw packedError();
+  const bytes = new Uint8Array(total);
+  for (const literal of literals) bytes.set(literal.bytes, literal.offset);
+  const pending = Array.from(blocks.values());
+  let next = 0, failed = false;
+  await Promise.all(Array.from({length:Math.min(6, pending.length)}, async () => {
+    while (!failed && next < pending.length) {
+      const block = pending[next++];
+      try {
+        const data = await sharedBlock(block.hash, block.length);
+        for (const offset of block.offsets) bytes.set(data, offset);
+      } catch (error) { failed = true; throw error; }
+    }
+  }));
+  return bytes;
+}
+
 async function loadFragment(record) {
   if (!record || !/^[a-zA-Z0-9/._-]+\.pdf$/.test(record.path) || record.path.split('/').includes('..') || record.path.startsWith('/')) throw new Error('分题 PDF 索引无效。');
-  const response = await fetch(`export-parts/${record.path}?v=${record.sha256}`);
-  if (!response.ok) throw new Error('分题 PDF 暂时无法读取，请检查网络后重试。');
-  const bytes = await response.arrayBuffer();
+  let bytes;
+  if (record.packed === true) bytes = await packedFragment(record);
+  else {
+    const response = await fetch(`export-parts/${record.path}?v=${record.sha256}`);
+    if (!response.ok) throw new Error('分题 PDF 暂时无法读取，请检查网络后重试。');
+    bytes = await response.arrayBuffer();
+  }
   if (record.bytes && bytes.byteLength !== record.bytes) throw new Error('分题 PDF 正在更新，请刷新页面后重试。');
   if (self.crypto?.subtle) {
-    const digest = await crypto.subtle.digest('SHA-256', bytes);
-    const actual = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+    const actual = await sha256Hex(bytes);
     if (actual !== record.sha256) throw new Error('分题 PDF 与索引不一致，请刷新页面后重试。');
   }
   return PDFDocument.load(bytes);

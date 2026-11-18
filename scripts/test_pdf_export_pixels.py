@@ -5,7 +5,6 @@ known decorative watermark; source chemistry is rendered at the output scale and
 translation on the same pixel grid. --synthetic checks drawNative's small fixture.
 """
 import argparse
-import hashlib
 from io import BytesIO
 import json
 from pathlib import Path
@@ -14,34 +13,13 @@ import sys
 import fitz
 from PIL import Image, ImageChops, ImageFilter
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ContentStream, NameObject
 
+from pdf_export_validation import open_without_browser_watermark
+from pdf_placement_verify import compare_placement_pdfium
 from pdf_watermark import strip_watermark
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'work/export-validation/patterns'
-
-
-def open_without_browser_watermark(path):
-    reader=PdfReader(path)
-    writer=PdfWriter()
-    jpeg=(ROOT/'dist/assets/chemy-watermark.jpg').read_bytes()
-    digest=hashlib.sha256(jpeg).digest()
-    for original in reader.pages:
-        page=writer.add_page(original)
-        resources=page['/Resources']
-        names=set()
-        for name,ref in resources.get('/XObject',{}).items():
-            obj=ref.get_object()
-            if obj.get('/Subtype')=='/Image' and hashlib.sha256(obj.get_data()).digest()==digest:
-                names.add(name)
-        content=ContentStream(page.get('/Contents'),writer)
-        removed=sum(op==b'Do' and args[0] in names for args,op in content.operations)
-        assert removed==1, ('Expected one known watermark draw per page',path,removed)
-        content.operations=[(args,op) for args,op in content.operations if not (op==b'Do' and args[0] in names)]
-        page[NameObject('/Contents')]=writer._add_object(content)
-    raw=BytesIO();writer.write(raw)
-    return fitz.open('pdf',raw.getvalue())
 
 
 def source_page(reader,number):
@@ -138,6 +116,7 @@ def relocate_compare(source,target,source_rect,x,top,scale,label,zoom=2,*,offset
     result['tolerantFractionOver32']=sum(n for i,n in enumerate(th) if i%256>32)/count
     result['tolerantMaxDelta']=max(i%256 for i,n in enumerate(th) if n)
     ordinary_metrics=(result['mae']<=1.5 and result['fractionOver32']<=.015 and result['tolerantMae']<=.2 and result['tolerantFractionOver32']<=.001)
+    result['ordinaryMetricsPassed']=ordinary_metrics
     result['passed']=ordinary_metrics and result['tolerantMaxDelta']<=32
     if not result['passed']:
         a.save(OUT/(label+'-expected.png'));b.save(OUT/(label+'-actual.png'));diff.save(OUT/(label+'-diff.png'))
@@ -163,6 +142,13 @@ def relocate_compare(source,target,source_rect,x,top,scale,label,zoom=2,*,offset
                     # only if both shifted rasters satisfy the unchanged limits.
                     result.update(initialPassed=False,glyphSamplingProof=proof,samplingPhases=phases)
                     result['passed']=all(phase['passed'] for phase in phases)
+        if _allow_sampling_retry and ordinary_metrics and not result['passed']:
+            # Keep all original metrics and failed phases. A different renderer
+            # must prove the entire original source band at both native DPIs;
+            # this proof has no critical-pixel masks or neighborhood tolerance.
+            result['initialPassed']=False
+            result['pdfiumPlacementProof']=compare_placement_pdfium(source,target,source_rect,x,top,scale)
+            result['passed']=result['pdfiumPlacementProof']['passed']
     return result
 
 

@@ -1045,6 +1045,45 @@ def _image_fingerprint(document,xref,seen=()):
     if raw is None:return None
     return (sha256(raw).hexdigest(),tuple(result))
 
+
+def _image_resource_xrefs(page):
+    # MuPDF's get_images() treats a Form seen through another resource alias as
+    # a cycle and can return before visiting the remaining sibling resources.
+    # Walk parsed dictionaries ourselves; a shared Form is not an ancestor loop.
+    m=fitz.mupdf
+    document=fitz._as_pdf_document(page.parent)
+    page_object=m.pdf_lookup_page_obj(document,page.number)
+    resources=m.pdf_dict_get_inheritable(page_object,m.PDF_ENUM_NAME_Resources)
+    images=set();complete=set();active=set()
+
+    def visit(resources,depth=0):
+        if depth>40:raise UnsupportedPDF('Image resource graph is too deeply nested')
+        if m.pdf_is_null(resources):return
+        if not m.pdf_is_dict(resources):raise UnsupportedPDF('Invalid image resource dictionary')
+        objects=m.pdf_dict_get(resources,m.PDF_ENUM_NAME_XObject)
+        if m.pdf_is_null(objects):return
+        if not m.pdf_is_dict(objects):raise UnsupportedPDF('Invalid image XObject dictionary')
+        for index in range(m.pdf_dict_len(objects)):
+            obj=m.pdf_dict_get_val(objects,index)
+            if not m.pdf_is_indirect(obj) or not m.pdf_is_stream(obj):
+                raise UnsupportedPDF('Image and Form resources must be indirect streams')
+            subtype=m.pdf_dict_get(obj,m.PDF_ENUM_NAME_Subtype)
+            xref=m.pdf_to_num(obj)
+            if m.pdf_name_eq(subtype,m.PDF_ENUM_NAME_Image):
+                images.add(xref)
+            elif m.pdf_name_eq(subtype,m.PDF_ENUM_NAME_Form):
+                if xref in active:raise UnsupportedPDF('Cyclic Form image resources')
+                if xref in complete:continue
+                active.add(xref)
+                visit(m.pdf_dict_get(obj,m.PDF_ENUM_NAME_Resources),depth+1)
+                active.remove(xref);complete.add(xref)
+            else:
+                raise UnsupportedPDF('Unsupported image XObject subtype')
+
+    visit(resources)
+    return sorted(images)
+
+
 def _matched_image_difference(source,target,difference):
     maximum=_path_maximum(difference)
     changed=maximum.point(lambda value:255 if value>8 else 0)
@@ -1072,15 +1111,19 @@ def _matched_image_difference(source,target,difference):
                 # same complete image-and-mask identity.
                 if resource_images is None:
                     resource_images={}
-                    for resource in page.get_images():
-                        pix=fitz.Pixmap(page.parent,resource[0])
-                        resource_images.setdefault(pix.digest,set()).add(resource[0])
+                    try:
+                        image_xrefs=_image_resource_xrefs(page)
+                    except (UnsupportedPDF,RuntimeError,ValueError):
+                        return {'matched':0,'reason':'unsupported image resource inventory'}
+                    for xref in image_xrefs:
+                        pix=fitz.Pixmap(page.parent,xref)
+                        resource_images.setdefault(pix.digest,set()).add(xref)
                 fingerprints={_image_fingerprint(page.parent,xref)for xref in resource_images.get(digest,())}
                 verified_fingerprints[digest]=next(iter(fingerprints)) if len(fingerprints)==1 and None not in fingerprints else None
             fingerprint=verified_fingerprints[digest]
             if fingerprint is None:return {'matched':0,'reason':'unsupported image resource'}
             near.append((seq,paint,image,bounds,fingerprint))
-        selected.append(near);contexts.append((log,visibility))
+        selected.append(near);contexts.append((page,log,visibility))
     if not selected[0]or len(selected[0])!=len(selected[1]):
         return {'matched':0,'reason':'image paint count differs','counts':[len(v)for v in selected]}
     allowed=Image.new('L',difference.size,0);draw=ImageDraw.Draw(allowed)
@@ -1096,12 +1139,23 @@ def _matched_image_difference(source,target,difference):
              min(allowed.width,math.ceil(r.x1)),min(allowed.height,math.ceil(r.y1)))
         draw.rectangle((box[0],box[1],box[2]-1,box[3]-1),fill=255)
     if ImageChops.subtract(changed,allowed).getbbox():return {'matched':0,'reason':'difference outside image cells'}
-    for near,(log,visibility)in zip(selected,contexts):
+    for near,(page,log,visibility)in zip(selected,contexts):
         chosen={item[0]for item in near}
         for seq,(kind,bounds)in enumerate(log):
             if seq in chosen:continue
             active=fitz.Rect(bounds)&visibility[seq]
             if not active.is_empty and _pixel_cells_touch(support,active):
+                if kind=='stroke-path':
+                    # A conservative stroke bbox can touch an image without
+                    # its actual ink reaching the difference's neighborhood.
+                    try:
+                        alpha,_=exact_paint_mask(page,[seq],scale=2)
+                    except (ValueError,RuntimeError):
+                        pass
+                    else:
+                        if (alpha.mode=='L' and alpha.size==support.size and
+                                not ImageChops.multiply(support,alpha).getbbox()):
+                            continue
                 return {'matched':0,'reason':'overlapping '+kind,'seq':seq}
     return {'matched':len(selected[0]),'reason':'identical image calls and independent local support'}
 
@@ -1251,6 +1305,22 @@ def clean_source_page(page, reader, *, diagnostics=None):
                                            'label_pixels':0})
         return [phase['delta'] for phase in phase_evidence]
 
+    def independent_samples():
+        from pdf_render_verify import render_pdfium
+        checks=[]
+        size=(original[0].rect.width,original[0].rect.height)
+        for scale in (2,4):
+            left,left_scale=render_pdfium(source_buffer.getvalue(),size,scale)
+            right,right_scale=render_pdfium(raw,size,scale)
+            if left.size!=right.size or left_scale!=right_scale:
+                raise UnsupportedPDF('Independent renderer pixel coordinates differ')
+            label=_label_coverage(original[0],cleaned[0],label_holes,
+                                  left,right,scale=left_scale)
+            checks.append({'dpi':scale*72,'pixel_scales':list(left_scale),
+                           'initial_max_delta':_path_maximum(ImageChops.difference(left,right)).getextrema()[1],
+                           'label_pixels':label['count'],'max_delta':label['unprovenMax']})
+        return checks
+
     for kind,matcher in [('glyph',_matched_glyph_difference),('fill',_matched_fill_difference)]:
         if delta <= 8:
             break
@@ -1268,12 +1338,22 @@ def clean_source_page(page, reader, *, diagnostics=None):
         proof = _matched_image_difference(original[0],cleaned[0],difference)
         if proof['matched']:
             phase_deltas = sampling_phases()
-            if max(phase_deltas) <= 8:
+            verified_delta=max(phase_deltas)
+            if verified_delta > 8:
+                # Identical complete image bytes, masks, paint and geometry can
+                # still encounter MuPDF image sampling noise at every phase.
+                # Use the same independent full-page proof as opaque vectors.
+                checks=independent_samples()
+                stats['independent_renderer']='PDFium'
+                stats['independent_render_checks']=checks
+                stats['image_sampling_phase_deltas']=phase_deltas
+                verified_delta=max(item['max_delta'] for item in checks)
+            if verified_delta <= 8:
                 stats['render_initial_max_delta'] = initial_delta
                 stats['image_sampling_proof'] = proof
                 stats['image_sampling_phase_deltas'] = phase_deltas
                 stats['sampling_phase_label_pixels'] = [p['label_pixels'] for p in phase_evidence]
-                delta = max(phase_deltas)
+                delta = verified_delta
                 stats['render_max_delta'] = delta
     if delta > 8:
         proof = _verify_path_sampling(original[0],cleaned[0],evidence_before,after)
@@ -1301,19 +1381,7 @@ def clean_source_page(page, reader, *, diagnostics=None):
                 delta = max(phase_deltas)
                 stats['render_max_delta'] = delta
             else:
-                from pdf_render_verify import render_pdfium
-                checks=[]
-                size=(original[0].rect.width,original[0].rect.height)
-                for scale in (2,4):
-                    left,left_scale=render_pdfium(source_buffer.getvalue(),size,scale)
-                    right,right_scale=render_pdfium(raw,size,scale)
-                    if left.size!=right.size or left_scale!=right_scale:
-                        raise UnsupportedPDF('Independent renderer pixel coordinates differ')
-                    label=_label_coverage(original[0],cleaned[0],label_holes,
-                                          left,right,scale=left_scale)
-                    checks.append({'dpi':scale*72,'pixel_scales':list(left_scale),
-                                   'initial_max_delta':_path_maximum(ImageChops.difference(left,right)).getextrema()[1],
-                                   'label_pixels':label['count'],'max_delta':label['unprovenMax']})
+                checks=independent_samples()
                 stats['independent_renderer']='PDFium'
                 stats['independent_render_checks']=checks
                 if max(item['max_delta'] for item in checks)<=8:

@@ -1,5 +1,6 @@
-"""Font-subset regressions, using a generated font rather than system fonts."""
+"""Generated and repository-embedded font regressions; no system fonts needed."""
 from io import BytesIO
+from array import array
 from pathlib import Path
 import json
 import shutil
@@ -11,15 +12,17 @@ from unittest.mock import patch
 import pymupdf as fitz
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import TTFont
+from fontTools.ttLib import TTFont, newTable
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
+from fontTools.ttLib.tables.ttProgram import Program
+from PIL import ImageChops
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject
 
 from pdf_font_subset import _matches, _program_usage, _subset_program, subset_pdf_fonts
 
 
-def fixture_font(*, legacy=False, symbol=False):
+def fixture_font(*, legacy=False, symbol=False, hinted=False):
     """Keep a high glyph ID and unused outlines to exercise retain_gids."""
     names = ['.notdef'] + [f'g{i}' for i in range(1,301)]
     builder = FontBuilder(1000,isTTF=True)
@@ -35,6 +38,10 @@ def fixture_font(*, legacy=False, symbol=False):
         pen.lineTo((500,0))
         pen.closePath()
         glyphs[name] = pen.glyph()
+        if hinted:
+            program=Program()
+            program.fromAssembly(['SVTCA[1]','PUSHB[ ]','1','MDAP[1]','IUP[1]'])
+            glyphs[name].program=program
     builder.setupGlyf(glyphs)
     builder.setupHorizontalMetrics({name:(600,0) for name in names})
     builder.setupHorizontalHeader(ascent=800,descent=-200)
@@ -44,6 +51,15 @@ def fixture_font(*, legacy=False, symbol=False):
         'copyright':'Test fixture created for Chemy','licenseDescription':'MIT test fixture'})
     builder.setupPost()
     builder.setupMaxp()
+    if hinted:
+        for tag,instructions in [('fpgm',['PUSHB[ ]','0','FDEF[ ]','ENDF[ ]']),
+                                 ('prep',['PUSHB[ ]','0','CALL[ ]'])]:
+            table=newTable(tag);table.program=Program();table.program.fromAssembly(instructions)
+            builder.font[tag]=table
+        table=newTable('cvt ');table.values=array('h',[30,600]);builder.font['cvt ']=table
+        builder.font['maxp'].maxFunctionDefs=1
+        builder.font['maxp'].maxStackElements=16
+        builder.font['maxp'].maxSizeOfInstructions=len(glyphs['g1'].program.getBytecode())
     output = BytesIO()
     builder.save(output)
     if legacy or symbol:
@@ -57,11 +73,11 @@ def fixture_font(*, legacy=False, symbol=False):
     return output.getvalue()
 
 
-def fixture_pdf(*,inline=False,indirect_category=False,legacy=False):
+def fixture_pdf(*,inline=False,indirect_category=False,legacy=False,hinted=False):
     doc = fitz.open()
     for text in (['AB','BA'] if legacy else ['AB中','B中A']):
         page = doc.new_page(width=200,height=100)
-        page.insert_font(fontname='Embedded',fontbuffer=fixture_font(legacy=legacy),set_simple=legacy)
+        page.insert_font(fontname='Embedded',fontbuffer=fixture_font(legacy=legacy,hinted=hinted),set_simple=legacy)
         page.insert_text((20,50),text,fontname='Embedded',fontsize=20)
     raw = doc.tobytes(deflate=True)
     doc.close()
@@ -136,6 +152,29 @@ def unicode_maps(raw):
     return result
 
 
+def independent_images(raw,scale):
+    import pypdfium2 as pdfium
+    images=[]
+    with pdfium.PdfDocument(raw)as document:
+        for number in range(len(document)):
+            page=document[number]
+            try:
+                bitmap=page.render(scale=scale,fill_color=(255,255,255,255),may_draw_forms=False)
+                try:images.append(bitmap.to_pil().convert('RGB').copy())
+                finally:bitmap.close()
+            finally:page.close()
+    return images
+
+
+def without_hinting(raw):
+    with fitz.open('pdf',raw)as document:
+        for xref,item in _program_usage(raw,document).items():
+            program=_subset_program(document.xref_stream(xref),tuple(sorted(item['gids'])),False)
+            document.update_stream(xref,program,compress=True)
+            if item['length1']:document.xref_set_key(xref,'Length1',str(len(program)))
+        return document.tobytes(garbage=1,deflate=True,use_objstms=1,no_new_id=True)
+
+
 class FontSubsetTests(unittest.TestCase):
     def assert_preserved(self,raw,result):
         first = fitz.open('pdf',raw)
@@ -173,6 +212,39 @@ class FontSubsetTests(unittest.TestCase):
         self.assertLess(len(result),len(raw))
         self.assertGreater(stats['changed_fonts'],0)
         self.assert_preserved(raw,result)
+
+    def test_generated_font_keeps_glyph_instructions_and_hint_tables(self):
+        raw=fixture_pdf(legacy=True,hinted=True);stats={}
+        result=subset_pdf_fonts(raw,diagnostics=stats)
+        self.assertGreater(stats['changed_fonts'],0)
+        self.assertTrue(stats['hinting_retained'])
+        self.assert_preserved(raw,result)
+        with TTFont(BytesIO(font_programs(raw)[0]))as before,TTFont(BytesIO(font_programs(result)[0]))as after:
+            for tag in ('cvt ','prep','fpgm'):
+                self.assertIn(tag,after)
+                self.assertEqual(before.getTableData(tag),after.getTableData(tag))
+            for gid in (1,2):
+                original=before['glyf'][before.getGlyphOrder()[gid]].program.getBytecode()
+                retained=after['glyf'][after.getGlyphOrder()[gid]].program.getBytecode()
+                self.assertTrue(original)
+                self.assertEqual(original,retained)
+        for scale in (2,4):
+            for before,after in zip(independent_images(raw,scale),independent_images(result,scale)):
+                self.assertLessEqual(max(high for low,high in ImageChops.difference(before,after).getextrema()),8)
+
+    def test_removing_library_font_hints_changes_pixels_without_changing_text(self):
+        from test_pdf_cleanup_validation import real_pair
+        # This actual embedded-font case changes in another reader when its
+        # hints are removed, even though the extracted text stays unchanged.
+        _,raw,_=real_pair('inference-answers',263)
+        unhinted=without_hinting(raw)
+        with fitz.open('pdf',raw)as before,fitz.open('pdf',unhinted)as after:
+            self.assertEqual([page.get_text()for page in before],[page.get_text()for page in after])
+        maxima=[]
+        for scale in (2,4):
+            maxima.extend(max(high for low,high in ImageChops.difference(before,after).getextrema())
+                          for before,after in zip(independent_images(raw,scale),independent_images(unhinted,scale)))
+        self.assertGreater(max(maxima),8,'Removing the original hints must reproduce the cross-reader difference')
 
     def test_legacy_and_symbol_cmaps_keep_the_original_glyph_mapping(self):
         for kind in ['legacy','symbol']:

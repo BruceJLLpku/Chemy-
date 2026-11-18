@@ -17,6 +17,7 @@ import uuid
 
 from paper1_manifest import SLUGS
 from check_release import check as check_release
+from pack_fragments import pack_fragments
 
 MAX_SITE_BYTES = 1_000_000_000
 ASSET_PATTERN = re.compile(r'assets/[^\s\"\'`<>()[\]{}]+')
@@ -140,13 +141,20 @@ def stage_site(root, output=None, clean_books=False, max_bytes=MAX_SITE_BYTES):
     dist, files, asset_count = plan_site(root, clean_books)
     sizes = {name: safe_file(dist, name).stat().st_size for name in files}
     planned_bytes = sum(sizes.values())
-    if planned_bytes > max_bytes:
+    pack = clean_books and planned_bytes > max_bytes
+    if planned_bytes > max_bytes and not pack:
         raise ValueError(f'Site would contain {planned_bytes:,} bytes; budget is {max_bytes:,}')
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=target.name + '-building-', dir=target.parent)).resolve()
     if not temporary.is_relative_to(output_root):
         raise ValueError('Unexpected temporary directory outside output')
     inventory = []
+    if pack:
+        replaced, inventory = pack_fragments(dist, set(files), temporary)
+        files = [name for name in files if name not in replaced]
+        planned_bytes = sum(sizes[name] for name in files) + sum(item['bytes'] for item in inventory)
+        if planned_bytes > max_bytes:
+            raise ValueError(f'Packed site would contain {planned_bytes:,} bytes; budget is {max_bytes:,}')
     for name in files:
         source = safe_file(dist, name)
         destination = temporary / name
@@ -177,7 +185,8 @@ def stage_site(root, output=None, clean_books=False, max_bytes=MAX_SITE_BYTES):
             backup.rename(target)
         raise
     report = {'path': str(target), 'bytes': actual_bytes, 'budget': max_bytes,
-              'files': len(files), 'referencedAssets': asset_count, 'cleanBooks': clean_books,
+              'files': len(inventory), 'referencedAssets': asset_count, 'cleanBooks': clean_books,
+              'packedFragments': bool(pack),
               'previousSiteBackup': str(backup) if backup else None, 'inventory': inventory}
     target.with_name(target.name + '-stage-report.json').write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
@@ -196,7 +205,12 @@ def main():
     if args.plan:
         dist, files, assets = plan_site(args.root, args.clean_books)
         total = sum((dist / name).stat().st_size for name in files)
-        print(json.dumps({'files': len(files), 'referencedAssets': assets, 'bytes': total,
+        file_count = len(files)
+        if args.clean_books and total > args.max_bytes:
+            replaced, packed = pack_fragments(dist, set(files))
+            total += sum(item['bytes'] for item in packed) - sum((dist / name).stat().st_size for name in replaced)
+            file_count += len(packed) - len(replaced)
+        print(json.dumps({'files': file_count, 'referencedAssets': assets, 'bytes': total,
                           'budget': args.max_bytes, 'withinBudget': total <= args.max_bytes}, indent=2))
         return 0 if total <= args.max_bytes <= MAX_SITE_BYTES else 1
     report = stage_site(args.root, args.output, args.clean_books, args.max_bytes)

@@ -1,6 +1,6 @@
 """Print the shared topic numbering, omitting paper-wide instruction sheets."""
 import argparse,os
-ap=argparse.ArgumentParser();ap.add_argument('--edition',type=int,default=39);ap.add_argument('--merge-only',action='store_true');args=ap.parse_args()
+ap=argparse.ArgumentParser();ap.add_argument('--edition',type=int,default=39);ap.add_argument('--merge-only',action='store_true');ap.add_argument('--workers',type=int,default=1);ap.add_argument('--papers',nargs='+',type=int);args=ap.parse_args()
 os.environ['CHEMY_EDITION']=str(args.edition)
 import copy,json,hashlib,re,os
 from io import BytesIO
@@ -29,6 +29,7 @@ BANK=json.loads((ROOT/'dist/questions.json').read_text(encoding='utf8'));QUESTIO
 NUMBERS=json.loads((ROOT/'dist/numbering.json').read_text(encoding='utf8'))['numberById']
 MANIFEST=json.loads(DATA.read_text(encoding='utf8'));NUMBERED=CACHE/'numbered'
 LABELS=json.loads((NUMBERED/'labels.json').read_text(encoding='utf8'))['patches'] if (NUMBERED/'labels.json').exists() else {}
+WIDE_FIGURE_EDGE = 84 + (W - 64) / 1.1
 TITLE_STYLE=ParagraphStyle('title',fontName='SourceSong',fontSize=12,leading=17)
 
 def specs_for(paper):
@@ -103,6 +104,9 @@ def create(paper,topic,k,specs):
     static={page:[{key:p[key] for key in ['id','old','box','font','size','baseline','color']} for p in ps] for page,ps in owned.items()}
     heights={i:heading_height(QUESTIONS[i]) for i in ids}
     fingerprint=hashlib.sha256(json.dumps({'profile':'numberless-template-v2','specs':specs,'q':[{key:QUESTIONS[i].get(key) for key in ['id','title','titleHtml','points','percent']}|{key:QUESTIONS[i][key] for key in ['sourcePaperLabel','series','answerCorrectionPages'] if key in QUESTIONS[i]} for i in sorted(ids)],'heights':heights,'labels':static},sort_keys=True).encode()).hexdigest()
+    # At the usual zoom, margin insets can extend beyond an A4 page.
+    if any(f['box'][2] > WIDE_FIGURE_EDGE for spec in specs for f in spec['figures'][k]):
+        fingerprint=hashlib.sha256((fingerprint+':fit-wide-insets-v2').encode()).hexdigest()
     foreign={f'{s["number"]}-{n}':foreign_float_boxes(k,paper,s['number'],n) for s in specs for n,_,_ in s['question' if k=='q' else 'answer'] if foreign_float_boxes(k,paper,s['number'],n)}
     if foreign:fingerprint=hashlib.sha256((fingerprint+json.dumps(foreign,sort_keys=True)).encode()).hexdigest()
     signature=hashlib.sha256(('indirect-form-contents-v2'+fingerprint+json.dumps({i:NUMBERS[i] for i in sorted(ids)})+json.dumps(owned,sort_keys=True)).encode()).hexdigest()
@@ -129,13 +133,16 @@ def create(paper,topic,k,specs):
                     else:chunks.append([a,b])
                 reader=PdfReader(blank_source(k,n))
                 for a,b in chunks:
-                    scale=min(1.1,620/max(b-a,1));height=(b-a)*scale;headheight=heights[qid] if first else 0
+                    ff=[f['box'] for f in spec['figures'][k] if f['page']==n and f['box'][1]<b and f['box'][3]>a]
+                    left=min([65]+[f[0] for f in ff]);right=max([550]+[f[2] for f in ff])
+                    max_scale = (W-80)/(right-84) if right > WIDE_FIGURE_EDGE else 1.1
+                    scale=min(max_scale,620/max(b-a,1))
+                    height=(b-a)*scale;headheight=heights[qid] if first else 0
                     if target is None or cursor-height-headheight<70:new_page()
                     if first:
                         heads.append({'id':qid,'page':index,'cursor':cursor});cursor-=headheight;record['firstPage']=index;first=False
                     p=copy.copy(reader.pages[0]);ph=float(p.mediabox.height)
-                    ff=[f['box'] for f in spec['figures'][k] if f['page']==n and f['box'][1]<b and f['box'][3]>a]
-                    left=min([65]+[f[0] for f in ff]);right=max([550]+[f[2] for f in ff]);p.cropbox=RectangleObject([left,ph-b,right,ph-a])
+                    p.cropbox=RectangleObject([left,ph-b,right,ph-a])
                     floats=[f['box'] for f in spec['figures'][k] if f['page']==n and f.get('mode')=='float']
                     if floats:
                         rects=[(left,ph-min(b,hi),right-left,max(0,min(b,hi)-max(a,lo)))]+[(f[0],ph-min(b,f[3]),f[2]-f[0],max(0,min(b,f[3])-max(a,f[1]))) for f in floats if f[1]<b and f[3]>a]
@@ -174,7 +181,7 @@ def create(paper,topic,k,specs):
 
 def merge_book(job):
     topic,slug,k,kind=job
-    chapters=sorted({(q.get('edition',39),q['paper']) for q in BANK},key=lambda p:(-p[0],p[1]))
+    chapters=list(dict.fromkeys((q.get('edition',39),q['paper']) for q in BANK if q['topic']==topic))
     records=[];paths=[];offset=0
     for e,paper in chapters:
         if not any(q['topic']==topic and q.get('edition',39)==e and q['paper']==paper for q in BANK):continue
@@ -211,12 +218,34 @@ def merge_all():
     (ROOT/'data/print_index.json').write_text(json.dumps(all_index,ensure_ascii=False,indent=2),encoding='utf8');print('TOTAL',total,'pages',flush=True)
     sync_pdf_version()
 
+def build_paper(paper):
+    specs = specs_for(paper)
+    for topic in dict.fromkeys(spec['topic'] for spec in specs):
+        for kind in ('q', 'a'):
+            create(paper, topic, kind, [spec for spec in specs if spec['topic'] == topic])
+    print('PARTS', EDITION, paper, 'ready', flush=True)
+
+
 if __name__=='__main__':
-    if args.merge_only:merge_all()
+    if args.merge_only:
+        merge_all()
     else:
-        papers=sorted({q['paper'] for q in BANK if q.get('edition',39)==EDITION})
-        for paper in papers:
-            specs=specs_for(paper)
-            for topic in dict.fromkeys(s['topic'] for s in specs):
-                for k in ['q','a']:create(paper,topic,k,[s for s in specs if s['topic']==topic])
-            print('PARTS',EDITION,paper,'ready',flush=True)
+        papers = sorted({q['paper'] for q in BANK if q.get('edition',39) == EDITION})
+        if args.papers:
+            assert set(args.papers) <= set(papers)
+            papers = sorted(set(args.papers))
+        if args.workers == 1:
+            for paper in papers:
+                build_paper(paper)
+        else:
+            # Render a page shared by adjacent papers once before starting workers.
+            page_owner = {}
+            for paper in papers:
+                for spec in specs_for(paper):
+                    for kind, field in [('q', 'question'), ('a', 'answer')]:
+                        for page, *_ in spec[field]:
+                            key = kind, page
+                            if page_owner.setdefault(key, paper) != paper:
+                                blank_source(*key)
+            with ProcessPoolExecutor(max_workers=args.workers) as pool:
+                list(pool.map(build_paper, papers))

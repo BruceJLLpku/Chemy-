@@ -12,6 +12,7 @@ function between(start,end){
 }
 const code=[
   between("el('ai-dialog').addEventListener('close',()=>{","  for(const id of ['ai-topic','ai-edition'])"),
+  between('function currentLecture()',"  function addTurn("),
   between('async function download(kind)',"  document.querySelectorAll('[data-ai-export]')"),
   between("document.querySelectorAll('[data-ai-word]')",'  async function printPaper(kind)'),
   between('async function printPaper(kind)',"  document.querySelectorAll('[data-ai-print]')"),
@@ -31,9 +32,10 @@ function harness(protocol='http:'){
     return elements.get(id);
   };
   const h={elements,workers,downloads,saves,busyChanges,wordButtons,element,classes};
-  const state={items:[{id:'first',links:[]}],concept:{name:'化学测试'},introduction:'知识介绍正文',exportNonce:0,exporting:false,generating:false,worker:null};
+  const state={items:[{id:'first',links:[]}],concept:{id:'chemistry',name:'化学测试'},index:{entries:[{id:'first'}]},introduction:'知识介绍正文',exportNonce:0,exporting:false,generating:false,worker:null};
   const context=vm.createContext({
     state,location:{protocol},localPreviewMessage:'Open http://127.0.0.1:8765/',el:element,
+    engine:{availableConcepts:()=>[{id:'chemistry',name:'化学测试'}]},questions:[{id:'first'}],
     byId:new Map([['first',{id:'first',topic:'晶体化学'}]]),slugByTopic:{'晶体化学':'crystal'},
     presentation:{first:{body:'<p>原题</p>',answer:'<p>原答案</p>'}},numbers:{first:1},
     pdfVersion:'fixture',safe:String,labels:()=>['关联说明'],origin:()=> '原题来源',association:()=>'<aside>关联说明</aside>',introductionHtml:text=>'<p>'+text+'</p>',
@@ -79,8 +81,27 @@ function harness(protocol='http:'){
     assert.equal(h.state.exporting,false);
   }
   {
+    const h=harness(),fonts=deferred();h.context.document.fonts.ready=fonts.promise;
+    const preparing=h.context.download('questions');
+    h.state.introduction='更新后的讲义';h.state.items=[{id:'second',links:[]}];
+    fonts.resolve();await preparing;
+    assert.equal(h.workers[0].request.items[0].id,'first');
+    assert.match(JSON.stringify(h.workers[0].request.paperIntro),/知识介绍正文/);
+    assert.ok(!JSON.stringify(h.workers[0].request.paperIntro).includes('更新后的讲义'),
+      'Font preparation must not mix a newer lecture into the original paper snapshot');
+  }
+  {
+    const h=harness();h.state.introduction=undefined;
+    await h.context.download('questions');
+    assert.match(JSON.stringify(h.workers[0].request.paperIntro),/本卷知识点/);
+    assert.match(JSON.stringify(h.workers[0].request.paperIntro),/化学测试/);
+    h.close();h.state.introduction='';await h.context.download('questions');
+    assert.equal(h.workers[1].request.paperIntro.length,0,
+      'An explicitly removed lecture must not be replaced by the local knowledge summary');
+  }
+  {
     const h=harness();await h.context.download('questions');
-    const old=h.workers[0];assert.match(old.url,/clean-vector-upstream-v1/);
+    const old=h.workers[0];assert.match(old.url,/clean-vector-packed-v2/);
     assert.equal(old.request.paperIntro.length,1,'Question PDF receives the upstream lecture');
     assert.ok(old.request.paperHeader?.bytes);assert.equal(old.request.items[0].annotation,null);
     h.close();await h.context.download('answers');const active=h.workers[1];
@@ -111,9 +132,10 @@ function harness(protocol='http:'){
     const h=harness(),word=deferred();let documentInput;
     h.context.window.ChemyWord.build=input=>{documentInput=input;return word.promise;};
     const exporting=h.wordButtons[0].handler();
-    h.state.items=[{id:'second',links:[]}];
+    h.state.items=[{id:'second',links:[]}];h.state.introduction='更新后的讲义';
     word.resolve(new Blob(['word']));await exporting;
     assert.equal(documentInput.items.length,1);assert.equal(documentInput.items[0].html,'<p>原题</p>');
+    assert.equal(documentInput.introduction,'知识介绍正文');assert.equal(documentInput.introductionTitle,'知识点讲义');
     assert.equal(h.downloads.length,1);assert.match(h.downloads[0],/题目\.docx$/);
     assert.deepEqual(h.saves,[{ids:['first'],title:'化学测试 · 专题练习'}],
       'Word history must describe the exported document even if a favorites refresh changes the active paper');
@@ -129,5 +151,5 @@ function harness(protocol='http:'){
     assert.equal(h.state.worker,active);assert.equal(h.state.exporting,true);assert.equal(h.busy,true);
     assert.equal(h.element('ai-print').innerHTML,'');assert.ok(!h.classes.has('ai-printing'));
   }
-  console.log('PASS AI PDF/Word/print mutual exclusion, lecture forwarding, stale callbacks, cancelled preparation, failure retry and paper-history snapshots.');
+  console.log('PASS AI PDF/Word/print mutual exclusion, lecture forwarding and local fallback, stale callbacks, cancelled preparation, failure retry and paper-history snapshots.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

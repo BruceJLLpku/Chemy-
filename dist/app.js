@@ -133,7 +133,7 @@ function startExport(kind='questions') {
   const snapshot=exportItems.slice(),label=answers?'答案':'题目';
   exportBusy = true; $('export-start').disabled = true; $('export-answers').disabled = true;
   $('export-status').textContent = `正在准备${label}…`;
-  try { exportWorker = new Worker('pdf-worker.js?v=clean-vector-upstream-v1'); }
+  try { exportWorker = new Worker('pdf-worker.js?v=clean-vector-packed-v2'); }
   catch (_) { exportFailed('PDF 工具暂时无法启动，请刷新页面后重试。',button,label); return; }
   const worker = exportWorker;
   worker.onerror = () => { if (exportWorker === worker) exportFailed('PDF 工具加载失败，请检查网络后重试。',button,label); };
@@ -299,7 +299,7 @@ function markQuestion(id, reveal = false) {
   }
 }
 function renderQuestion(q) {
-    const score = q.points == null ? '' : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
+    const score = q.points == null ? (q.percent == null ? '' : `（占 ${q.percent}%）`) : `（${q.points} 分${q.percent == null ? '' : '，占 '+q.percent+'%'}）`;
     const answerOpen = openAnswers.has(q.id);
     return `<article class="question" id="${escapeHtml(q.id)}" tabindex="-1"><div class="q-meta"><span class="topic-badge">${q.topic}</span><span>专题第 ${numbers[q.id]} 题</span>${q.points == null ? '' : `<span>${q.points} 分</span>`}</div><h2 class="q-title">第 ${numbers[q.id]} 题　${presentation[q.id].titleHtml || q.titleHtml || escapeHtml(q.title)}${score}</h2><div class="q-origin">来源：${sourceLine(q)}</div><div class="question-download"><label><input type="checkbox" data-select-question="${escapeHtml(q.id)}"${selectedQuestions.has(q.id) ? ' checked' : ''} aria-label="勾选${q.topic}第${numbers[q.id]}题">选入练习卷</label><button type="button" data-favorite="${escapeHtml(q.id)}" aria-pressed="false">收藏</button><button data-download-question="${escapeHtml(q.id)}" aria-label="下载${q.topic}第${numbers[q.id]}题 PDF">下载本题 PDF</button></div><div class="q-body">${lazyFigures(presentation[q.id].body)}</div><details class="answers" data-answer="${escapeHtml(q.id)}"${answerOpen ? ' open' : ''}><summary><span>${answerOpen ? '收起' : '查看'}参考答案</span>${chevron}</summary><div class="answer-caption">原卷参考答案与评分细则</div><div class="answer-content"${answerOpen ? ' data-loaded="true"' : ''}>${answerOpen ? lazyFigures(presentation[q.id].answer) : ''}</div></details><details class="discussion-toggle"><summary><span data-discussion-label>讨论与提问</span>${chevron}</summary><section class="question-discussion" data-discussion="${escapeHtml(q.id)}" aria-label="本题讨论"><p class="forum-loading">展开后读取本题讨论。</p></section></details></article>`;
 

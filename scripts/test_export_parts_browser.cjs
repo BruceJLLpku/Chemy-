@@ -16,7 +16,12 @@ const server = http.createServer((req, res) => {
 });
 const patternMode = process.argv.includes('--patterns');
 const annotationMode = process.argv.includes('--annotations');
-assert.ok(!(patternMode && annotationMode), 'Choose one specialist regression mode');
+const editionArgs = process.argv.slice(2).filter(arg => arg.startsWith('--edition'));
+assert.ok(editionArgs.length <= 1 && editionArgs.every(arg => /^--edition=(0|[1-9]\d*)$/.test(arg)), 'Use --edition=<nonnegative integer> once');
+const edition = editionArgs.length ? Number(editionArgs[0].split('=')[1]) : null;
+assert.ok(edition === null || Number.isSafeInteger(edition), 'Edition must be a safe integer');
+const editionMode = edition !== null;
+assert.ok(Number(patternMode) + Number(annotationMode) + Number(editionMode) <= 1, 'Choose one specialist regression mode');
 const patternTopics = (process.env.CHEMY_TEST_PATTERN_TOPICS || '').split(',').filter(Boolean);
 assert.ok(patternTopics.every(slug => ['polymer','kinetics','organic'].includes(slug)), 'Unknown pattern topic');
 const report = {checks:[], errors:[], requests:[], exports:[]};
@@ -43,12 +48,43 @@ function check(name, result) {assert.ok(result, name);report.checks.push(name);c
     await page.waitForFunction(() => typeof ready !== 'undefined' && ready);
     const crossIds = await page.evaluate(() => topics.map(t => byTopic.get(t)[0].id));
     check('Nine topics available', crossIds.length === 9);
-    const jobs = annotationMode ? [] : patternMode ? [
+    let editionSample;
+    if (editionMode) {
+      editionSample = await page.evaluate(edition => {
+        const candidates = questions.filter(q => Number(editionOf(q)) === edition);
+        const compare = (a,b) => Number(a.paper)-Number(b.paper) || Number(a.number)-Number(b.number) || a.id.localeCompare(b.id);
+        candidates.sort(compare);
+        const paperGroups = new Map();
+        for (const question of candidates) {
+          const key = String(question.paper);
+          if (!paperGroups.has(key)) paperGroups.set(key, []);
+          paperGroups.get(key).push(question);
+        }
+        const ids = new Set(), papers = [];
+        for (const [paper, group] of paperGroups) {
+          const first = group[0].id, last = group.at(-1).id;
+          ids.add(first);ids.add(last);
+          papers.push({paper, count:group.length, first, last});
+        }
+        const topicSamples = topics.filter(topic => candidates.some(q => q.topic === topic)).map(topic => {
+          const representative = candidates.find(q => q.topic === topic).id;
+          ids.add(representative);
+          return {topic, representative};
+        });
+        return {edition, questionCount:candidates.length, ids:[...ids], papers, topics:topicSamples};
+      }, edition);
+      check(`Edition ${edition}: questions available`, editionSample.questionCount > 0);
+      const selected = new Set(editionSample.ids);
+      check(`Edition ${edition}: every paper first and last question selected`, editionSample.papers.every(paper => selected.has(paper.first) && selected.has(paper.last)));
+      check(`Edition ${edition}: every available topic represented`, editionSample.topics.every(topic => selected.has(topic.representative)));
+      report.editionSample = editionSample;
+    }
+    const jobs = editionMode ? [[`edition-${edition}`, editionSample.ids, ['questions','answers']]] : annotationMode ? [] : patternMode ? [
       ['pattern-polymer', ['chemy39-17-4','chemy39-20-7'], ['questions','answers']],
       ['pattern-kinetics', ['chemy39-3-7'], ['questions','answers']],
       ['pattern-organic', ['chemy34-6-8','chemy34-6-9','chemy34-7-10','chemy34-7-11','chemy34-8-8'], ['answers']],
     ] : [['single-polymer', ['chemy39-5-4'], ['questions','answers']]];
-    if (!patternMode && !annotationMode && !process.env.CHEMY_TEST_SINGLE && !process.argv.includes('--single')) jobs.push(['nine-topics', crossIds, ['questions','answers']]);
+    if (!editionMode && !patternMode && !annotationMode && !process.env.CHEMY_TEST_SINGLE && !process.argv.includes('--single')) jobs.push(['nine-topics', crossIds, ['questions','answers']]);
     for (const [name, ids, kinds] of jobs.filter(([name]) => !patternMode || !patternTopics.length || patternTopics.includes(name.replace('pattern-', '')))) {
       await page.evaluate(ids => openExport(ids), ids);
       for (const kind of kinds) {
@@ -69,7 +105,7 @@ function check(name, result) {assert.ok(result, name);report.checks.push(name);c
       }
       await page.locator('#export-close').click();
     }
-    if (patternMode) { check('No JavaScript errors', report.errors.length === 0); return; }
+    if (editionMode || patternMode) { check('No JavaScript errors', report.errors.length === 0); return; }
     if (annotationMode) {
       const cases = await page.evaluate(async () => {
         async function note(extraLines=0) {
@@ -201,6 +237,6 @@ function check(name, result) {assert.ok(result, name);report.checks.push(name);c
     await page.screenshot({path:path.join(output,'polymer-web.png')});
   } finally {
     await browser.close();server.close();
-    fs.writeFileSync(path.join(output, annotationMode ? 'annotation-browser-report.json' : patternMode ? `pattern-browser${patternTopics.length ? '-' + patternTopics.join('-') : ''}-report.json` : 'browser-report.json'), JSON.stringify(report, null, 2));
+    fs.writeFileSync(path.join(output, editionMode ? `edition-${edition}-browser-report.json` : annotationMode ? 'annotation-browser-report.json' : patternMode ? `pattern-browser${patternTopics.length ? '-' + patternTopics.join('-') : ''}-report.json` : 'browser-report.json'), JSON.stringify(report, null, 2));
   }
 })().catch(error => {console.error(error);server.close();process.exitCode=1;});

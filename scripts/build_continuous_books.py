@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import os
 from concurrent.futures import ProcessPoolExecutor
 from io import BytesIO
 from pathlib import Path
@@ -56,7 +57,7 @@ def complete_visible_bands(slug,kind,source,records,regions,originals):
     key = 'q' if kind == 'questions' else 'a'
     by_id = {r['id']:r for r in records}
     heads = {}
-    for path in (ROOT/'tmp/library/books').glob(f'*-{slug}-{key}.layout.json'):
+    for path in Path(os.environ.get('CHEMY_PDF_PARTS') or ROOT/'tmp/library/books').glob(f'*-{slug}-{key}.layout.json'):
         layout = json.loads(path.read_text(encoding='utf8'))
         if not layout['ledger'] or layout['ledger'][0]['id'] not in by_id:
             continue
@@ -118,7 +119,7 @@ def complete_visible_bands(slug,kind,source,records,regions,originals):
     return output
 
 
-def flow_book(source, records, topic, slug, kind, dest):
+def flow_book(source, records, topic, slug, kind, dest, layout_dir=DATA):
     out = pikepdf.Pdf.new()
     originals = pikepdf.open(source)
     for page in originals.pages:
@@ -224,11 +225,11 @@ def flow_book(source, records, topic, slug, kind, dest):
     out.close(); originals.close()
     stamp_pdf(temporary)
     temporary.replace(dest)
-    DATA.mkdir(parents=True,exist_ok=True)
+    layout_dir.mkdir(parents=True,exist_ok=True)
     layout = {'profile':PROFILE,'typography':STYLE,'sourcePages':max(r['lastPage'] for r in records),'pages':pages,
               'sha256':hashlib.sha256(dest.read_bytes()).hexdigest(),'sourceSha256':hashlib.sha256(source.read_bytes()).hexdigest(),
               'records':ledger,'heads':heads,'questions':final_index,'placements':placements}
-    (DATA/(slug+'-'+kind+'.json')).write_text(json.dumps(layout,ensure_ascii=False,separators=(',',':')),encoding='utf8')
+    (layout_dir/(slug+'-'+kind+'.json')).write_text(json.dumps(layout,ensure_ascii=False,separators=(',',':')),encoding='utf8')
     print('CONTINUOUS',slug,kind,layout['sourcePages'],'->',pages,'pages',len(ledger),'questions',flush=True)
     return ledger,pages,final_index
 

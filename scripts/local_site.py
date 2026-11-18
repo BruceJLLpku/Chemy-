@@ -74,8 +74,13 @@ def check_prepared():
         raise RuntimeError('本地文件不完整：' + '、'.join(missing))
     manifest = json.loads((DIST / 'export-parts/manifest.json').read_text(encoding='utf8'))
     books = manifest.get('books', {})
-    if len(books) != 18 or not all(book.get('complete') for book in books.values()):
+    if (not isinstance(books, dict) or len(books) != 18
+            or not all(isinstance(book, dict) and book.get('complete') for book in books.values())):
         raise RuntimeError('分题 PDF 尚未完整生成，请先运行 scripts/build_export_parts.py。')
+    numbering = json.loads((DIST / 'numbering.json').read_text(encoding='utf8'))
+    if (manifest.get('bookVersion') != numbering.get('pdfVersion')
+            or sum(book.get('count', 0) for book in books.values()) != 2 * len(numbering['numberById'])):
+        raise RuntimeError('本地 PDF 与当前题库版本不一致，请先完成 scripts/build_export_parts.py 的生成。')
 
 
 class Handler(SimpleHTTPRequestHandler):

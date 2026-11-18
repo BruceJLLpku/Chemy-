@@ -308,7 +308,9 @@ class CleanupTests(unittest.TestCase):
 # Include the verification-only regressions in this existing CI entry point.
 from test_pdf_cleanup_validation import PathSamplingTests, LabelProofTest, RealLabelProofTest, FillSamplingTests
 from test_pdf_image_resources import FilterImageResourceTests
-from test_pdf_image_sampling import ImageSamplingTest, InlineImageIdentityTest
+from test_pdf_image_sampling import (ImageSamplingTest, InlineImageIdentityTest,
+                                     SharedFormImageResourceTest, IndependentImageSamplingTests,
+                                     ForeignStrokeSupportTests)
 from test_pdf_image_paint_evidence import ImagePaintEvidenceTests
 from test_pdf_label_ownership import LabelOwnershipTests
 from test_pdf_paint_evidence import PaintEvidenceTests

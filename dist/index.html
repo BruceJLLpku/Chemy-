@@ -8,13 +8,13 @@
   <meta name="description" content="按九个化学专题、届次和试卷查找 Chemy 竞赛题目，搜索题干关键词，查看原卷参考答案，下载专题或自选题目 PDF。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css?v=question-font-v1">
-  <link rel="stylesheet" href="interface.css?v=load-recovery-v1">
-  <link rel="stylesheet" href="ai-paper.css?v=workspace-v2">
-  <script src="app.js?v=upstream-sync-v1" defer></script>
+  <link rel="stylesheet" href="interface.css?v=edition40-sync-v2">
+  <link rel="stylesheet" href="ai-paper.css?v=edition40-sync-v2">
+  <script src="app.js?v=edition40-sync-v2" defer></script>
   <script src="paper-engine.js?v=topic-conversation-v1" defer></script>
-  <script src="lecture-format.js?v=1" defer></script>
-  <script src="word-export.js?v=lecture-v3" defer></script>
-  <script src="ai-paper.js?v=upstream-sync-v1" defer></script>
+  <script src="lecture-format.js?v=edition40-sync-v2" defer></script>
+  <script src="word-export.js?v=edition40-sync-v2" defer></script>
+  <script src="ai-paper.js?v=edition40-sync-v2" defer></script>
   <link rel="stylesheet" href="account.css?v=forum-v1">
   <script src="account.js?v=local-sdk-v1" defer></script>
   <link rel="stylesheet" href="forum.css?v=inline-replies-v4">
@@ -85,7 +85,7 @@
       <div class="selection-tools" id="selection-tools"><button id="select-visible" aria-haspopup="dialog" aria-controls="question-picker">按题目 / 试卷选题</button><span id="selection-count" role="status">已选 0 题</span><button id="download-selected" disabled>下载选题 PDF</button><button id="clear-selection" disabled>清空</button></div>
       <section id="favorites-controls" hidden aria-label="收藏筛选"><div class="account-actions"><label>专题<select id="favorites-topic"><option value="all">全部专题</option></select></label><label>搜索收藏<input id="favorites-search" type="search" placeholder="题名、题干关键词"></label></div><label class="auto-favorite-label"><input type="checkbox" data-auto-favorite checked>保存或下载组卷后自动收藏</label><p id="favorites-status" role="status"></p><button id="favorites-login" type="button">登录查看收藏</button><div class="account-actions"><button id="favorites-prev">上一页</button><span id="favorites-page"></span><button id="favorites-next">下一页</button></div></section>
       <div id="questions" aria-busy="true"><p class="loading-note">正在读取题目与编号…</p></div>
-      <footer class="copyright">题目与参考答案来源：Chemy 化学奥林匹克团队，第32～39届试题合集与 Chemy 联赛。版权归原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
+      <footer class="copyright">题目与参考答案来源：Chemy 化学奥林匹克团队，第32～40届试题合集与 Chemy 联赛。版权归原命题组所有，仅供学术交流使用，请勿用于任何形式的商业用途。</footer>
     </div>
   </main>
   <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-title">
@@ -128,6 +128,7 @@
             <div id="ai-welcome">
               <h3>今天想组一套什么卷？</h3>
               <p class="ai-lead" id="ai-lead">输入想练习的知识点，从 Chemy 题库中选题。</p>
+              <p id="ai-local-note" class="ai-hint" hidden>题库索引模式会随卷列出知识点。撰写详细讲义需要 DeepSeek。已启动本机服务时，可以<a href="http://127.0.0.1:8788/">打开本机 AI 组卷</a>。</p>
               <div class="ai-starters" aria-label="组卷示例">
                 <button type="button" data-ai-prompt="组 5 道晶体化学题，从基础到进阶，卷首整理相关知识点。"><strong>准备一份讲义</strong><span>晶体化学 · 知识梳理与练习</span></button>
                 <button type="button" data-ai-prompt="组一套同时包含化学方程式和元素化学的卷子，共 5 道题，兼顾不同知识点。"><strong>组合多个主题</strong><span>化学方程式与元素化学</span></button>
@@ -185,12 +186,14 @@
           </div></details>
           <button type="button" id="ai-undo" disabled>撤销修改</button>
           <button type="button" id="ai-reroll">重新组卷</button>
+          <button type="button" id="ai-write-lecture" hidden>生成知识点讲义</button>
         </div>
         <p id="ai-export-status" class="ai-hint" role="status" aria-live="polite"></p>
         <nav class="ai-paper-nav" aria-label="试卷阅读工具"><label>跳转到 <select id="ai-jump" aria-label="跳转到试卷题目"></select></label><button type="button" id="ai-answers-toggle" aria-pressed="false">展开全部答案</button></nav>
+        <p id="ai-lecture-status" class="ai-hint" role="status"></p>
         <div class="ai-paper-body">
           <section id="ai-paper-intro" class="ai-paper-intro" hidden>
-            <h4>知识介绍</h4><div class="q-body ai-paper-intro-text"></div>
+            <h4>知识点讲义</h4><div class="q-body ai-paper-intro-text"></div>
           </section>
           <div id="ai-items"></div>
         </div>

@@ -3,7 +3,8 @@
 MuPDF's fallback subsetter skips already tagged subset fonts. Source libraries
 also contain inline font dictionaries. This pass handles both, retains glyph
 IDs, and leaves Encoding, widths, CIDToGIDMap and ToUnicode untouched. It uses
-only the embedded font bytes; no locally installed fonts are consulted.
+only the embedded font bytes; no locally installed fonts are consulted. Original
+glyph hinting is retained so other PDF readers keep the same text edges.
 """
 from functools import lru_cache
 from io import BytesIO
@@ -152,9 +153,9 @@ def _matches(original, candidate):
 def subset_pdf_fonts(raw: bytes, *, diagnostics=None) -> bytes:
     """Return a verified smaller PDF, or the original bytes if unsafe/unhelpful.
 
-    All font IDs and PDF character maps are retained. Hint removal is attempted
-    first; any visual difference retries with hinting retained. If that also
-    differs, the original bytes are returned and diagnostics explains why.
+    All font IDs, PDF character maps and original glyph hinting are retained.
+    If the subset changes rendering, the original bytes are returned and
+    diagnostics explains why. A single renderer cannot justify removing hints.
     Unsupported font formats are left intact. Every accepted replacement is
     checked for identical extracted text and rendered appearance at 144 dpi.
     """
@@ -163,7 +164,7 @@ def subset_pdf_fonts(raw: bytes, *, diagnostics=None) -> bytes:
     original = fitz.open('pdf',raw)
     try:
         programs = _program_usage(raw,original)
-        for hinting in (False,True):
+        for hinting in (True,):
             doc = fitz.open('pdf',raw)
             count = 0
             skipped = []

@@ -141,10 +141,13 @@ class CleanBookPixelEvidenceTests(unittest.TestCase):
                 self.assertGreater(result['maxDelta'], 8)
                 self.assertEqual(result['imageSamplingProof']['matched'], 0)
 
-    def test_image_identity_requires_both_full_page_sampling_phases(self):
+    def test_image_identity_requires_both_phases_without_an_independent_oracle(self):
         # Keep actual image bytes, native paint and clips unchanged, then inject
         # controlled renderer sampling noise. The real structural proof runs;
         # only the rasterizer is replaced to exercise both phase outcomes.
+        # The unchanged real PDFium input would correctly pass this identical
+        # page pair. Make that oracle unavailable here to isolate the primary
+        # two-phase gate; independent full-page gates have their own regressions.
         raw = image_sample()
         native_pixmap = fitz.Page.get_pixmap
         native_no_cache = book_pixels.render_no_tile_cache
@@ -173,12 +176,18 @@ class CleanBookPixelEvidenceTests(unittest.TestCase):
                     return perturb(pix, amount) if amount else pix
 
                 with patch.object(fitz.Page, 'get_pixmap', cached), \
-                        patch.object(book_pixels, 'render_no_tile_cache', side_effect=uncached):
+                        patch.object(book_pixels, 'render_no_tile_cache', side_effect=uncached), \
+                        patch.object(book_pixels, 'original_page_pdfium',
+                                     side_effect=ValueError('Independent oracle unavailable in phase-only fixture')) as independent:
                     result = book_pixels.compare_page(expected[0], actual[0])
                 self.assertEqual(result['initialMaxDelta'], 20)
                 self.assertEqual(result['imageSamplingProof']['matched'], 1)
                 self.assertEqual(result['imageSamplingPhaseDeltas'], [0, second_phase_delta])
                 self.assertEqual(result['maxDelta'], 0 if second_phase_delta == 0 else 20)
+                if second_phase_delta == 0:
+                    independent.assert_not_called()
+                else:
+                    self.assertIn('unavailable', result['independentError'])
 
 
 if __name__ == '__main__':

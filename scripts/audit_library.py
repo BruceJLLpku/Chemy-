@@ -1,5 +1,5 @@
 """Final cross-edition source/content/resource audit; never marks visual review complete."""
-import argparse,hashlib,json,re
+import argparse,hashlib,json,os,re
 from collections import Counter,defaultdict
 from functools import lru_cache
 from html.parser import HTMLParser
@@ -12,7 +12,10 @@ from paper1_manifest import ROOT,SLUGS
 REPORT=ROOT/'data/audit_report.json'
 EXCEPTIONS=json.loads((ROOT/'data/source_exceptions.json').read_text(encoding='utf8'))
 def read(path):return json.loads(path.read_text(encoding='utf8'))
-def cache_for(e):return ROOT/'tmp'/('library' if e==39 else f'library{e}')
+def cache_for(e):
+    if str(e) == os.environ.get('CHEMY_EDITION') and os.environ.get('CHEMY_EDITION_CACHE'):
+        return Path(os.environ['CHEMY_EDITION_CACHE'])
+    return ROOT/'tmp'/('library' if e==39 else f'library{e}')
 @lru_cache(maxsize=6)
 def source_index(e,k):return read(cache_for(e)/k/'index.json')
 def digest(raw):return hashlib.sha256(raw).hexdigest()
@@ -32,8 +35,12 @@ def text_of(html):
     parser=Text();parser.feed(html);return ''.join(parser.parts)
 def chars_of(text):return Counter(c for c in text.replace('\uf044','Δ') if not c.isspace())
 
-def audit(pixels=True,books=True):
+def audit(pixels=True,books=True,edition=None):
     bank=read(ROOT/'dist/questions.json');manifest=read(ROOT/'data/library_manifest.json');notes=read(ROOT/'dist/papers.json')
+    if edition is not None:
+        bank=[q for q in bank if q.get('edition',39)==edition]
+        manifest['papers']={key:chapter for key,chapter in manifest['papers'].items() if chapter.get('edition',39)==edition}
+        notes={}
     scope_expected={}
     for e in sorted({q.get('edition',39) for q in bank},reverse=True):
         index=source_index(e,'q')
@@ -42,8 +49,9 @@ def audit(pixels=True,books=True):
     def require(condition,code,context):
         if not condition:issues.append({'code':code,**context})
     require(len(bykey)==len(bank)==sum(n for _,n in scope_expected.values()),'total_or_duplicate',{'count':len(bank)})
-    original=read(ROOT/'tmp/approved-paper1.json')
-    require([q for q in bank if q.get('edition',39)==39 and q['paper']==1]==original,'approved_sample_changed',{})
+    if 39 in scope_expected:
+        original=read(ROOT/'tmp/approved-paper1.json')
+        require([q for q in bank if q.get('edition',39)==39 and q['paper']==1]==original,'approved_sample_changed',{})
     for e,(papers,count) in scope_expected.items():
         qindex=source_index(e,'q');aindex=source_index(e,'a')
         sourcekeys={(e,h['paper'],h['number']) for h in qindex['questions']}
@@ -58,7 +66,10 @@ def audit(pixels=True,books=True):
             if source['kind'] in ['q','a'] and source['filename']==config[source['kind']]:
                 require(source['sha256']=={'q':qindex,'a':aindex}[source['kind']]['sha256'],'source_index_changed',{'edition':e,'kind':source['kind']})
         checks['source_questions']+=count
-    allhtml=[q['body']+q['answer'] for q in bank]+[str(n.get('instructions',''))+str(n.get('scoring','')) for n in list(notes.values())+[read(ROOT/'dist/paper1-notes.json')]]
+    note_values = list(notes.values())
+    if edition in (None, 39):
+        note_values.append(read(ROOT/'dist/paper1-notes.json'))
+    allhtml=[q['body']+q['answer'] for q in bank]+[str(n.get('instructions',''))+str(n.get('scoring','')) for n in note_values]
     allrefs={name for html in allhtml for name in re.findall(r'src="assets/([^\"]+)"',html)}
     for name in sorted(allrefs):
         path=ROOT/'dist/assets'/name
@@ -148,9 +159,11 @@ def audit(pixels=True,books=True):
                 checks['topic_pdfs']+=1;checks['print_pages']+=len(book.pages)
     candidates=list({json.dumps(c,sort_keys=True):c for c in candidates}.values())
     report={'scope':{str(e):{'papers':p,'questions':n} for e,(p,n) in scope_expected.items()},'methods':{'losslessSourcePixelComparison':pixels,'printChapterContentComparison':books,'nativeGlyphCoverage':True,'sourcePairingAndHashes':True},'checks':dict(checks),'issues':issues,'reviewCandidates':candidates,'automatedPassed':not issues,'visualReviewComplete':False}
-    REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8')
-    print(json.dumps({'checks':dict(checks),'issues':len(issues),'reviewCandidates':len(candidates),'report':str(REPORT)},ensure_ascii=False),flush=True)
+    report_path=REPORT if edition is None else REPORT.with_name(f'audit_report{edition}.json')
+    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8')
+    print(json.dumps({'checks':dict(checks),'issues':len(issues),'reviewCandidates':len(candidates),'report':str(report_path)},ensure_ascii=False),flush=True)
     for issue in issues[:12]:print(json.dumps(issue,ensure_ascii=False),flush=True)
     return report
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--no-pixels',action='store_true');ap.add_argument('--no-books',action='store_true');args=ap.parse_args();audit(not args.no_pixels,not args.no_books)
+    ap=argparse.ArgumentParser();ap.add_argument('--no-pixels',action='store_true');ap.add_argument('--no-books',action='store_true');ap.add_argument('--edition',type=int);args=ap.parse_args()
+    audit(not args.no_pixels,not args.no_books and args.edition is None,args.edition)

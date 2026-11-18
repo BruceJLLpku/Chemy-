@@ -1,5 +1,9 @@
 """Exercise safe staging, referenced-asset retention, and the Pages byte limit."""
 import json
+import gzip
+import hashlib
+import random
+import struct
 from pathlib import Path
 import shutil
 import tempfile
@@ -164,6 +168,77 @@ class StageSiteTests(unittest.TestCase):
                 expected.update({f'{slug}-{kind}.json', f'{slug}-{kind}-frame.pdf',
                                  f'{slug}-{kind}-book.pdf', f'{slug}/fixture-{slug}-{kind}.pdf'})
         self.assertEqual({p.relative_to(target).as_posix() for p in target.rglob('*') if p.is_file()}, expected)
+
+    def test_oversized_release_shares_exact_byte_ranges_and_preserves_question_pdfs(self):
+        self.clean_books()
+        exports = self.root / 'dist/export-parts'
+        payload = random.Random(1701).randbytes(32_000)
+        shared = hashlib.sha256(payload).hexdigest()
+        originals = {}
+        for manifest in sorted(exports.glob('*-questions.json')):
+            value = json.loads(manifest.read_text(encoding='utf8'))
+            for record in value['questions'].values():
+                path = exports / record['path']
+                raw = path.read_bytes() + b'\nstream\n' + payload + b'\nendstream\n'
+                path.write_bytes(raw)
+                record.update(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+                originals[record['path']] = raw
+            manifest.write_text(json.dumps(value), encoding='utf8')
+        dist, files, _ = plan_site(self.root, clean_books=True)
+        budget = sum((dist / name).stat().st_size for name in files) - len(payload)
+        report = stage_site(self.root, clean_books=True, max_bytes=budget)
+        target = Path(report['path']) / 'export-parts'
+        self.assertTrue(report['packedFragments'])
+        self.assertLessEqual(report['bytes'], budget)
+        self.assertEqual((target / 'shared' / (shared + '.bin')).read_bytes(), payload)
+        for name, expected in originals.items():
+            with self.subTest(name=name):
+                packed = gzip.decompress((target / (name + '.pack')).read_bytes())
+                self.assertEqual(packed[:8], b'CHEMYPK1')
+                cursor = 8
+                result = bytearray()
+                while cursor < len(packed):
+                    length, = struct.unpack_from('<I', packed, cursor)
+                    cursor += 4
+                    if length & 0x80000000:
+                        key = packed[cursor:cursor + 32].hex()
+                        cursor += 32
+                        block = (target / 'shared' / (key + '.bin')).read_bytes()
+                        self.assertEqual(len(block), length & 0x7fffffff)
+                        result.extend(block)
+                    else:
+                        result.extend(packed[cursor:cursor + length])
+                        cursor += length
+                self.assertEqual(result, expected)
+                self.assertEqual((exports / name).read_bytes(), expected)
+                self.assertFalse((target / name).exists())
+
+    def test_packed_release_still_over_budget_keeps_published_site(self):
+        self.clean_books()
+        self.write('output/site/sentinel.txt', b'previous published site')
+        with self.assertRaisesRegex(ValueError, 'Packed site.*budget'):
+            stage_site(self.root, clean_books=True, max_bytes=10)
+        self.assertEqual((self.root / 'output/site/sentinel.txt').read_bytes(), b'previous published site')
+        self.assertFalse(list((self.root / 'output').glob('site-backup-*')))
+
+    def test_question_changed_after_release_check_cannot_replace_published_site(self):
+        from pack_fragments import pack_fragments as original_pack
+        self.clean_books()
+        self.write('output/site/sentinel.txt', b'previous published site')
+        manifest = json.loads((self.root / 'dist/export-parts/polymer-questions.json').read_text(encoding='utf8'))
+        record = next(iter(manifest['questions'].values()))
+        path = self.root / 'dist/export-parts' / record['path']
+
+        def changed_input(dist, files, destination=None):
+            raw = path.read_bytes()
+            path.write_bytes(raw[:-1] + bytes([raw[-1] ^ 1]))
+            return original_pack(dist, files, destination)
+
+        with patch('stage_site.pack_fragments', side_effect=changed_input):
+            with self.assertRaisesRegex(ValueError, 'Question PDF changed before packing'):
+                stage_site(self.root, clean_books=True, max_bytes=10)
+        self.assertEqual((self.root / 'output/site/sentinel.txt').read_bytes(), b'previous published site')
+        self.assertFalse(list((self.root / 'output').glob('site-backup-*')))
 
 
 if __name__ == '__main__':
